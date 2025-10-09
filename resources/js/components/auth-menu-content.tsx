@@ -12,7 +12,11 @@ export function AuthMenuContent() {
         <>
             <DropdownMenuGroup>
                 <DropdownMenuItem asChild>
-                    <Link className="block w-full" href={login()} as="button">
+                    <Link
+                        className="block w-full cursor-pointer"
+                        href={login()}
+                        as="button"
+                    >
                         <LogIn className="mr-2" />
                         Login
                     </Link>
@@ -20,7 +24,11 @@ export function AuthMenuContent() {
             </DropdownMenuGroup>
             <DropdownMenuSeparator />
             <DropdownMenuItem asChild>
-                <Link className="block w-full" href={register()} as="button">
+                <Link
+                    className="block w-full cursor-pointer"
+                    href={register()}
+                    as="button"
+                >
                     <UserCheck className="mr-2" />
                     Signup
                 </Link>

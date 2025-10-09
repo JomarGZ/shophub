@@ -29,7 +29,7 @@ import {
 import { UserMenuContent } from '@/components/user-menu-content';
 import { useInitials } from '@/hooks/use-initials';
 import { cn } from '@/lib/utils';
-import { home } from '@/routes';
+import { home, shop } from '@/routes';
 import { type BreadcrumbItem, type NavItem, type SharedData } from '@/types';
 import { Link, usePage } from '@inertiajs/react';
 import { Menu, Search, User } from 'lucide-react';
@@ -44,7 +44,7 @@ const mainNavItems: NavItem[] = [
     },
     {
         title: 'Shop',
-        href: '#',
+        href: shop(),
     },
 ];
 
@@ -236,7 +236,7 @@ export function AppHeader({ breadcrumbs = [] }: AppHeaderProps) {
                                 <DropdownMenuTrigger asChild>
                                     <Button
                                         variant="ghost"
-                                        className="size-10 rounded-full p-1"
+                                        className="size-10 cursor-pointer rounded-full p-1"
                                     >
                                         <Avatar className="size-8 overflow-hidden rounded-full">
                                             <AvatarImage
@@ -261,7 +261,7 @@ export function AppHeader({ breadcrumbs = [] }: AppHeaderProps) {
                                 <DropdownMenuTrigger asChild>
                                     <Button
                                         variant="ghost"
-                                        className="size-10 rounded-full p-1"
+                                        className="size-10 cursor-pointer rounded-full p-1"
                                     >
                                         <User className="size-5" />
                                     </Button>
