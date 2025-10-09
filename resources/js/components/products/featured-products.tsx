@@ -9,6 +9,7 @@ interface FeatureProductsProps {
 }
 export function FeaturedProducts({ featuredProducts }: FeatureProductsProps) {
     const handleAddToCart = (Product: any) => {
+        console.log('trigger', Product);
         toast.success(`${Product.name} added to cart!`);
     };
     return (

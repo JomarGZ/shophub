@@ -21,6 +21,7 @@ export default function Home({ featured_products }: HomeProps) {
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="Home" />
+            {/* Hero Section */}
             <Container
                 as="section"
                 className="bg-gradient-hero py-20 md:py-32"
@@ -47,9 +48,11 @@ export default function Home({ featured_products }: HomeProps) {
             <Container as="section" className="border-b py-16">
                 <Features />
             </Container>
+            {/* Featured Products Section */}
             <Container as="section" className="py-16">
                 <FeaturedProducts featuredProducts={featured_products} />
             </Container>
+            {/* CTA Section */}
             <Container
                 as="section"
                 className="bg-secondary py-20 text-secondary-foreground"
