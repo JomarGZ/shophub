@@ -3,6 +3,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
 import AppLayout from '@/layouts/app-layout';
+import { checkout } from '@/routes';
 import { BreadcrumbItem, CartItem } from '@/types';
 import { Head, Link } from '@inertiajs/react';
 import { Minus, Plus, X } from 'lucide-react';
@@ -161,8 +162,8 @@ export default function ShoppingCart({ cart_items }: ShoppingCartProps) {
                                     <span>${total.toFixed(2)}</span>
                                 </div>
 
-                                <Link href="/checkout">
-                                    <Button className="h-12 w-full bg-primary text-base text-primary-foreground hover:bg-primary/90">
+                                <Link href={checkout()}>
+                                    <Button className="mb-4 h-12 w-full cursor-pointer bg-primary text-base text-primary-foreground hover:bg-primary/90">
                                         Proceed to Checkout
                                     </Button>
                                 </Link>

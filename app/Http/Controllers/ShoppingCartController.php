@@ -8,9 +8,9 @@ class ShoppingCartController extends Controller
 {
     public function __invoke()
     {
-        return Inertia::render('shoppingcart', [
+        return Inertia::render('shopping-cart', [
             'cart_items' => [
-                  [
+                [
                     'id' => '1',
                     'name' => 'Wireless Headphones',
                     'price' => 79.99,
@@ -19,7 +19,7 @@ class ShoppingCartController extends Controller
                     'description' => 'Premium wireless headphones with noise cancellation and 30-hour battery life.',
                     'stock' => 45,
                     'rating' => 4.5,
-                    'quantity' => 4
+                    'quantity' => 4,
                 ],
                 [
                     'id' => '2',
@@ -30,7 +30,7 @@ class ShoppingCartController extends Controller
                     'description' => 'Feature-rich smartwatch with health tracking and GPS.',
                     'stock' => 28,
                     'rating' => 4.7,
-                    'quantity' => 4
+                    'quantity' => 4,
                 ],
                 [
                     'id' => '3',
@@ -41,9 +41,9 @@ class ShoppingCartController extends Controller
                     'description' => 'Stylish leather backpack perfect for work or travel.',
                     'stock' => 15,
                     'rating' => 4.3,
-                    'quantity' => 4
+                    'quantity' => 4,
                 ],
-            ]
+            ],
         ]);
     }
 }
