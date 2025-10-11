@@ -42,13 +42,11 @@ export default function Checkout() {
     const total = subtotal; // Shipping is free
 
     const { data, setData, post, processing } = useForm({
-        firstName: '',
-        lastName: '',
-        email: '',
         phone: '',
         address: '',
         city: '',
         zipCode: '',
+        country: '',
         cardNumber: '',
         cardExpiry: '',
         cardCvc: '',
@@ -85,39 +83,14 @@ export default function Checkout() {
                                 <CardContent className="space-y-4 p-6">
                                     <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                                         <div>
-                                            <Label htmlFor="firstName">
-                                                First Name
+                                            <Label htmlFor="country">
+                                                Country
                                             </Label>
                                             <Input
-                                                id="firstName"
-                                                name="firstName"
-                                                value={data.firstName}
-                                                onChange={handleChange}
-                                                required
-                                            />
-                                        </div>
-                                        <div>
-                                            <Label htmlFor="lastName">
-                                                Last Name
-                                            </Label>
-                                            <Input
-                                                id="lastName"
-                                                name="lastName"
-                                                value={data.lastName}
-                                                onChange={handleChange}
-                                                required
-                                            />
-                                        </div>
-                                    </div>
-
-                                    <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-                                        <div>
-                                            <Label htmlFor="email">Email</Label>
-                                            <Input
-                                                id="email"
-                                                name="email"
-                                                type="email"
-                                                value={data.email}
+                                                id="country"
+                                                name="country"
+                                                type="country"
+                                                value={data.country}
                                                 onChange={handleChange}
                                                 required
                                             />
