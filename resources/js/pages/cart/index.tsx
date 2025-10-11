@@ -1,9 +1,9 @@
+import { index } from '@/actions/App/Http/Controllers/CheckoutController';
 import { Container } from '@/components/container';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
 import AppLayout from '@/layouts/app-layout';
-import { checkout } from '@/routes';
 import { BreadcrumbItem, CartItem } from '@/types';
 import { Head, Link } from '@inertiajs/react';
 import { Minus, Plus, X } from 'lucide-react';
@@ -19,7 +19,7 @@ interface ShoppingCartProps {
     cart_items: CartItem[];
 }
 
-export default function ShoppingCart({ cart_items }: ShoppingCartProps) {
+export default function Index({ cart_items }: ShoppingCartProps) {
     const updateQuantity = (id: string, delta: number) => {
         console.log('updated quantity');
     };
@@ -162,7 +162,7 @@ export default function ShoppingCart({ cart_items }: ShoppingCartProps) {
                                     <span>${total.toFixed(2)}</span>
                                 </div>
 
-                                <Link href={checkout()}>
+                                <Link href={index()}>
                                     <Button className="mb-4 h-12 w-full cursor-pointer bg-primary text-base text-primary-foreground hover:bg-primary/90">
                                         Proceed to Checkout
                                     </Button>

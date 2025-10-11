@@ -1,5 +1,6 @@
 // resources/js/Pages/Checkout.tsx
 
+import { index } from '@/actions/App/Http/Controllers/ShoppingCartController';
 import { Container } from '@/components/container';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -7,7 +8,6 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Separator } from '@/components/ui/separator';
 import AppLayout from '@/layouts/app-layout';
-import { cart } from '@/routes';
 import { type BreadcrumbItem } from '@/types';
 import { Head, useForm } from '@inertiajs/react';
 import { FormEvent } from 'react';
@@ -15,7 +15,7 @@ import { FormEvent } from 'react';
 const breadcrumbs: BreadcrumbItem[] = [
     {
         title: 'Cart',
-        href: cart().url,
+        href: index().url,
     },
     {
         title: 'Checkout',
@@ -29,7 +29,7 @@ interface OrderItem {
     price: number;
 }
 
-export default function Checkout() {
+export default function Index() {
     const orderItems: OrderItem[] = [
         { name: 'Product 1', quantity: 2, price: 19.99 },
         { name: 'Product 2', quantity: 1, price: 49.99 },

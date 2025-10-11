@@ -1,3 +1,4 @@
+import { index } from '@/actions/App/Http/Controllers/ShoppingCartController';
 import {
     DropdownMenuGroup,
     DropdownMenuItem,
@@ -6,7 +7,7 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { UserInfo } from '@/components/user-info';
 import { useMobileNavigation } from '@/hooks/use-mobile-navigation';
-import { cart, logout } from '@/routes';
+import { logout } from '@/routes';
 import { edit } from '@/routes/profile';
 import { type User } from '@/types';
 import { Link, router } from '@inertiajs/react';
@@ -51,7 +52,7 @@ export function UserMenuContent({ user }: UserMenuContentProps) {
                 <DropdownMenuItem asChild>
                     <Link
                         className="block w-full cursor-pointer"
-                        href={cart()}
+                        href={index()}
                         as="button"
                         prefetch
                         onClick={cleanup}

@@ -6,9 +6,9 @@ use Inertia\Inertia;
 
 class ShoppingCartController extends Controller
 {
-    public function __invoke()
+    public function index()
     {
-        return Inertia::render('shopping-cart', [
+        return Inertia::render('cart/index', [
             'cart_items' => [
                 [
                     'id' => '1',

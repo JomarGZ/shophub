@@ -6,8 +6,8 @@ use Inertia\Inertia;
 
 class CheckoutController extends Controller
 {
-    public function __invoke()
+    public function index()
     {
-        return Inertia::render('checkout');
+        return Inertia::render('checkout/index');
     }
 }
