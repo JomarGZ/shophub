@@ -1,13 +1,12 @@
+import { index } from '@/actions/App/Http/Controllers/ShopController';
 import { Container } from '@/components/container';
 import { Features } from '@/components/features';
 import { FeaturedProducts } from '@/components/products/featured-products';
 import { Button } from '@/components/ui/button';
 import AppLayout from '@/layouts/app-layout';
-import { shop } from '@/routes';
 import { type BreadcrumbItem } from '@/types';
 import { Head, Link } from '@inertiajs/react';
 import { ArrowRight } from 'lucide-react';
-
 const breadcrumbs: BreadcrumbItem[] = [
     {
         title: 'Home',
@@ -35,7 +34,7 @@ export default function Home({ featured_products }: HomeProps) {
                         Shop the latest trends with unbeatable prices and fast
                         shipping
                     </p>
-                    <Link href={shop()}>
+                    <Link href={index()}>
                         <Button
                             size="lg"
                             className="h-14 cursor-pointer bg-card px-8 text-lg text-foreground hover:bg-card/90"
@@ -65,7 +64,7 @@ export default function Home({ featured_products }: HomeProps) {
                 <p className="mb-8 text-xl opacity-90">
                     Join thousands of happy customers today
                 </p>
-                <Link href={shop()}>
+                <Link href={index()}>
                     <Button
                         size="lg"
                         className="h-14 cursor-pointer bg-primary px-8 text-lg text-primary-foreground hover:bg-primary/90"

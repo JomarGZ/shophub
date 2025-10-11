@@ -29,7 +29,8 @@ import {
 import { UserMenuContent } from '@/components/user-menu-content';
 import { useInitials } from '@/hooks/use-initials';
 import { cn } from '@/lib/utils';
-import { home, shop } from '@/routes';
+import { home } from '@/routes';
+import { index } from '@/routes/shop';
 import { type BreadcrumbItem, type NavItem, type SharedData } from '@/types';
 import { Link, usePage } from '@inertiajs/react';
 import { Menu, Search, User } from 'lucide-react';
@@ -44,7 +45,7 @@ const mainNavItems: NavItem[] = [
     },
     {
         title: 'Shop',
-        href: shop(),
+        href: index(),
     },
 ];
 

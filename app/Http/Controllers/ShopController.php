@@ -6,9 +6,9 @@ use Inertia\Inertia;
 
 class ShopController extends Controller
 {
-    public function __invoke()
+    public function index()
     {
-        return Inertia::render('shop', [
+        return Inertia::render('shop/index', [
             'products' => [
                 [
                     'id' => '1',
@@ -92,6 +92,44 @@ class ShopController extends Controller
                 ],
             ],
             'categories' => ['Electronics', 'Fashion', 'Home', 'Sports'],
+        ]);
+    }
+
+    public function show() 
+    {
+        return Inertia::render('shop/show', [
+            'product' => [
+                    'id' => '8',
+                    'name' => 'Water Bottle',
+                    'price' => 24.99,
+                    'image' => 'https://images.unsplash.com/photo-1602143407151-7111542de6e8?w=500&h=500&fit=crop',
+                    'category' => 'Sports',
+                    'description' => 'Insulated stainless steel water bottle keeps drinks cold for 24 hours.',
+                    'stock' => 94,
+                    'rating' => 4.7,
+            ],
+            'related_products' => [
+                 [
+                    'id' => '6',
+                    'name' => 'Desk Lamp',
+                    'price' => 49.99,
+                    'image' => 'https://images.unsplash.com/photo-1507473885765-e6ed057f782c?w=500&h=500&fit=crop',
+                    'category' => 'Home',
+                    'description' => 'Modern LED desk lamp with adjustable brightness.',
+                    'stock' => 58,
+                    'rating' => 4.2,
+                ],
+                [
+                    'id' => '7',
+                    'name' => 'Yoga Mat',
+                    'price' => 39.99,
+                    'image' => 'https://images.unsplash.com/photo-1601925260368-ae2f83cf8b7f?w=500&h=500&fit=crop',
+                    'category' => 'Sports',
+                    'description' => 'Non-slip yoga mat with extra cushioning.',
+                    'stock' => 71,
+                    'rating' => 4.6,
+                ],
+            ]
         ]);
     }
 }

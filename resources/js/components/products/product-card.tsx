@@ -1,3 +1,4 @@
+import { show } from '@/actions/App/Http/Controllers/ShopController';
 import { Product } from '@/types';
 import { Link } from '@inertiajs/react';
 import { ShoppingCart, Star } from 'lucide-react';
@@ -12,7 +13,7 @@ interface ProductCardProps {
 export function ProductCard({ product, onAddToCart }: ProductCardProps) {
     return (
         <Card className="group hover:shadow-hover overflow-hidden border-border transition-all duration-300">
-            <Link href={`/product/${product.id}`}>
+            <Link href={show(1)}>
                 <div className="aspect-square overflow-hidden bg-muted">
                     <img
                         src={product.image}

@@ -12,7 +12,7 @@ import { useState } from 'react';
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
-        title: 'Home',
+        title: 'Shop',
         href: '#',
     },
 ];
@@ -21,7 +21,7 @@ interface ShopProps {
     products: Product[];
     categories: string[];
 }
-export default function Shop({ products, categories }: ShopProps) {
+export default function Index({ products, categories }: ShopProps) {
     const [priceRange, setPriceRange] = useState([0, 250]);
     const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
     const toggleCategory = (category: string) => {
