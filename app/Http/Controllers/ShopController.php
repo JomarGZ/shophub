@@ -95,21 +95,21 @@ class ShopController extends Controller
         ]);
     }
 
-    public function show() 
+    public function show()
     {
         return Inertia::render('shop/show', [
             'product' => [
-                    'id' => '8',
-                    'name' => 'Water Bottle',
-                    'price' => 24.99,
-                    'image' => 'https://images.unsplash.com/photo-1602143407151-7111542de6e8?w=500&h=500&fit=crop',
-                    'category' => 'Sports',
-                    'description' => 'Insulated stainless steel water bottle keeps drinks cold for 24 hours.',
-                    'stock' => 94,
-                    'rating' => 4.7,
+                'id' => '8',
+                'name' => 'Water Bottle',
+                'price' => 24.99,
+                'image' => 'https://images.unsplash.com/photo-1602143407151-7111542de6e8?w=500&h=500&fit=crop',
+                'category' => 'Sports',
+                'description' => 'Insulated stainless steel water bottle keeps drinks cold for 24 hours.',
+                'stock' => 94,
+                'rating' => 4.7,
             ],
             'related_products' => [
-                 [
+                [
                     'id' => '6',
                     'name' => 'Desk Lamp',
                     'price' => 49.99,
@@ -129,7 +129,7 @@ class ShopController extends Controller
                     'stock' => 71,
                     'rating' => 4.6,
                 ],
-            ]
+            ],
         ]);
     }
 }
