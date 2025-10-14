@@ -36,6 +36,7 @@ The goal is to demonstrate practical, real-world e-commerce logic and architectu
 | 3️⃣  | **Checkout & Payment Flow (Customer)** | Visualizes the checkout process, decision flow, and payment logic.        |
 | 4️⃣  | **Order Fulfillment Flow (Admin)**     | Outlines how admins process and fulfill customer orders.                  |
 | 5️⃣  | **User Registration & Login**          | Describes the authentication flow including verification logic.           |
+| 6️⃣  | **Database Design**                    | Shows the overall database table design with relationship.                |
 
 ---
 
@@ -61,7 +62,7 @@ The goal is to demonstrate practical, real-world e-commerce logic and architectu
 
 ![User Auth Flow](docs/diagrams/user-auth-flow.png)
 
-#### 5️⃣ Database Design
+#### 6️⃣ Database Design
 
 ![DB Design](docs/diagrams/db-design.png)
 
