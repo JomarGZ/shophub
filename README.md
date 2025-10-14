@@ -15,16 +15,15 @@ The goal is to demonstrate practical, real-world e-commerce logic and architectu
 
 ## ⚙️ Tech Stack
 
-| Layer              | Technology             |
-| ------------------ | ---------------------- |
-| **Framework**      | Laravel 12             |
-| **Admin Panel**    | Filament               |
-| **Frontend**       | Inertia.js + React     |
-| **Database**       | MySQL                  |
-| **Environment**    | Docker (Laravel Sail)  |
-| **Authentication** | Laravel authentication |
-| **Deployment**     | Hostinger + Ploi       |
-| **Other Tools**    | Git, Composer, NPM     |
+| Layer              | Technology                     |
+| ------------------ | ------------------------------ |
+| **Framework**      | Laravel 12                     |
+| **Admin Panel**    | Filament                       |
+| **Frontend**       | Inertia.js + React +Typescript |
+| **Database**       | MySQL                          |
+| **Environment**    | Docker (Laravel Sail)          |
+| **Authentication** | Laravel authentication         |
+| **Other Tools**    | Git, Composer, NPM             |
 
 ---
 
