@@ -61,6 +61,10 @@ The goal is to demonstrate practical, real-world e-commerce logic and architectu
 
 ![User Auth Flow](docs/diagrams/user-auth-flow.png)
 
+#### 5️⃣ Database Design
+
+![DB Design](docs/diagrams/db-design.png)
+
 ---
 
 ## 🚀 Getting Started (with Docker + Laravel Sail)
