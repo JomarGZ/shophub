@@ -89,7 +89,6 @@ export default function Index({
     );
     const shipping = 0;
     const total = subtotal + shipping;
-    console.log(addresses);
 
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
