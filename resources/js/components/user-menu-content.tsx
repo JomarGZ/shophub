@@ -1,3 +1,5 @@
+import { index as orderIndex } from '@/actions/App/Http/Controllers/OrderController';
+import { index as cartIndex } from '@/actions/App/Http/Controllers/ShoppingCartController';
 import {
     DropdownMenuGroup,
     DropdownMenuItem,
@@ -10,7 +12,7 @@ import { logout } from '@/routes';
 import { edit } from '@/routes/profile';
 import { type User } from '@/types';
 import { Link, router } from '@inertiajs/react';
-import { LogOut, Settings } from 'lucide-react';
+import { ListOrdered, LogOut, Settings, ShoppingCart } from 'lucide-react';
 
 interface UserMenuContentProps {
     user: User;
@@ -35,7 +37,7 @@ export function UserMenuContent({ user }: UserMenuContentProps) {
             <DropdownMenuGroup>
                 <DropdownMenuItem asChild>
                     <Link
-                        className="block w-full"
+                        className="block w-full cursor-pointer"
                         href={edit()}
                         as="button"
                         prefetch
@@ -47,9 +49,39 @@ export function UserMenuContent({ user }: UserMenuContentProps) {
                 </DropdownMenuItem>
             </DropdownMenuGroup>
             <DropdownMenuSeparator />
+            <DropdownMenuGroup>
+                <DropdownMenuItem asChild>
+                    <Link
+                        className="block w-full cursor-pointer"
+                        href={cartIndex()}
+                        as="button"
+                        prefetch
+                        onClick={cleanup}
+                    >
+                        <ShoppingCart className="mr-2" />
+                        Cart
+                    </Link>
+                </DropdownMenuItem>
+            </DropdownMenuGroup>
+            <DropdownMenuSeparator />
+            <DropdownMenuGroup>
+                <DropdownMenuItem asChild>
+                    <Link
+                        className="block w-full cursor-pointer"
+                        href={orderIndex()}
+                        as="button"
+                        prefetch
+                        onClick={cleanup}
+                    >
+                        <ListOrdered className="mr-2" />
+                        Orders
+                    </Link>
+                </DropdownMenuItem>
+            </DropdownMenuGroup>
+            <DropdownMenuSeparator />
             <DropdownMenuItem asChild>
                 <Link
-                    className="block w-full"
+                    className="block w-full cursor-pointer"
                     href={logout()}
                     as="button"
                     onClick={handleLogout}
