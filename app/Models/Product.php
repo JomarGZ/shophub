@@ -19,14 +19,28 @@ class Product extends Model
         'stock',
         'image_url',
     ];
+
     protected static function booted()
     {
         static::deleting(function ($product) {
             if ($product->image_url) {
-                Storage::disk('public')->delete($product->image_url);
+                if (file_exists(storage_path('app/public/'.$product->image_url))) {
+                    Storage::disk('public')->delete($product->image_url);
+                }
+            }
+        });
+
+        static::updated(function ($product) {
+            if ($product->isDirty('image_url')) {
+                $originalImage = $product->getOriginal('image_url');
+                if (file_exists(storage_path('app/public/'.$originalImage))) {
+                    Storage::disk('public')->delete($originalImage);
+                }
+
             }
         });
     }
+
     public function category()
     {
         return $this->belongsTo(Category::class);

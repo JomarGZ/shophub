@@ -9,7 +9,7 @@ pest()->use(RefreshDatabase::class);
 
 test('category index lists categories', function () {
     $admin = User::factory()->create([
-        'role' => UserRole::ADMIN
+        'role' => UserRole::ADMIN,
     ]);
     $categories = Category::factory()->count(3)->create();
     $this->actingAs($admin)
