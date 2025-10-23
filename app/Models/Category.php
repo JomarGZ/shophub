@@ -9,16 +9,17 @@ use Spatie\Sluggable\SlugOptions;
 
 class Category extends Model
 {
-    use HasSlug;
     /** @use HasFactory<\Database\Factories\CategoryFactory> */
     use HasFactory;
+
+    use HasSlug;
 
     protected $fillable = [
         'name',
         'description',
     ];
 
-    public function getSlugOptions() : SlugOptions
+    public function getSlugOptions(): SlugOptions
     {
         return SlugOptions::create()
             ->generateSlugsFrom('name')

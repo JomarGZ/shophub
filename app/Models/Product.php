@@ -10,9 +10,10 @@ use Spatie\Sluggable\SlugOptions;
 
 class Product extends Model
 {
-    use HasSlug;
     /** @use HasFactory<\Database\Factories\ProductFactory> */
     use HasFactory;
+
+    use HasSlug;
 
     protected $fillable = [
         'category_id',
@@ -44,7 +45,7 @@ class Product extends Model
         });
     }
 
-    public function getSlugOptions() : SlugOptions
+    public function getSlugOptions(): SlugOptions
     {
         return SlugOptions::create()
             ->generateSlugsFrom('name')

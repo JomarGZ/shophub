@@ -16,7 +16,7 @@ export function ProductCard({ product, onAddToCart }: ProductCardProps) {
             <Link href={show(1)}>
                 <div className="aspect-square overflow-hidden bg-muted">
                     <img
-                        src={product.image}
+                        src={`/storage/${product.image_url}`}
                         alt={product.name}
                         className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-110"
                     />
@@ -31,7 +31,7 @@ export function ProductCard({ product, onAddToCart }: ProductCardProps) {
                         </h3>
                     </Link>
                     <Badge variant="secondary" className="shrink-0">
-                        {product.category}
+                        {product.category.name}
                     </Badge>
                 </div>
 
@@ -47,7 +47,7 @@ export function ProductCard({ product, onAddToCart }: ProductCardProps) {
 
                 <div className="flex items-center justify-between">
                     <span className="text-2xl font-bold text-foreground">
-                        ${product.price.toFixed(2)}
+                        ${product.price}
                     </span>
                     <span className="text-sm text-muted-foreground">
                         {product.stock} in stock

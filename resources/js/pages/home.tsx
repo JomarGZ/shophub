@@ -17,6 +17,7 @@ interface HomeProps {
     featured_products: any[];
 }
 export default function Home({ featured_products }: HomeProps) {
+    console.log(featured_products);
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="Home" />
