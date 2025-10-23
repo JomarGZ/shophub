@@ -13,7 +13,9 @@ class HomeController extends Controller
     public function __invoke()
     {
         return Inertia::render('home', [
-            'featured_products' => fn () => ProductResource::collection($this->productRepo->getFeaturedProducts(relation: ['category:id,name'], limit: 8)),
+            'featured_products' => fn () => ProductResource::collection(
+                $this->productRepo->getFeaturedProducts(relation: ['category:id,name'], limit: 8)
+            ),
         ]);
     }
 }
