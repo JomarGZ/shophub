@@ -32,7 +32,6 @@ class ProductForm
                     ->numeric(),
                 FileUpload::make('image_url')
                     ->label('Product Image')
-                    ->disk('public')
                     ->directory('products')
                     ->visibility('public')
                     ->required()

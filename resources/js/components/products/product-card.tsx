@@ -16,7 +16,7 @@ export function ProductCard({ product, onAddToCart }: ProductCardProps) {
             <Link href={show(1)}>
                 <div className="aspect-square overflow-hidden bg-muted">
                     <img
-                        src={`/storage/${product.image_url}`}
+                        src={product.image_url}
                         alt={product.name}
                         className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-110"
                     />
