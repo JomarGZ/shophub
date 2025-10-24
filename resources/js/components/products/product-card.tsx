@@ -13,7 +13,7 @@ interface ProductCardProps {
 export function ProductCard({ product, onAddToCart }: ProductCardProps) {
     return (
         <Card className="group hover:shadow-hover overflow-hidden border-border transition-all duration-300">
-            <Link href={show(1)}>
+            <Link href={show({ slug: product.slug })}>
                 <div className="aspect-square overflow-hidden bg-muted">
                     <img
                         src={product.image_url}
@@ -25,7 +25,7 @@ export function ProductCard({ product, onAddToCart }: ProductCardProps) {
 
             <CardContent className="space-y-2 p-4">
                 <div className="flex items-start justify-between gap-2">
-                    <Link href={`/product/${product.id}`}>
+                    <Link href={show({ slug: product.slug })}>
                         <h3 className="line-clamp-2 font-semibold text-foreground transition-colors group-hover:text-primary">
                             {product.name}
                         </h3>

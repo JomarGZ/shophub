@@ -18,6 +18,8 @@ export default function Show({
     product: Product;
     related_products: Product[];
 }) {
+    console.log(product);
+    console.log(related_products);
     const breadcrumbs: BreadcrumbItem[] = [
         {
             title: 'Shop',
@@ -43,7 +45,7 @@ export default function Show({
             >
                 <div className="aspect-square overflow-hidden rounded-lg bg-muted shadow-card">
                     <img
-                        src={product.image}
+                        src={product.image_url}
                         alt={product.name}
                         className="h-full w-full object-cover"
                     />
@@ -51,7 +53,7 @@ export default function Show({
                 <div className="space-y-6">
                     <div>
                         <Badge variant="secondary" className="mb-3">
-                            {product.category}
+                            {product.category.name}
                         </Badge>
                         <h1 className="mb-4 text-4xl font-bold text-foreground">
                             {product.name}
@@ -75,7 +77,7 @@ export default function Show({
                             </span>
                         </div>
                         <p className="text-5xl font-bold text-foreground">
-                            ${product.price.toFixed(2)}
+                            ${product.price}
                         </p>
                     </div>
 

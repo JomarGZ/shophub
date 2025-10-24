@@ -8,13 +8,17 @@ use Inertia\Inertia;
 
 class HomeController extends Controller
 {
-    public function __construct(protected ProductRepository $productRepo) {}
+    public function __construct(protected ProductRepository $productRepository) {}
 
     public function __invoke()
     {
         return Inertia::render('home', [
             'featured_products' => fn () => ProductResource::collection(
-                $this->productRepo->getFeaturedProducts(relation: ['category:id,name'], limit: 8)
+                $this->productRepository->getFeaturedProducts(
+                    relation: ['category:id,name'], 
+                    column: ['id', 'name', 'slug', 'price', 'image_url', 'category_id', 'description', 'stock'], 
+                    limit: 8
+                    )
             ),
         ]);
     }

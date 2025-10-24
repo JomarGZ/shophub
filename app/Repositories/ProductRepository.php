@@ -14,13 +14,27 @@ class ProductRepository extends Repository
         parent::__construct(new Product);
     }
 
-    public function getFeaturedProducts($relation = [], $limit = 8, $column = ['*'])
+
+
+    public function getFeaturedProducts(array $relation = [], array $column = ['*'], $limit = 8)
     {
         return $this->query()
             ->with($relation)
             ->select($column)
             ->inRandomOrder()
             ->where('stock', '>', 0)
+            ->take($limit)
+            ->get();
+    }
+
+    public function getRelatedProducts(int|string $catId, array $relation = [], array $column = ['*'], $limit = 8)
+    {
+        return $this->query()
+            ->with($relation)
+            ->select($column)
+            ->inRandomOrder()
+            ->where('stock', '>', 0)
+            ->where('category_id', $catId)
             ->take($limit)
             ->get();
     }
