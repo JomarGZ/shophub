@@ -1,13 +1,13 @@
 import { Container } from '@/components/container';
+import { Pagination } from '@/components/pagination';
 import { ProductCard } from '@/components/products/product-card';
 import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Label } from '@/components/ui/label';
 import { Slider } from '@/components/ui/slider';
 import AppLayout from '@/layouts/app-layout';
-import { BreadcrumbItem, Product } from '@/types';
+import { BreadcrumbItem, PaginatedResponse, Product } from '@/types';
 import { Head } from '@inertiajs/react';
-import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { useState } from 'react';
 
 const breadcrumbs: BreadcrumbItem[] = [
@@ -18,10 +18,11 @@ const breadcrumbs: BreadcrumbItem[] = [
 ];
 
 interface ShopProps {
-    products: Product[];
+    products: PaginatedResponse<Product>;
     categories: string[];
 }
 export default function Index({ products, categories }: ShopProps) {
+    console.log(products);
     const [priceRange, setPriceRange] = useState([0, 250]);
     const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
     const toggleCategory = (category: string) => {
@@ -118,12 +119,12 @@ export default function Index({ products, categories }: ShopProps) {
                             All Products
                         </h1>
                         <p className="text-muted-foreground">
-                            {products.length} products found
+                            {products.data.length} products found
                         </p>
                     </div>
 
                     <div className="mb-8 grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
-                        {products.map((product) => (
+                        {products.data.map((product) => (
                             <ProductCard
                                 key={product.id}
                                 product={product}
@@ -133,7 +134,7 @@ export default function Index({ products, categories }: ShopProps) {
                     </div>
 
                     {/* Pagination */}
-                    <div className="flex items-center justify-center gap-2">
+                    {/* <div className="flex items-center justify-center gap-2">
                         <Button variant="outline" size="icon">
                             <ChevronLeft className="h-4 w-4" />
                         </Button>
@@ -149,7 +150,9 @@ export default function Index({ products, categories }: ShopProps) {
                         <Button variant="outline" size="icon">
                             <ChevronRight className="h-4 w-4" />
                         </Button>
-                    </div>
+
+                    </div> */}
+                    <Pagination links={products.meta.links} />
                 </div>
             </Container>
         </AppLayout>

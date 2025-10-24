@@ -75,4 +75,16 @@ class Product extends Model
     {
         return $query->where('stock', '=', 0);
     }
+
+    #[Scope]
+    protected function filter(Builder $query, array $filters)
+    {
+        $query->when($filters['search'] ?? null, function ($query, $search) {
+            $query->where(function ($query) use ($search) {
+                $query->where('name', 'like', "%{$search}%")
+                    ->orWhere('description', 'like', "%{$search}%");
+            });
+        });
+        // ->when($filters['category_id'] ?? null, function ($query, $categoryId))
+    }
 }

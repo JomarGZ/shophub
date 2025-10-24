@@ -20,7 +20,7 @@ abstract class Repository
         return $this->model->query();
     }
 
-    public function  paginate(int $perPage = 15, array $columns = ['*'], array|string $relations = []): LengthAwarePaginator
+    public function paginate(int $perPage = 15, array $columns = ['*'], array|string $relations = []): LengthAwarePaginator
     {
         return $this->query()->with($relations)->paginate($perPage, $columns);
     }

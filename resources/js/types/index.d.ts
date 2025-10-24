@@ -42,6 +42,26 @@ export interface User {
     [key: string]: unknown; // This allows for additional properties...
 }
 
+export interface PaginationLinks {
+    first: string | null;
+    last: string | null;
+    prev: string | null;
+    next: string | null;
+}
+
+export interface PaginationMetaLink {
+    url: string | null;
+    label: string;
+    active: boolean;
+}
+
+export interface PaginationMeta {
+    current_page: number;
+    from: number | null;
+    last_page: number;
+    links: PaginationMetaLink[];
+}
+
 export interface Category {
     id: string;
     name: string;
@@ -58,6 +78,13 @@ export interface Product {
     stock: number;
     rating: number;
 }
+
+export interface PaginatedResponse<T> {
+    data: T[];
+    meta: PaginationMeta;
+    links: PaginationLinks;
+}
+
 export interface CartItem extends Product {
     quantity: number;
 }
