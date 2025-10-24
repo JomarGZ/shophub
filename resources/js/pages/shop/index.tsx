@@ -3,12 +3,15 @@ import { Pagination } from '@/components/pagination';
 import { ProductCard } from '@/components/products/product-card';
 import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
+import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Slider } from '@/components/ui/slider';
 import AppLayout from '@/layouts/app-layout';
+import { index } from '@/routes/shop';
 import { BreadcrumbItem, PaginatedResponse, Product } from '@/types';
-import { Head } from '@inertiajs/react';
-import { useState } from 'react';
+import { Head, router, usePage } from '@inertiajs/react';
+import { Search } from 'lucide-react';
+import { useEffect, useRef, useState } from 'react';
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
@@ -22,7 +25,36 @@ interface ShopProps {
     categories: string[];
 }
 export default function Index({ products, categories }: ShopProps) {
-    console.log(products);
+    const { focus, filters = { search: '' } } = usePage().props as {
+        focus?: string;
+        filters?: { search?: string };
+    };
+    const [term, setTerm] = useState(filters.search ?? '');
+    const options = {
+        mergeQuery: {
+            search: term,
+        },
+    };
+    const inputRef = useRef<HTMLInputElement>(null);
+    useEffect(() => {
+        if (focus === 'search' && inputRef.current) {
+            inputRef.current.focus();
+        }
+    }, [focus]);
+
+    useEffect(() => {
+        const timeout = setTimeout(() => {
+            const url = index.url(options);
+            router.visit(url, {
+                preserveScroll: true,
+                preserveState: true,
+                replace: true,
+            });
+        }, 500);
+
+        return () => clearTimeout(timeout);
+    }, [term]);
+
     const [priceRange, setPriceRange] = useState([0, 250]);
     const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
     const toggleCategory = (category: string) => {
@@ -114,6 +146,19 @@ export default function Index({ products, categories }: ShopProps) {
                     </div>
                 </aside>
                 <div className="lg:col-span-3">
+                    <div className="mb-6">
+                        <div className="relative">
+                            <Search className="absolute top-1/2 left-3 h-5 w-5 -translate-y-1/2 text-muted-foreground" />
+                            <Input
+                                type="search"
+                                ref={inputRef}
+                                value={term}
+                                onChange={(e) => setTerm(e.target.value)}
+                                placeholder="Search products by name or category..."
+                                className="h-12 border-border bg-card pl-11 text-base shadow-card"
+                            />
+                        </div>
+                    </div>
                     <div className="mb-6 flex items-center justify-between">
                         <h1 className="text-3xl font-bold text-foreground">
                             All Products

@@ -15,6 +15,7 @@ class ShopController extends Controller
     public function index()
     {
         return Inertia::render('shop/index', [
+            'filters' => Request::all('search'),
             'products' => ProductResource::collection(
                 $this->productRepository->getPaginatedProducts(
                     perPage: 12,
@@ -24,6 +25,7 @@ class ShopController extends Controller
                 )
             ),
             'categories' => ['Electronics', 'Fashion', 'Home', 'Sports'],
+            'focus' => Request::get('focus'),
         ]);
     }
 
@@ -34,7 +36,7 @@ class ShopController extends Controller
             'related_products' => ProductResource::collection($this->productRepository->getRelatedProducts(
                 catId: $product->category_id,
                 relation: 'category:id,name',
-                column: ['id', 'name', 'slug', 'price', 'image_url', 'category_id', 'description', 'stock'],
+                columns: ['id', 'name', 'slug', 'price', 'image_url', 'category_id', 'description', 'stock'],
                 limit: 4
             )),
         ]);

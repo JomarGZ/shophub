@@ -16,14 +16,14 @@ class ProductRepository extends Repository
         parent::__construct(new Product);
     }
 
-    public function getFeaturedProducts(array|string $relation = [], array $column = ['*'], int $limit = 8): Collection
+    public function getFeaturedProducts(array|string $relation = [], array $columns = ['*'], int $limit = 8): Collection
     {
-        return $this->query()->with($relation)->select($column)->inRandomOrder()->inStock()->take($limit)->get();
+        return $this->query()->with($relation)->select($columns)->inRandomOrder()->inStock()->take($limit)->get();
     }
 
-    public function getRelatedProducts(int|string $catId, array|string $relation = [], array $column = ['*'], int $limit = 8): Collection
+    public function getRelatedProducts(int|string $catId, array|string $relation = [], array $columns = ['*'], int $limit = 8): Collection
     {
-        return $this->query()->with($relation)->select($column)->inRandomOrder()->inStock()->where('category_id', $catId)->take($limit)->get();
+        return $this->query()->with($relation)->select($columns)->inRandomOrder()->inStock()->where('category_id', $catId)->take($limit)->get();
     }
 
     public function getPaginatedProducts(int $perPage = 15, array $columns = ['*'], ?array $filters = [], array|string $relations = []): LengthAwarePaginator
