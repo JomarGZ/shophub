@@ -132,26 +132,7 @@ export default function Index({ products, categories }: ShopProps) {
                             />
                         ))}
                     </div>
-
                     {/* Pagination */}
-                    {/* <div className="flex items-center justify-center gap-2">
-                        <Button variant="outline" size="icon">
-                            <ChevronLeft className="h-4 w-4" />
-                        </Button>
-                        <Button variant="default" size="icon">
-                            1
-                        </Button>
-                        <Button variant="outline" size="icon">
-                            2
-                        </Button>
-                        <Button variant="outline" size="icon">
-                            3
-                        </Button>
-                        <Button variant="outline" size="icon">
-                            <ChevronRight className="h-4 w-4" />
-                        </Button>
-
-                    </div> */}
                     <Pagination links={products.meta.links} />
                 </div>
             </Container>
