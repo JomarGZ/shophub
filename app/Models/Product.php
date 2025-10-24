@@ -2,6 +2,8 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Attributes\Scope;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Storage;
@@ -60,5 +62,17 @@ class Product extends Model
     public function category()
     {
         return $this->belongsTo(Category::class);
+    }
+
+    #[Scope]
+    protected function inStock(Builder $query)
+    {
+        return $query->where('stock', '>', 0);
+    }
+
+    #[Scope]
+    protected function outOfStock(Builder $query)
+    {
+        return $query->where('stock', '=', 0);
     }
 }

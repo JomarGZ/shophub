@@ -15,7 +15,7 @@ class HomeController extends Controller
         return Inertia::render('home', [
             'featured_products' => fn () => ProductResource::collection(
                 $this->productRepository->getFeaturedProducts(
-                    relation: ['category:id,name'], 
+                    relation: 'category:id,name', 
                     column: ['id', 'name', 'slug', 'price', 'image_url', 'category_id', 'description', 'stock'], 
                     limit: 8
                     )
