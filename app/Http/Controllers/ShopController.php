@@ -15,21 +15,22 @@ class ShopController extends Controller
     public function __construct(
         protected ProductRepository $productRepository,
         protected CategoryRepository $categoryRepository
-        ) {}
+    ) {}
 
     public function index()
     {
         return Inertia::render('shop/index', [
-            'filters' => Request::only('search', 'categories'),
-            'products' => ProductResource::collection(
+            'filters' => Request::only('search', 'categories', 'min_price', 'max_price'),
+            'price_range' => fn() => $this->productRepository->getPriceRange(),
+            'products' => fn() => ProductResource::collection(
                 $this->productRepository->getPaginatedProducts(
                     perPage: 12,
                     columns: ['id', 'name', 'slug', 'price', 'image_url', 'category_id', 'description', 'stock'],
                     relations: 'category:id,name',
-                    filters: Request::only('search', 'categories')
+                    filters: Request::only('search', 'categories', 'min_price', 'max_price')
                 )
             ),
-            'categories' => CategoryResource::collection($this->categoryRepository->getOnlyWithProducts()),
+            'categories' => fn() => CategoryResource::collection($this->categoryRepository->getOnlyWithProducts()),
             'focus' => Request::get('focus'),
         ]);
     }

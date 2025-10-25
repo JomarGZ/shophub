@@ -2,6 +2,8 @@
 
 namespace App\Models;
 
+use App\Observers\ProductObserver;
+use Illuminate\Database\Eloquent\Attributes\ObservedBy;
 use Illuminate\Database\Eloquent\Attributes\Scope;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -10,6 +12,7 @@ use Illuminate\Support\Facades\Storage;
 use Spatie\Sluggable\HasSlug;
 use Spatie\Sluggable\SlugOptions;
 
+#[ObservedBy([ProductObserver::class])]
 class Product extends Model
 {
     /** @use HasFactory<\Database\Factories\ProductFactory> */
@@ -85,10 +88,16 @@ class Product extends Model
                     ->orWhere('description', 'like', "%{$search}%");
             });
         })
-        ->when($filters['categories'] ?? null, function ($query, $categories) {
-            $query->whereHas('category', function ($q) use ($categories) {
-                $q->whereIn('slug', $categories);
+            ->when($filters['categories'] ?? null, function ($query, $categories) {
+                $query->whereHas('category', function ($q) use ($categories) {
+                    $q->whereIn('slug', is_array($categories) ? $categories : [$categories]);
+                });
+            })
+            ->when(isset($filters['min_price']), function ($query) use ($filters) {
+                $query->where('price', '>=', $filters['min_price']);
+            })
+            ->when(isset($filters['max_price']), function ($query) use ($filters) {
+                $query->where('price', '<=', $filters['max_price']);
             });
-        });
     }
 }

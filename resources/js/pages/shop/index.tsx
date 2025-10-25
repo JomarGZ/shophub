@@ -25,16 +25,33 @@ interface ShopProps {
     categories: Category[];
 }
 export default function Index({ products, categories }: ShopProps) {
-    const { focus, filters = { search: '', categories: [] } } = usePage()
-        .props as {
+    const {
+        focus,
+        price_range: serverPriceRange,
+        filters = {
+            search: '',
+            categories: [],
+            min_price: null,
+            max_price: null,
+        },
+    } = usePage().props as unknown as {
         focus?: string;
-        filters?: { search?: string; categories: string[] };
+        price_range: { min: number; max: number };
+        filters?: {
+            search?: string;
+            categories: string[];
+            min_price?: number;
+            max_price?: number;
+        };
     };
     const [term, setTerm] = useState(filters.search ?? '');
     const [selectedCategorySlugs, setSelectedCategorySlugs] = useState<
         string[]
     >(filters.categories ?? []);
-
+    const [priceRange, setPriceRange] = useState<number[]>([
+        filters.min_price ?? serverPriceRange.min,
+        filters.max_price ?? serverPriceRange.max,
+    ]);
     const inputRef = useRef<HTMLInputElement>(null);
     useEffect(() => {
         if (focus === 'search' && inputRef.current) {
@@ -46,7 +63,9 @@ export default function Index({ products, categories }: ShopProps) {
         const hasLocalChanges =
             term !== (filters.search ?? '') ||
             JSON.stringify(selectedCategorySlugs) !==
-                JSON.stringify(filters.categories ?? []);
+                JSON.stringify(filters.categories ?? []) ||
+            priceRange[0] !== (filters.min_price ?? serverPriceRange.min) ||
+            priceRange[1] !== (filters.max_price ?? serverPriceRange.max);
 
         if (!hasLocalChanges) {
             return;
@@ -57,6 +76,12 @@ export default function Index({ products, categories }: ShopProps) {
                     ...(term && { search: term }),
                     ...(selectedCategorySlugs.length > 0 && {
                         categories: selectedCategorySlugs,
+                    }),
+                    ...(priceRange[0] > serverPriceRange.min && {
+                        min_price: priceRange[0],
+                    }),
+                    ...(priceRange[1] < serverPriceRange.max && {
+                        max_price: priceRange[1],
                     }),
                 },
             };
@@ -69,9 +94,7 @@ export default function Index({ products, categories }: ShopProps) {
         }, 500);
 
         return () => clearTimeout(timeout);
-    }, [term, selectedCategorySlugs]);
-
-    const [priceRange, setPriceRange] = useState([0, 250]);
+    }, [term, selectedCategorySlugs, priceRange]);
 
     const toggleCategory = (category: string) => {
         setSelectedCategorySlugs((prev) =>
@@ -134,11 +157,13 @@ export default function Index({ products, categories }: ShopProps) {
                             </Label>
                             <div className="space-y-4">
                                 <Slider
-                                    min={0}
-                                    max={250}
+                                    min={serverPriceRange.min}
+                                    max={serverPriceRange.max}
                                     step={10}
                                     value={priceRange}
-                                    onValueChange={setPriceRange}
+                                    onValueChange={(value) =>
+                                        setPriceRange(value as [number, number])
+                                    }
                                     className="w-full"
                                 />
                                 <div className="flex items-center justify-between text-sm text-muted-foreground">
@@ -153,7 +178,10 @@ export default function Index({ products, categories }: ShopProps) {
                             variant="outline"
                             className="mt-6 w-full"
                             onClick={() => {
-                                setPriceRange([0, 250]);
+                                setPriceRange([
+                                    serverPriceRange.min,
+                                    serverPriceRange.max,
+                                ]);
                                 setSelectedCategorySlugs([]);
                             }}
                         >

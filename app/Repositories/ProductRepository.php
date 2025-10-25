@@ -5,6 +5,7 @@ namespace App\Repositories;
 use App\Models\Product;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Support\Facades\Cache;
 
 class ProductRepository extends Repository
 {
@@ -29,5 +30,18 @@ class ProductRepository extends Repository
     public function getPaginatedProducts(int $perPage = 15, array $columns = ['*'], ?array $filters = [], array|string $relations = []): LengthAwarePaginator
     {
         return $this->query()->with($relations)->filter($filters)->paginate($perPage, $columns)->withQueryString();
+    }
+
+    public function getPriceRange()
+    {
+        return Cache::rememberForever('product_price_range', function () {
+            $min = (float) $this->model->min('price') ?? 0;
+            $max = (float) $this->model->max('price') ?? 250;
+
+            return [
+                'min' => floor($min / 10) * 10,
+                'max' => ceil($max / 10) * 10,
+            ];
+        });
     }
 }

@@ -3,6 +3,7 @@
 namespace App\Repositories;
 
 use App\Models\Category;
+use Illuminate\Support\Facades\Cache;
 
 class CategoryRepository extends Repository
 {
@@ -16,6 +17,8 @@ class CategoryRepository extends Repository
 
     public function getOnlyWithProducts()
     {
-        return $this->query()->select('id', 'name', 'slug')->whereHas('products')->get();
+        return Cache::rememberForever('categories_with_products', function () {
+            return $this->query()->select('id', 'name', 'slug')->whereHas('products')->get();
+        });
     }
 }
