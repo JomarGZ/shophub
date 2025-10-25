@@ -84,7 +84,11 @@ class Product extends Model
                 $query->where('name', 'like', "%{$search}%")
                     ->orWhere('description', 'like', "%{$search}%");
             });
+        })
+        ->when($filters['categories'] ?? null, function ($query, $categories) {
+            $query->whereHas('category', function ($q) use ($categories) {
+                $q->whereIn('slug', $categories);
+            });
         });
-        // ->when($filters['category_id'] ?? null, function ($query, $categoryId))
     }
 }

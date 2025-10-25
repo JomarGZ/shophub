@@ -2,29 +2,34 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Resources\CategoryResource;
 use App\Http\Resources\ProductResource;
 use App\Models\Product;
+use App\Repositories\CategoryRepository;
 use App\Repositories\ProductRepository;
 use Illuminate\Support\Facades\Request;
 use Inertia\Inertia;
 
 class ShopController extends Controller
 {
-    public function __construct(protected ProductRepository $productRepository) {}
+    public function __construct(
+        protected ProductRepository $productRepository,
+        protected CategoryRepository $categoryRepository
+        ) {}
 
     public function index()
     {
         return Inertia::render('shop/index', [
-            'filters' => Request::all('search'),
+            'filters' => Request::only('search', 'categories'),
             'products' => ProductResource::collection(
                 $this->productRepository->getPaginatedProducts(
                     perPage: 12,
                     columns: ['id', 'name', 'slug', 'price', 'image_url', 'category_id', 'description', 'stock'],
                     relations: 'category:id,name',
-                    filters: Request::only('search', 'category_id')
+                    filters: Request::only('search', 'categories')
                 )
             ),
-            'categories' => ['Electronics', 'Fashion', 'Home', 'Sports'],
+            'categories' => CategoryResource::collection($this->categoryRepository->getOnlyWithProducts()),
             'focus' => Request::get('focus'),
         ]);
     }

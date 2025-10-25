@@ -28,6 +28,6 @@ class ProductRepository extends Repository
 
     public function getPaginatedProducts(int $perPage = 15, array $columns = ['*'], ?array $filters = [], array|string $relations = []): LengthAwarePaginator
     {
-        return $this->query()->with($relations)->filter($filters)->paginate($perPage, $columns);
+        return $this->query()->with($relations)->filter($filters)->paginate($perPage, $columns)->withQueryString();
     }
 }

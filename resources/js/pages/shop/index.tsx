@@ -8,7 +8,7 @@ import { Label } from '@/components/ui/label';
 import { Slider } from '@/components/ui/slider';
 import AppLayout from '@/layouts/app-layout';
 import { index } from '@/routes/shop';
-import { BreadcrumbItem, PaginatedResponse, Product } from '@/types';
+import { BreadcrumbItem, Category, PaginatedResponse, Product } from '@/types';
 import { Head, router, usePage } from '@inertiajs/react';
 import { Search } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
@@ -22,19 +22,19 @@ const breadcrumbs: BreadcrumbItem[] = [
 
 interface ShopProps {
     products: PaginatedResponse<Product>;
-    categories: string[];
+    categories: Category[];
 }
 export default function Index({ products, categories }: ShopProps) {
-    const { focus, filters = { search: '' } } = usePage().props as {
+    const { focus, filters = { search: '', categories: [] } } = usePage()
+        .props as {
         focus?: string;
-        filters?: { search?: string };
+        filters?: { search?: string; categories: string[] };
     };
     const [term, setTerm] = useState(filters.search ?? '');
-    const options = {
-        mergeQuery: {
-            search: term,
-        },
-    };
+    const [selectedCategorySlugs, setSelectedCategorySlugs] = useState<
+        string[]
+    >(filters.categories ?? []);
+
     const inputRef = useRef<HTMLInputElement>(null);
     useEffect(() => {
         if (focus === 'search' && inputRef.current) {
@@ -43,7 +43,23 @@ export default function Index({ products, categories }: ShopProps) {
     }, [focus]);
 
     useEffect(() => {
+        const hasLocalChanges =
+            term !== (filters.search ?? '') ||
+            JSON.stringify(selectedCategorySlugs) !==
+                JSON.stringify(filters.categories ?? []);
+
+        if (!hasLocalChanges) {
+            return;
+        }
         const timeout = setTimeout(() => {
+            const options = {
+                query: {
+                    ...(term && { search: term }),
+                    ...(selectedCategorySlugs.length > 0 && {
+                        categories: selectedCategorySlugs,
+                    }),
+                },
+            };
             const url = index.url(options);
             router.visit(url, {
                 preserveScroll: true,
@@ -53,12 +69,12 @@ export default function Index({ products, categories }: ShopProps) {
         }, 500);
 
         return () => clearTimeout(timeout);
-    }, [term]);
+    }, [term, selectedCategorySlugs]);
 
     const [priceRange, setPriceRange] = useState([0, 250]);
-    const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
+
     const toggleCategory = (category: string) => {
-        setSelectedCategories((prev) =>
+        setSelectedCategorySlugs((prev) =>
             prev.includes(category)
                 ? prev.filter((c) => c !== category)
                 : [...prev, category],
@@ -88,23 +104,23 @@ export default function Index({ products, categories }: ShopProps) {
                             <div className="space-y-3">
                                 {categories.map((category) => (
                                     <div
-                                        key={category}
+                                        key={category.slug}
                                         className="flex items-center gap-2"
                                     >
                                         <Checkbox
-                                            id={category}
-                                            checked={selectedCategories.includes(
-                                                category,
+                                            id={`cat-${category.slug}`} // must be string and unique
+                                            checked={selectedCategorySlugs.includes(
+                                                category.slug,
                                             )}
                                             onCheckedChange={() =>
-                                                toggleCategory(category)
+                                                toggleCategory(category.slug)
                                             }
                                         />
                                         <label
-                                            htmlFor={category}
+                                            htmlFor={`cat-${category.slug}`}
                                             className="cursor-pointer text-sm leading-none font-medium"
                                         >
-                                            {category}
+                                            {category.name}
                                         </label>
                                     </div>
                                 ))}
@@ -138,7 +154,7 @@ export default function Index({ products, categories }: ShopProps) {
                             className="mt-6 w-full"
                             onClick={() => {
                                 setPriceRange([0, 250]);
-                                setSelectedCategories([]);
+                                setSelectedCategorySlugs([]);
                             }}
                         >
                             Reset Filters

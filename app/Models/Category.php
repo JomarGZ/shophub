@@ -26,6 +26,11 @@ class Category extends Model
             ->saveSlugsTo('slug');
     }
 
+    public function getRouteKeyName(): string
+    {
+        return 'slug';
+    }
+
     public function products()
     {
         return $this->hasMany(Product::class);
