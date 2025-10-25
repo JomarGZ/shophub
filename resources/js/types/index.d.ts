@@ -42,16 +42,50 @@ export interface User {
     [key: string]: unknown; // This allows for additional properties...
 }
 
+export interface PaginationLinks {
+    first: string | null;
+    last: string | null;
+    prev: string | null;
+    next: string | null;
+}
+
+export interface PaginationMetaLink {
+    url: string | null;
+    label: string;
+    active: boolean;
+}
+
+export interface PaginationMeta {
+    current_page: number;
+    from: number | null;
+    last_page: number;
+    links: PaginationMetaLink[];
+}
+
+export interface Category {
+    id: string;
+    name: string;
+    slug: string;
+}
+
 export interface Product {
     id: string;
     name: string;
+    slug: string;
     price: number;
-    image: string;
-    category: string;
+    image_url: string;
+    category: Category;
     description: string;
     stock: number;
     rating: number;
 }
+
+export interface PaginatedResponse<T> {
+    data: T[];
+    meta: PaginationMeta;
+    links: PaginationLinks;
+}
+
 export interface CartItem extends Product {
     quantity: number;
 }

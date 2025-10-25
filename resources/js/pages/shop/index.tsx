@@ -1,14 +1,17 @@
 import { Container } from '@/components/container';
+import { Pagination } from '@/components/pagination';
 import { ProductCard } from '@/components/products/product-card';
 import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
+import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Slider } from '@/components/ui/slider';
 import AppLayout from '@/layouts/app-layout';
-import { BreadcrumbItem, Product } from '@/types';
-import { Head } from '@inertiajs/react';
-import { ChevronLeft, ChevronRight } from 'lucide-react';
-import { useState } from 'react';
+import { index } from '@/routes/shop';
+import { BreadcrumbItem, Category, PaginatedResponse, Product } from '@/types';
+import { Head, router, usePage } from '@inertiajs/react';
+import { Search } from 'lucide-react';
+import { useEffect, useRef, useState } from 'react';
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
@@ -18,14 +21,83 @@ const breadcrumbs: BreadcrumbItem[] = [
 ];
 
 interface ShopProps {
-    products: Product[];
-    categories: string[];
+    products: PaginatedResponse<Product>;
+    categories: Category[];
 }
 export default function Index({ products, categories }: ShopProps) {
-    const [priceRange, setPriceRange] = useState([0, 250]);
-    const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
+    const {
+        focus,
+        price_range: serverPriceRange,
+        filters = {
+            search: '',
+            categories: [],
+            min_price: null,
+            max_price: null,
+        },
+    } = usePage().props as unknown as {
+        focus?: string;
+        price_range: { min: number; max: number };
+        filters?: {
+            search?: string;
+            categories: string[];
+            min_price?: number;
+            max_price?: number;
+        };
+    };
+    const [term, setTerm] = useState(filters.search ?? '');
+    const [selectedCategorySlugs, setSelectedCategorySlugs] = useState<
+        string[]
+    >(filters.categories ?? []);
+    const [priceRange, setPriceRange] = useState<number[]>([
+        filters.min_price ?? serverPriceRange.min,
+        filters.max_price ?? serverPriceRange.max,
+    ]);
+    const inputRef = useRef<HTMLInputElement>(null);
+    useEffect(() => {
+        if (focus === 'search' && inputRef.current) {
+            inputRef.current.focus();
+        }
+    }, [focus]);
+
+    useEffect(() => {
+        const hasLocalChanges =
+            term !== (filters.search ?? '') ||
+            JSON.stringify(selectedCategorySlugs) !==
+                JSON.stringify(filters.categories ?? []) ||
+            priceRange[0] !== (filters.min_price ?? serverPriceRange.min) ||
+            priceRange[1] !== (filters.max_price ?? serverPriceRange.max);
+
+        if (!hasLocalChanges) {
+            return;
+        }
+        const timeout = setTimeout(() => {
+            const options = {
+                query: {
+                    ...(term && { search: term }),
+                    ...(selectedCategorySlugs.length > 0 && {
+                        categories: selectedCategorySlugs,
+                    }),
+                    ...(priceRange[0] > serverPriceRange.min && {
+                        min_price: priceRange[0],
+                    }),
+                    ...(priceRange[1] < serverPriceRange.max && {
+                        max_price: priceRange[1],
+                    }),
+                },
+            };
+            const url = index.url(options);
+            router.visit(url, {
+                preserveScroll: true,
+                preserveState: true,
+                replace: true,
+            });
+        }, 500);
+
+        return () => clearTimeout(timeout);
+    }, [term, selectedCategorySlugs, priceRange]);
+
     const toggleCategory = (category: string) => {
-        setSelectedCategories((prev) =>
+        setSelectedCategorySlugs((prev) =>
             prev.includes(category)
                 ? prev.filter((c) => c !== category)
                 : [...prev, category],
@@ -55,23 +127,23 @@ export default function Index({ products, categories }: ShopProps) {
                             <div className="space-y-3">
                                 {categories.map((category) => (
                                     <div
-                                        key={category}
+                                        key={category.slug}
                                         className="flex items-center gap-2"
                                     >
                                         <Checkbox
-                                            id={category}
-                                            checked={selectedCategories.includes(
-                                                category,
+                                            id={`cat-${category.slug}`} // must be string and unique
+                                            checked={selectedCategorySlugs.includes(
+                                                category.slug,
                                             )}
                                             onCheckedChange={() =>
-                                                toggleCategory(category)
+                                                toggleCategory(category.slug)
                                             }
                                         />
                                         <label
-                                            htmlFor={category}
+                                            htmlFor={`cat-${category.slug}`}
                                             className="cursor-pointer text-sm leading-none font-medium"
                                         >
-                                            {category}
+                                            {category.name}
                                         </label>
                                     </div>
                                 ))}
@@ -85,11 +157,13 @@ export default function Index({ products, categories }: ShopProps) {
                             </Label>
                             <div className="space-y-4">
                                 <Slider
-                                    min={0}
-                                    max={250}
+                                    min={serverPriceRange.min}
+                                    max={serverPriceRange.max}
                                     step={10}
                                     value={priceRange}
-                                    onValueChange={setPriceRange}
+                                    onValueChange={(value) =>
+                                        setPriceRange(value as [number, number])
+                                    }
                                     className="w-full"
                                 />
                                 <div className="flex items-center justify-between text-sm text-muted-foreground">
@@ -104,8 +178,11 @@ export default function Index({ products, categories }: ShopProps) {
                             variant="outline"
                             className="mt-6 w-full"
                             onClick={() => {
-                                setPriceRange([0, 250]);
-                                setSelectedCategories([]);
+                                setPriceRange([
+                                    serverPriceRange.min,
+                                    serverPriceRange.max,
+                                ]);
+                                setSelectedCategorySlugs([]);
                             }}
                         >
                             Reset Filters
@@ -113,17 +190,30 @@ export default function Index({ products, categories }: ShopProps) {
                     </div>
                 </aside>
                 <div className="lg:col-span-3">
+                    <div className="mb-6">
+                        <div className="relative">
+                            <Search className="absolute top-1/2 left-3 h-5 w-5 -translate-y-1/2 text-muted-foreground" />
+                            <Input
+                                type="search"
+                                ref={inputRef}
+                                value={term}
+                                onChange={(e) => setTerm(e.target.value)}
+                                placeholder="Search products by name or category..."
+                                className="h-12 border-border bg-card pl-11 text-base shadow-card"
+                            />
+                        </div>
+                    </div>
                     <div className="mb-6 flex items-center justify-between">
                         <h1 className="text-3xl font-bold text-foreground">
                             All Products
                         </h1>
                         <p className="text-muted-foreground">
-                            {products.length} products found
+                            {products.data.length} products found
                         </p>
                     </div>
 
                     <div className="mb-8 grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
-                        {products.map((product) => (
+                        {products.data.map((product) => (
                             <ProductCard
                                 key={product.id}
                                 product={product}
@@ -131,25 +221,8 @@ export default function Index({ products, categories }: ShopProps) {
                             />
                         ))}
                     </div>
-
                     {/* Pagination */}
-                    <div className="flex items-center justify-center gap-2">
-                        <Button variant="outline" size="icon">
-                            <ChevronLeft className="h-4 w-4" />
-                        </Button>
-                        <Button variant="default" size="icon">
-                            1
-                        </Button>
-                        <Button variant="outline" size="icon">
-                            2
-                        </Button>
-                        <Button variant="outline" size="icon">
-                            3
-                        </Button>
-                        <Button variant="outline" size="icon">
-                            <ChevronRight className="h-4 w-4" />
-                        </Button>
-                    </div>
+                    <Pagination links={products.meta.links} />
                 </div>
             </Container>
         </AppLayout>
