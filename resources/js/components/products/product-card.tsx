@@ -1,6 +1,7 @@
 import { show } from '@/actions/App/Http/Controllers/ShopController';
-import { Product } from '@/types';
-import { Link } from '@inertiajs/react';
+import { login } from '@/routes';
+import { Product, SharedData } from '@/types';
+import { Link, usePage } from '@inertiajs/react';
 import { ShoppingCart, Star } from 'lucide-react';
 import { Badge } from '../ui/badge';
 import { Button } from '../ui/button';
@@ -11,6 +12,7 @@ interface ProductCardProps {
     onAddToCart?: (product: Product) => void;
 }
 export function ProductCard({ product, onAddToCart }: ProductCardProps) {
+    const { auth } = usePage<SharedData>().props;
     return (
         <Card className="group hover:shadow-hover overflow-hidden border-border transition-all duration-300">
             <Link href={show({ slug: product.slug })}>
@@ -56,13 +58,24 @@ export function ProductCard({ product, onAddToCart }: ProductCardProps) {
             </CardContent>
 
             <CardFooter className="p-4 pt-0">
-                <Button
-                    onClick={() => onAddToCart?.(product)}
-                    className="w-full bg-primary text-primary-foreground hover:bg-primary/90"
-                >
-                    <ShoppingCart className="mr-2 h-4 w-4" />
-                    Add to Cart
-                </Button>
+                {auth.user ? (
+                    <Button
+                        onClick={() => onAddToCart?.(product)}
+                        disabled={Number(product.stock) === 0}
+                        className={`w-full cursor-pointer ${Number(product.stock) === 0 ? 'bg-primary/60' : 'bg-primary'} text-primary-foreground hover:bg-primary/90`}
+                    >
+                        <ShoppingCart className="mr-2 h-4 w-4" />
+                        {Number(product.stock) === 0
+                            ? 'Out of Stock'
+                            : 'Add to Cart'}
+                    </Button>
+                ) : (
+                    <Link href={login()} className="w-full">
+                        <Button className="w-full cursor-pointer bg-secondary/70">
+                            Login to Add to Cart
+                        </Button>
+                    </Link>
+                )}
             </CardFooter>
         </Card>
     );

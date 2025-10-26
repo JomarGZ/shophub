@@ -8,6 +8,8 @@ use Illuminate\Database\Eloquent\Attributes\Scope;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Support\Facades\Storage;
 use Spatie\Sluggable\HasSlug;
 use Spatie\Sluggable\SlugOptions;
@@ -62,19 +64,24 @@ class Product extends Model
         return 'slug';
     }
 
-    public function category()
+    public function category(): BelongsTo
     {
         return $this->belongsTo(Category::class);
     }
 
+    public function cartItems(): HasMany
+    {
+        return $this->hasMany(CartItem::class);
+    }
+
     #[Scope]
-    protected function inStock(Builder $query)
+    protected function inStock(Builder $query): Builder
     {
         return $query->where('stock', '>', 0);
     }
 
     #[Scope]
-    protected function outOfStock(Builder $query)
+    protected function outOfStock(Builder $query): Builder
     {
         return $query->where('stock', '=', 0);
     }

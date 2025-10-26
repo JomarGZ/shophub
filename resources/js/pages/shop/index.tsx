@@ -6,6 +6,7 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Slider } from '@/components/ui/slider';
+import { useAddToCart } from '@/hooks/use-add-to-cart';
 import AppLayout from '@/layouts/app-layout';
 import { index } from '@/routes/shop';
 import { BreadcrumbItem, Category, PaginatedResponse, Product } from '@/types';
@@ -25,6 +26,7 @@ interface ShopProps {
     categories: Category[];
 }
 export default function Index({ products, categories }: ShopProps) {
+    const { addToCart } = useAddToCart();
     const {
         focus,
         price_range: serverPriceRange,
@@ -217,7 +219,7 @@ export default function Index({ products, categories }: ShopProps) {
                             <ProductCard
                                 key={product.id}
                                 product={product}
-                                onAddToCart={handleAddToCart}
+                                onAddToCart={addToCart}
                             />
                         ))}
                     </div>

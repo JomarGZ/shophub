@@ -2,10 +2,16 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\AddToCartRequest;
+use App\Models\Product;
+use App\Services\CartService;
+use Illuminate\Support\Facades\Redirect;
 use Inertia\Inertia;
 
-class ShoppingCartController extends Controller
+class CartController extends Controller
 {
+    public function __construct(protected CartService $cartService) {}
+
     public function index()
     {
         return Inertia::render('cart/index', [
@@ -45,5 +51,14 @@ class ShoppingCartController extends Controller
                 ],
             ],
         ]);
+    }
+
+    public function store(AddToCartRequest $request)
+    {
+        $product = Product::findOrFail($request->validated('product_id'));
+
+        $this->cartService->addItem(auth()->user(), $product, quantity: $request->validated('quantity'));
+
+        return redirect()->back()->with('success', 'Product added to cart successfully!');
     }
 }
