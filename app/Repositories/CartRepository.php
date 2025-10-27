@@ -2,7 +2,10 @@
 
 namespace App\Repositories;
 
+use App\Models\Cart;
 use App\Models\CartItem;
+use Illuminate\Contracts\Pagination\LengthAwarePaginator;
+use Illuminate\Support\Collection;
 
 class CartRepository extends Repository
 {
@@ -28,5 +31,12 @@ class CartRepository extends Repository
         ]);
     }
 
-   
+   public function getPaginatedCartItems(int $userId, int $perPage = 15, array $columns = ['*'], array|string $relations = []): Collection|LengthAwarePaginator
+   {
+        $cartId = Cart::where('user_id', $userId)->value('id');
+        if (!$cartId) {
+            return collect();
+        }
+        return $this->query()->where('cart_id', $cartId)->with($relations)->paginate($perPage, $columns)->withQueryString();
+   }
 }

@@ -26,7 +26,7 @@ interface ShopProps {
     categories: Category[];
 }
 export default function Index({ products, categories }: ShopProps) {
-    const { addToCart } = useAddToCart();
+    const { addToCart, loading } = useAddToCart();
     const {
         focus,
         price_range: serverPriceRange,
@@ -104,9 +104,6 @@ export default function Index({ products, categories }: ShopProps) {
                 ? prev.filter((c) => c !== category)
                 : [...prev, category],
         );
-    };
-    const handleAddToCart = (product: Product) => {
-        console.log('Add to cart:', product);
     };
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
@@ -220,6 +217,7 @@ export default function Index({ products, categories }: ShopProps) {
                                 key={product.id}
                                 product={product}
                                 onAddToCart={addToCart}
+                                loading={loading}
                             />
                         ))}
                     </div>

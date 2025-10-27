@@ -7,7 +7,7 @@ interface FeatureProductsProps {
     featuredProducts: any[];
 }
 export function FeaturedProducts({ featuredProducts }: FeatureProductsProps) {
-    const { addToCart } = useAddToCart();
+    const { addToCart, loading } = useAddToCart();
     return (
         <>
             <div className="mb-8 flex items-center justify-between">
@@ -25,6 +25,7 @@ export function FeaturedProducts({ featuredProducts }: FeatureProductsProps) {
                 {featuredProducts.map((product) => (
                     <ProductCard
                         key={product.id}
+                        loading={loading}
                         product={product}
                         onAddToCart={addToCart}
                     />

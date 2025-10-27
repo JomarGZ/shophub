@@ -10,8 +10,13 @@ import { Card, CardContent, CardFooter } from '../ui/card';
 interface ProductCardProps {
     product: Product;
     onAddToCart?: (product: Product) => void;
+    loading: boolean;
 }
-export function ProductCard({ product, onAddToCart }: ProductCardProps) {
+export function ProductCard({
+    product,
+    onAddToCart,
+    loading,
+}: ProductCardProps) {
     const { auth } = usePage<SharedData>().props;
     return (
         <Card className="group hover:shadow-hover overflow-hidden border-border transition-all duration-300">
@@ -61,7 +66,7 @@ export function ProductCard({ product, onAddToCart }: ProductCardProps) {
                 {auth.user ? (
                     <Button
                         onClick={() => onAddToCart?.(product)}
-                        disabled={Number(product.stock) === 0}
+                        disabled={Number(product.stock) === 0 || loading}
                         className={`w-full cursor-pointer ${Number(product.stock) === 0 ? 'bg-primary/60' : 'bg-primary'} text-primary-foreground hover:bg-primary/90`}
                     >
                         <ShoppingCart className="mr-2 h-4 w-4" />
