@@ -5,10 +5,16 @@ namespace App\Services;
 use App\Models\CartItem;
 use App\Models\Product;
 use App\Models\User;
+use App\Repositories\CartRepository;
 use Illuminate\Validation\ValidationException;
 
 class CartService
 {
+
+    public function __construct(protected CartRepository $cartRepo)
+    {
+        
+    }
     public function addItem(User $user, Product $product, int $quantity)
     {
         if ($product->stock < $quantity) {
@@ -17,13 +23,10 @@ class CartService
 
         $cart = $user->cart ?? $user->cart()->create();
 
-        $item = CartItem::firstOrNew([
-            'cart_id' => $cart->id,
-            'product_id' => $product->id,
-        ]);
+        $item = $this->cartRepo->findOrCreateItem(cartId: $cart->id, productId: $product->id);
 
         $item->quantity += $quantity;
-        $item->save();
-        return $item;
+        
+        return $this->cartRepo->save($item);
     }
 }
