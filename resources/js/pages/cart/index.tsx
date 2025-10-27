@@ -20,6 +20,10 @@ const breadcrumbs: BreadcrumbItem[] = [
 
 interface ShoppingCartProps {
     cart_items: PaginatedResponse<CartItem>;
+    order_summary: {
+        sub_total: number;
+        shipping_fee: number;
+    };
 }
 
 function emptyCart() {
@@ -205,12 +209,12 @@ export default function Index({
                                     <div className="flex justify-between text-foreground">
                                         <span>Shipping</span>
                                         <span className="font-semibold">
-                                            {order_summary.shipping_feee === 0
+                                            {order_summary.shipping_fee === 0
                                                 ? 'FREE'
                                                 : `$${order_summary.shipping_fee}`}
                                         </span>
                                     </div>
-                                    {order_summary.shipping_feee === 0 && (
+                                    {order_summary.shipping_fee === 0 && (
                                         <p className="text-sm text-primary">
                                             🎉 You qualify for free shipping!
                                         </p>
