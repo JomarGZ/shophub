@@ -14,7 +14,13 @@ class CartRepository extends Repository
         parent::__construct(new CartItem());
     }
 
-    public function findOrCreateItem(int $cartId, int $productId)
+    public function save(CartItem $item): CartItem
+    {
+        $item->save();
+        return $item;
+    }
+
+    public function findOrCreateItem(int $cartId, int $productId): CartItem
     {
         return $this->model()->firstOrNew([
             'cart_id' => $cartId,
@@ -22,9 +28,5 @@ class CartRepository extends Repository
         ]);
     }
 
-    public function save(CartItem $item)
-    {
-        $item->save();
-        return $item;
-    }
+   
 }

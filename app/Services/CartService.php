@@ -15,7 +15,7 @@ class CartService
     {
         
     }
-    public function addItem(User $user, Product $product, int $quantity)
+    public function addItem(User $user, Product $product, int $quantity): CartItem
     {
         if ($product->stock < $quantity) {
             throw ValidationException::withMessages(['product' => 'Not enough stock available']);
