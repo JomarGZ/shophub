@@ -32,11 +32,11 @@ class CartItem extends Model
     #[Scope]
     protected function filters(Builder $query, array $filters)
     {
-        $query->when($filters['search'] ?? null, function ($query ,$search) {
-            $query->whereHas('product', function($q) use ($search) {
+        $query->when($filters['search'] ?? null, function ($query, $search) {
+            $query->whereHas('product', function ($q) use ($search) {
                 $term = trim($search);
                 $q->where('name', 'like', "%{$term}%")
-                ->orWhere('description', 'like', "%{$term}%");
+                    ->orWhere('description', 'like', "%{$term}%");
             });
         });
     }

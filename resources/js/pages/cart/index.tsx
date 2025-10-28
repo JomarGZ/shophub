@@ -72,7 +72,6 @@ export default function Index({
         setItems(cart_items.data);
     }, [cart_items]);
     useEffect(() => {
-        console.log('trigger2');
         const hasLocalChanges = term !== (filters.search ?? '');
         if (!hasLocalChanges) return;
         const options = {
@@ -89,8 +88,6 @@ export default function Index({
     }, [debounceSearch]);
     useEffect(() => {
         if (!debouncedPending) return;
-        console.log('trigger3');
-
         router.patch(
             update(debouncedPending.id),
             {

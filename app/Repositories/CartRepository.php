@@ -14,12 +14,13 @@ class CartRepository extends Repository
      */
     public function __construct()
     {
-        parent::__construct(new CartItem());
+        parent::__construct(new CartItem);
     }
 
     public function save(CartItem $item): CartItem
     {
         $item->save();
+
         return $item;
     }
 
@@ -31,12 +32,13 @@ class CartRepository extends Repository
         ]);
     }
 
-   public function getPaginatedCartItems(int $userId, int $perPage = 15, array $columns = ['*'], array $filters = [], array|string $relations = []): Collection|LengthAwarePaginator
-   {
+    public function getPaginatedCartItems(int $userId, int $perPage = 15, array $columns = ['*'], array $filters = [], array|string $relations = []): Collection|LengthAwarePaginator
+    {
         $cartId = Cart::where('user_id', $userId)->value('id');
-        if (!$cartId) {
+        if (! $cartId) {
             return collect();
         }
+
         return $this->query()->where('cart_id', $cartId)->with($relations)->filters($filters)->paginate($perPage, $columns)->withQueryString();
-   }
+    }
 }

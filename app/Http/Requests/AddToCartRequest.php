@@ -23,14 +23,14 @@ class AddToCartRequest extends FormRequest
     {
         return [
             'product_id' => 'required|exists:products,id',
-            'quantity' => 'nullable|integer|min:1'
+            'quantity' => 'nullable|integer|min:1',
         ];
     }
 
     protected function prepareForValidation(): void
     {
         $this->merge([
-            'quantity' => $this->quantity ?? 1
+            'quantity' => $this->quantity ?? 1,
         ]);
     }
 }

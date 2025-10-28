@@ -10,6 +10,7 @@ use App\Repositories\CartRepository;
 use App\Services\CartService;
 use Illuminate\Support\Facades\Request;
 use Inertia\Inertia;
+
 class CartController extends Controller
 {
     public function __construct(protected CartService $cartService, protected CartRepository $cartRepo) {}
@@ -17,17 +18,17 @@ class CartController extends Controller
     public function index()
     {
         return Inertia::render('cart/index', [
-            'cart_items' => fn() => CartItemResource::collection($this->cartRepo->getPaginatedCartItems(
-                userId: auth()->id(), 
-                relations: ['product.category:id,name'], 
+            'cart_items' => fn () => CartItemResource::collection($this->cartRepo->getPaginatedCartItems(
+                userId: auth()->id(),
+                relations: ['product.category:id,name'],
                 perPage: 1,
                 filters: Request::only('search')
             )),
             'filters' => Request::only('search'),
             'order_summary' => [
                 'sub_total' => 200,
-                'shipping_fee' => 20
-            ]
+                'shipping_fee' => 20,
+            ],
         ]);
     }
 
@@ -45,7 +46,7 @@ class CartController extends Controller
         $cartItem->load('product');
         $stock = $cartItem->product->stock;
         $request->validate([
-            'quantity' => ['required', 'integer', 'min:1', 'max:' . $stock],
+            'quantity' => ['required', 'integer', 'min:1', 'max:'.$stock],
         ]);
         $this->cartService->updateQuantity(user: auth()->user(), cartItem: $cartItem, quantity: $request->quantity);
 
@@ -55,6 +56,7 @@ class CartController extends Controller
     public function destroy(CartItem $cartItem)
     {
         $this->cartService->removeItem(user: auth()->user(), item: $cartItem);
+
         return redirect()->back()->with('success', 'Cart item deleted successfully!');
     }
 }
