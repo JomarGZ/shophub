@@ -24,4 +24,15 @@ abstract class Repository
     {
         return $this->query()->with($relations)->paginate($perPage, $columns);
     }
+
+    public function update(Model $model, array $data): bool
+    {
+        return $model->update($data);
+    }
+    
+    public function delete(Model $model): bool
+    {
+        return $model->delete();
+    }
+
 }

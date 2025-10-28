@@ -29,4 +29,23 @@ class CartService
         
         return $this->cartRepo->save($item);
     }
+
+    public function removeItem(User $user, CartItem $item)
+    {
+        $item->load('cart');
+        if (!$item->cart || $item->cart->user_id !== $user->id) {
+            abort(403);
+        }
+
+        return $this->cartRepo->delete($item);
+    }
+
+    public function updateQuantity(User $user, CartItem $cartItem,int $quantity)
+    {
+        $cartItem->load('cart');
+        if ($cartItem->cart->user_id !== $user->id) {
+            abort(403);
+        }
+        $this->cartRepo->update(model: $cartItem, data: ['quantity' => $quantity]);
+    }
 }

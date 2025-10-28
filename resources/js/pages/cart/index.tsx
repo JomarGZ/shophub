@@ -5,12 +5,14 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Separator } from '@/components/ui/separator';
 import AppLayout from '@/layouts/app-layout';
+import { destroy, update } from '@/routes/cart/item';
 import { index } from '@/routes/checkout';
 import { BreadcrumbItem, CartItem, PaginatedResponse } from '@/types';
-import { Head, Link } from '@inertiajs/react';
+import { Head, Link, router } from '@inertiajs/react';
 import { Minus, Plus, Search, ShoppingBag, X } from 'lucide-react';
-import { useState } from 'react';
-
+import { useEffect, useState } from 'react';
+import { toast } from 'sonner';
+import { useDebounce } from 'use-debounce';
 const breadcrumbs: BreadcrumbItem[] = [
     {
         title: 'Home',
@@ -51,36 +53,61 @@ export default function Index({
     cart_items,
     order_summary,
 }: ShoppingCartProps) {
-    const [loading, setLoading] = useState(false);
     const [items, setItems] = useState(cart_items.data);
-    const incrementQuantity = (id: number) => {
+    const [pendingUpdate, setPendingUpdate] = useState<{
+        id: number;
+        qty: number;
+    } | null>(null);
+    const [debouncedPending] = useDebounce(pendingUpdate, 500);
+    const [loading, setLoading] = useState(false);
+
+    useEffect(() => {
+        if (!debouncedPending) return;
+
+        router.patch(
+            update(debouncedPending.id),
+            {
+                quantity: debouncedPending.qty,
+            },
+            {
+                preserveScroll: true,
+                onStart: () => setLoading(true),
+                onFinish: () => setLoading(false),
+            },
+        );
+    }, [debouncedPending]);
+
+    const updateLocalAndTrigger = (id: number, quantity: number) => {
         setItems((prev) =>
             prev.map((item) =>
-                Number(item.id) === id && item.quantity < item.product.stock
-                    ? { ...item, quantity: item.quantity + 1 }
-                    : item,
+                Number(item.id) === id ? { ...item, quantity } : item,
             ),
         );
+        setPendingUpdate({ id, qty: quantity });
     };
     const decrementQuantity = (id: number) => {
-        setItems((prev) =>
-            prev.map((item) =>
-                Number(item.id) === id && item.quantity > 1
-                    ? { ...item, quantity: item.quantity - 1 }
-                    : item,
-            ),
-        );
+        const item = items.find((i) => Number(i.id) === id);
+        if (!item || item.quantity <= 1) return;
+        updateLocalAndTrigger(id, item.quantity - 1);
     };
-    const removeItem = (id: string) => {
-        console.log('removed item');
+    const incrementQuantity = (id: number) => {
+        const item = items.find((i) => Number(i.id) === id);
+        if (!item || item.quantity >= item.product.stock) return;
+        updateLocalAndTrigger(id, item.quantity + 1);
+    };
+    const removeItem = (id: number) => {
+        router.delete(destroy(id), {
+            onSuccess: () => {
+                toast.success('Cart item deleted successfully!');
+                setItems((prev) => prev.filter((i) => Number(i.id) !== id));
+            },
+            onError: () => toast.error('Cart item deletion failed'),
+            onStart: () => setLoading(true),
+            onFinish: () => setLoading(false),
+            preserveScroll: true,
+        });
     };
 
-    // const subtotal = cart_items.reduce(
-    //     (sum, item) => sum + item.price * item.quantity,
-    //     0,
-    // );
-    // const shipping = subtotal > 100 ? 0 : 9.99;
-    // const total = subtotal + shipping;
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="Shop" />
@@ -135,8 +162,11 @@ export default function Index({
                                                           variant="ghost"
                                                           size="icon"
                                                           onClick={() =>
-                                                              removeItem(id)
+                                                              removeItem(
+                                                                  Number(id),
+                                                              )
                                                           }
+                                                          disabled={loading}
                                                           className="text-muted-foreground hover:text-destructive"
                                                       >
                                                           <X className="h-5 w-5" />
@@ -149,6 +179,7 @@ export default function Index({
                                                               variant="ghost"
                                                               size="icon"
                                                               className="h-8 w-8 cursor-pointer"
+                                                              disabled={loading}
                                                               onClick={() =>
                                                                   decrementQuantity(
                                                                       Number(
@@ -166,6 +197,7 @@ export default function Index({
                                                               variant="ghost"
                                                               size="icon"
                                                               className="h-8 w-8 cursor-pointer"
+                                                              disabled={loading}
                                                               onClick={() =>
                                                                   incrementQuantity(
                                                                       Number(
