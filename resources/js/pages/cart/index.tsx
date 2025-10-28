@@ -5,10 +5,11 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Separator } from '@/components/ui/separator';
 import AppLayout from '@/layouts/app-layout';
+import { index as cartIndex } from '@/routes/cart';
 import { destroy, update } from '@/routes/cart/item';
 import { index } from '@/routes/checkout';
 import { BreadcrumbItem, CartItem, PaginatedResponse } from '@/types';
-import { Head, Link, router } from '@inertiajs/react';
+import { Head, Link, router, usePage } from '@inertiajs/react';
 import { Minus, Plus, Search, ShoppingBag, X } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { toast } from 'sonner';
@@ -53,16 +54,42 @@ export default function Index({
     cart_items,
     order_summary,
 }: ShoppingCartProps) {
+    const { filters = { search: '' } } = usePage().props as {
+        filters?: {
+            search: string;
+        };
+    };
     const [items, setItems] = useState(cart_items.data);
     const [pendingUpdate, setPendingUpdate] = useState<{
         id: number;
         qty: number;
     } | null>(null);
-    const [debouncedPending] = useDebounce(pendingUpdate, 500);
     const [loading, setLoading] = useState(false);
-
+    const [term, setTerm] = useState(filters.search ?? '');
+    const [debouncedPending] = useDebounce(pendingUpdate, 500);
+    const [debounceSearch] = useDebounce(term, 500);
+    useEffect(() => {
+        setItems(cart_items.data);
+    }, [cart_items]);
+    useEffect(() => {
+        console.log('trigger2');
+        const hasLocalChanges = term !== (filters.search ?? '');
+        if (!hasLocalChanges) return;
+        const options = {
+            query: {
+                ...(term && { search: term }),
+            },
+        };
+        const url = cartIndex.url(options);
+        router.visit(url, {
+            preserveScroll: true,
+            preserveState: true,
+            replace: true,
+        });
+    }, [debounceSearch]);
     useEffect(() => {
         if (!debouncedPending) return;
+        console.log('trigger3');
 
         router.patch(
             update(debouncedPending.id),
@@ -97,10 +124,7 @@ export default function Index({
     };
     const removeItem = (id: number) => {
         router.delete(destroy(id), {
-            onSuccess: () => {
-                toast.success('Cart item deleted successfully!');
-                setItems((prev) => prev.filter((i) => Number(i.id) !== id));
-            },
+            onSuccess: () => toast.success('Cart item deleted successfully!'),
             onError: () => toast.error('Cart item deletion failed'),
             onStart: () => setLoading(true),
             onFinish: () => setLoading(false),
@@ -123,6 +147,8 @@ export default function Index({
                                 <Search className="absolute top-1/2 left-3 h-5 w-5 -translate-y-1/2 text-muted-foreground" />
                                 <Input
                                     type="search"
+                                    value={term}
+                                    onChange={(e) => setTerm(e.target.value)}
                                     placeholder="Search cart items by name or category..."
                                     className="h-12 border-border bg-card pl-11 text-base shadow-card"
                                 />

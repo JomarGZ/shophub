@@ -8,10 +8,8 @@ use App\Models\CartItem;
 use App\Models\Product;
 use App\Repositories\CartRepository;
 use App\Services\CartService;
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Redirect;
+use Illuminate\Support\Facades\Request;
 use Inertia\Inertia;
-use Illuminate\Validation\Rule;
 class CartController extends Controller
 {
     public function __construct(protected CartService $cartService, protected CartRepository $cartRepo) {}
@@ -19,7 +17,13 @@ class CartController extends Controller
     public function index()
     {
         return Inertia::render('cart/index', [
-            'cart_items' => fn() => CartItemResource::collection($this->cartRepo->getPaginatedCartItems(userId: auth()->id(), relations: ['product.category:id,name'])),
+            'cart_items' => fn() => CartItemResource::collection($this->cartRepo->getPaginatedCartItems(
+                userId: auth()->id(), 
+                relations: ['product.category:id,name'], 
+                perPage: 1,
+                filters: Request::only('search')
+            )),
+            'filters' => Request::only('search'),
             'order_summary' => [
                 'sub_total' => 200,
                 'shipping_fee' => 20
