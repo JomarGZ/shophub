@@ -6,7 +6,10 @@ import { toast } from 'sonner';
 
 export function useAddToCart() {
     const [loading, setLoading] = useState(false);
-    const addToCart = (product: Product) => {
+    const addToCart = (
+        product: Product,
+        extraOptions: Parameters<typeof router.post>[2] = {},
+    ) => {
         if (loading) return;
         setLoading(true);
         router.post(
@@ -20,6 +23,7 @@ export function useAddToCart() {
                 onError: () => toast.error('Failed to add to cart'),
                 onFinish: () => setLoading(false),
                 preserveScroll: true,
+                ...extraOptions,
             },
         );
     };

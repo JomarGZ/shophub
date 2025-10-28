@@ -1,4 +1,5 @@
 import { useAddToCart } from '@/hooks/use-add-to-cart';
+import { Product } from '@/types';
 import { Link } from '@inertiajs/react';
 import { ArrowRight } from 'lucide-react';
 import { Button } from '../ui/button';
@@ -8,6 +9,12 @@ interface FeatureProductsProps {
 }
 export function FeaturedProducts({ featuredProducts }: FeatureProductsProps) {
     const { addToCart, loading } = useAddToCart();
+    const handleAddToCart = (product: Product) => {
+        const options = {
+            except: ['featured_products'],
+        };
+        addToCart(product, options);
+    };
     return (
         <>
             <div className="mb-8 flex items-center justify-between">
@@ -27,7 +34,7 @@ export function FeaturedProducts({ featuredProducts }: FeatureProductsProps) {
                         key={product.id}
                         loading={loading}
                         product={product}
-                        onAddToCart={addToCart}
+                        onAddToCart={handleAddToCart}
                     />
                 ))}
             </div>

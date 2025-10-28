@@ -24,8 +24,9 @@ const breadcrumbs: BreadcrumbItem[] = [
 interface ShoppingCartProps {
     cart_items: PaginatedResponse<CartItem>;
     order_summary: {
-        sub_total: number;
+        subtotal: number;
         shipping_fee: number;
+        total: number;
     };
 }
 
@@ -84,6 +85,7 @@ export default function Index({
             preserveScroll: true,
             preserveState: true,
             replace: true,
+            except: ['order_summary'],
         });
     }, [debounceSearch]);
     useEffect(() => {
@@ -138,22 +140,19 @@ export default function Index({
                 <div className="grid grid-cols-1 gap-8 lg:grid-cols-3">
                     <div className="space-y-4 lg:col-span-2">
                         {/* Search Box */}
-                        {items && items?.length > 0 && (
-                            <div className="mb-6">
-                                <div className="relative">
-                                    <Search className="absolute top-1/2 left-3 h-5 w-5 -translate-y-1/2 text-muted-foreground" />
-                                    <Input
-                                        type="search"
-                                        value={term}
-                                        onChange={(e) =>
-                                            setTerm(e.target.value)
-                                        }
-                                        placeholder="Search cart items by name or category..."
-                                        className="h-12 border-border bg-card pl-11 text-base shadow-card"
-                                    />
-                                </div>
+
+                        <div className="mb-6">
+                            <div className="relative">
+                                <Search className="absolute top-1/2 left-3 h-5 w-5 -translate-y-1/2 text-muted-foreground" />
+                                <Input
+                                    type="search"
+                                    value={term}
+                                    onChange={(e) => setTerm(e.target.value)}
+                                    placeholder="Search cart items by name or category..."
+                                    className="h-12 border-border bg-card pl-11 text-base shadow-card"
+                                />
                             </div>
-                        )}
+                        </div>
                         {!items || items?.length === 0
                             ? emptyCart()
                             : items.map(({ id, quantity, product }) => (
@@ -261,7 +260,7 @@ export default function Index({
                                     <div className="flex justify-between text-foreground">
                                         <span>Subtotal</span>
                                         <span className="font-semibold">
-                                            ${order_summary.sub_total}
+                                            ${order_summary.subtotal}
                                         </span>
                                     </div>
                                     <div className="flex justify-between text-foreground">
@@ -283,11 +282,7 @@ export default function Index({
 
                                 <div className="flex justify-between text-xl font-bold text-foreground">
                                     <span>Total</span>
-                                    <span>
-                                        $
-                                        {order_summary.sub_total +
-                                            order_summary.shipping_fee}
-                                    </span>
+                                    <span>${order_summary.total}</span>
                                 </div>
 
                                 <Link href={index()}>

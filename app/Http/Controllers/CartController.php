@@ -9,6 +9,7 @@ use App\Models\Product;
 use App\Repositories\CartRepository;
 use App\Services\CartService;
 use Illuminate\Support\Facades\Request;
+use Illuminate\Http\Request as ValidationRequest;
 use Inertia\Inertia;
 
 class CartController extends Controller
@@ -17,18 +18,17 @@ class CartController extends Controller
 
     public function index()
     {
+        $cart = auth()->user()->load('cart')->cart;
+        $orderSummary = $cart ? $this->cartService->calculateTotals($cart) : ['subtotal' => 0, 'shipping_fee' => 0, 'total' => 0];
         return Inertia::render('cart/index', [
             'cart_items' => fn () => CartItemResource::collection($this->cartRepo->getPaginatedCartItems(
                 userId: auth()->id(),
                 relations: ['product.category:id,name'],
-                perPage: 1,
+                perPage: 10,
                 filters: Request::only('search')
             )),
             'filters' => Request::only('search'),
-            'order_summary' => [
-                'sub_total' => 200,
-                'shipping_fee' => 20,
-            ],
+            'order_summary' => $orderSummary
         ]);
     }
 
@@ -41,7 +41,7 @@ class CartController extends Controller
         return redirect()->back()->with('success', 'Product added to cart successfully!');
     }
 
-    public function update(Request $request, CartItem $cartItem)
+    public function update(ValidationRequest $request, CartItem $cartItem)
     {
         $cartItem->load('product');
         $stock = $cartItem->product->stock;
