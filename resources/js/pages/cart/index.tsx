@@ -131,7 +131,6 @@ export default function Index({
             preserveScroll: true,
         });
     };
-
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="Shop" />
@@ -142,19 +141,23 @@ export default function Index({
                 <div className="grid grid-cols-1 gap-8 lg:grid-cols-3">
                     <div className="space-y-4 lg:col-span-2">
                         {/* Search Box */}
-                        <div className="mb-6">
-                            <div className="relative">
-                                <Search className="absolute top-1/2 left-3 h-5 w-5 -translate-y-1/2 text-muted-foreground" />
-                                <Input
-                                    type="search"
-                                    value={term}
-                                    onChange={(e) => setTerm(e.target.value)}
-                                    placeholder="Search cart items by name or category..."
-                                    className="h-12 border-border bg-card pl-11 text-base shadow-card"
-                                />
+                        {items && items?.length > 0 && (
+                            <div className="mb-6">
+                                <div className="relative">
+                                    <Search className="absolute top-1/2 left-3 h-5 w-5 -translate-y-1/2 text-muted-foreground" />
+                                    <Input
+                                        type="search"
+                                        value={term}
+                                        onChange={(e) =>
+                                            setTerm(e.target.value)
+                                        }
+                                        placeholder="Search cart items by name or category..."
+                                        className="h-12 border-border bg-card pl-11 text-base shadow-card"
+                                    />
+                                </div>
                             </div>
-                        </div>
-                        {items.length === 0
+                        )}
+                        {!items || items?.length === 0
                             ? emptyCart()
                             : items.map(({ id, quantity, product }) => (
                                   <Card key={id} className="shadow-card">
@@ -246,7 +249,7 @@ export default function Index({
                                       </CardContent>
                                   </Card>
                               ))}
-                        <Pagination links={cart_items.meta.links} />
+                        <Pagination links={cart_items?.meta?.links} />
                     </div>
                     <div className="lg:col-span-1">
                         <Card className="sticky top-24 shadow-card">

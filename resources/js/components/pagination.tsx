@@ -9,7 +9,7 @@ type PaginationProps = {
 export function Pagination({ links }: PaginationProps) {
     return (
         <>
-            {links.length > 3 && (
+            {links && links.length > 3 && (
                 <div className="mt-6 flex items-center justify-center gap-2">
                     {links.map((link, i) => {
                         const label = link.label;
