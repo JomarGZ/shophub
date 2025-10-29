@@ -88,10 +88,11 @@ export interface PaginatedResponse<T> {
 
 export interface CartItem extends Product {
     quantity: number;
+    product: Product;
 }
 
 export interface Order {
-    id: string;
+    id: number;
     customer: string;
     date: string;
     total: number;

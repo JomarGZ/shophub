@@ -19,7 +19,7 @@ return new class extends Migration
             $table->string('slug')->unique();
             $table->text('description');
             $table->decimal('price', 10, 2);
-            $table->integer('stock');
+            $table->unsignedBigInteger('stock')->default(0);
             $table->string('image_url')->nullable();
             $table->timestamps();
         });

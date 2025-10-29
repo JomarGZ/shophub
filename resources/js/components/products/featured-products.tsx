@@ -1,16 +1,19 @@
+import { useAddToCart } from '@/hooks/use-add-to-cart';
+import { Product } from '@/types';
 import { Link } from '@inertiajs/react';
 import { ArrowRight } from 'lucide-react';
-import { toast } from 'sonner';
 import { Button } from '../ui/button';
 import { ProductCard } from './product-card';
-
 interface FeatureProductsProps {
     featuredProducts: any[];
 }
 export function FeaturedProducts({ featuredProducts }: FeatureProductsProps) {
-    const handleAddToCart = (Product: any) => {
-        console.log('trigger', Product);
-        toast.success(`${Product.name} added to cart!`);
+    const { addToCart, loading } = useAddToCart();
+    const handleAddToCart = (product: Product) => {
+        const options = {
+            except: ['featured_products'],
+        };
+        addToCart(product, options);
     };
     return (
         <>
@@ -29,6 +32,7 @@ export function FeaturedProducts({ featuredProducts }: FeatureProductsProps) {
                 {featuredProducts.map((product) => (
                     <ProductCard
                         key={product.id}
+                        loading={loading}
                         product={product}
                         onAddToCart={handleAddToCart}
                     />

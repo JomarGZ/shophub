@@ -1,6 +1,5 @@
 // resources/js/Pages/Checkout.tsx
 
-import { index } from '@/actions/App/Http/Controllers/ShoppingCartController';
 import { Container } from '@/components/container';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -9,6 +8,7 @@ import { Label } from '@/components/ui/label';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Separator } from '@/components/ui/separator';
 import AppLayout from '@/layouts/app-layout';
+import { index } from '@/routes/cart';
 import { type BreadcrumbItem } from '@/types';
 import { Head, useForm } from '@inertiajs/react';
 import {

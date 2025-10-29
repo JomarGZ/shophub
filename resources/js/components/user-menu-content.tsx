@@ -1,5 +1,5 @@
+import { index as cartIndex } from '@/actions/App/Http/Controllers/CartController';
 import { index as orderIndex } from '@/actions/App/Http/Controllers/OrderController';
-import { index as cartIndex } from '@/actions/App/Http/Controllers/ShoppingCartController';
 import {
     DropdownMenuGroup,
     DropdownMenuItem,

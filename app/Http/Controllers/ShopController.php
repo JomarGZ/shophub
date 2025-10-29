@@ -21,8 +21,8 @@ class ShopController extends Controller
     {
         return Inertia::render('shop/index', [
             'filters' => Request::only('search', 'categories', 'min_price', 'max_price'),
-            'price_range' => fn() => $this->productRepository->getPriceRange(),
-            'products' => fn() => ProductResource::collection(
+            'price_range' => fn () => $this->productRepository->getPriceRange(),
+            'products' => fn () => ProductResource::collection(
                 $this->productRepository->getPaginatedProducts(
                     perPage: 12,
                     columns: ['id', 'name', 'slug', 'price', 'image_url', 'category_id', 'description', 'stock'],
@@ -30,7 +30,7 @@ class ShopController extends Controller
                     filters: Request::only('search', 'categories', 'min_price', 'max_price')
                 )
             ),
-            'categories' => fn() => CategoryResource::collection($this->categoryRepository->getOnlyWithProducts()),
+            'categories' => fn () => CategoryResource::collection($this->categoryRepository->getOnlyWithProducts()),
             'focus' => Request::get('focus'),
         ]);
     }
