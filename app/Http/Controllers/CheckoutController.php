@@ -3,11 +3,14 @@
 namespace App\Http\Controllers;
 
 use Inertia\Inertia;
+use Nnjeim\World\World;
 
 class CheckoutController extends Controller
 {
     public function index()
     {
+
+        $countries = World::countries();
         // Mock customer addresses
         $addresses = [
             [
@@ -52,6 +55,7 @@ class CheckoutController extends Controller
 
         return Inertia::render('checkout/index', [
             'addresses' => $addresses,
+            'countries' => $countries->success ? $countries->data : [],
             'cart' => $cart,
             'paymentMethods' => $paymentMethods,
         ]);
