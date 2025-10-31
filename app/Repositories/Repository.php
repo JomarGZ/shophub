@@ -25,6 +25,11 @@ abstract class Repository
         return $this->query()->with($relations)->paginate($perPage, $columns);
     }
 
+    public function create(array $data): Model
+    {
+        return $this->model->create($data);
+    }
+
     public function update(Model $model, array $data): bool
     {
         return $model->update($data);

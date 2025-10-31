@@ -48,13 +48,6 @@ class CartService
         $this->cartRepo->update(model: $cartItem, data: ['quantity' => $quantity]);
     }
 
-    //BEGIN
-    //cartitem * productPrice
-    //sum up all item total for subtotal
-    //add shipping fee
-    //final total
-    //END
-
     public function calculateTotals(Cart $cart)
     {
         $subTotal = DB::table('cart_items')
