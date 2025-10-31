@@ -14,6 +14,6 @@ class AddressController extends Controller
     public function store(StoreAddressRequest $request)
     {
         $this->addressService->create(auth()->user(), $request->validated());
-        return redirect()->route('checkout.index')->with('message', 'Address address added successfully.');
+        return redirect()->route('checkout.index')->with('message', 'Address added successfully.');
     }
 }
