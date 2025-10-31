@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Resources\AddressResource;
+use App\Models\Address;
 use Inertia\Inertia;
 use Nnjeim\World\World;
 
@@ -11,30 +13,6 @@ class CheckoutController extends Controller
     {
 
         $countries = World::countries();
-        // Mock customer addresses
-        $addresses = [
-            [
-                'id' => 'addr-1',
-                'firstName' => 'John',
-                'lastName' => 'Doe',
-                'email' => 'john.doe@example.com',
-                'phone' => '+1 (555) 123-4567',
-                'street' => '123 Main Street',
-                'city' => 'New York',
-                'zipCode' => '10001',
-                'isDefault' => true,
-            ],
-            [
-                'id' => 'addr-2',
-                'firstName' => 'John',
-                'lastName' => 'Doe',
-                'email' => 'john.doe@example.com',
-                'phone' => '+1 (555) 123-4567',
-                'street' => '456 Park Avenue',
-                'city' => 'Brooklyn',
-                'zipCode' => '11201',
-                'isDefault' => false,
-            ], ];
 
         // Mock cart summary data
         $cart = [
@@ -52,9 +30,11 @@ class CheckoutController extends Controller
             ['id' => 'cod', 'name' => 'Cash on Delivery'],
             ['id' => 'paypal', 'name' => 'PayPal'],
         ];
+        $addresses = Address::with(['country:id,name', 'city:id,name'])->where('user_id', auth()->id())->get(['id', 'first_name', 'last_name', 'phone', 'street_address', 'is_default', 'country_id', 'city_id']);
+        
 
         return Inertia::render('checkout/index', [
-            'addresses' => $addresses,
+            'addresses' => fn () => AddressResource::collection($addresses),
             'countries' => $countries->success ? $countries->data : [],
             'cart' => $cart,
             'paymentMethods' => $paymentMethods,

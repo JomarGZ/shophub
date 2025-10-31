@@ -4,20 +4,15 @@ namespace App\Http\Controllers;
 
 use Illuminate\Support\Facades\Request;
 use Nnjeim\World\Models\City;
-use Nnjeim\World\WorldHelper;
 
 class CityController extends Controller
 {
-    
-     public function __construct(protected WorldHelper $world)
-     {
-     }
     public function index()
     {
         $filters = Request::only('country_id', 'search', 'limit');
-        $limit = isset($filters['limit']) && is_numeric($filters['limit']) ? (int)$filters['limit'] : 100;
+        $limit = isset($filters['limit']) && is_numeric($filters['limit']) ? (int) $filters['limit'] : 100;
         $query = City::query();
-        if (!isset($filters['country_id']) || !$filters['country_id']) {
+        if (! isset($filters['country_id']) || ! $filters['country_id']) {
             return response()->json(['data' => [], 'success' => false], 400);
         }
         $query->where('country_id', $filters['country_id']);

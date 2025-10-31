@@ -15,19 +15,24 @@ class Address extends Model
 
     protected $fillable = [
         'user_id',
+        'first_name',
+        'last_name',
         'phone',
         'country_id',
         'city_id',
         'street_address',
-        'is_default'
+        'is_default',
     ];
 
+    protected $casts = [
+        'is_default' => 'boolean',
+    ];
 
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);
     }
-    
+
     public function country(): BelongsTo
     {
         return $this->belongsTo(Country::class);
@@ -36,10 +41,5 @@ class Address extends Model
     public function city(): BelongsTo
     {
         return $this->belongsTo(City::class);
-    }
-
-    public function isDefault(): bool
-    {
-        return $this->is_default;
     }
 }

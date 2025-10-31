@@ -56,13 +56,13 @@ class CartService
             ->sum(DB::raw('cart_items.quantity * products.price'));
 
         $shippingFee = config('cart.shipping_fee', 20);
-        
+
         $total = $shippingFee + $subTotal;
 
         return [
             'subtotal' => $subTotal,
             'shipping_fee' => $shippingFee,
-            'total' => $total
+            'total' => $total,
         ];
     }
 }

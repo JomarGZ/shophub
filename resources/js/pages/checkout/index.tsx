@@ -1,6 +1,7 @@
 // resources/js/Pages/Checkout.tsx
 
 import { AddressForm } from '@/components/checkout/address-form';
+import DeleteAddressDialog from '@/components/checkout/delete-address-dialog';
 import { Container } from '@/components/container';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -9,16 +10,10 @@ import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Separator } from '@/components/ui/separator';
 import AppLayout from '@/layouts/app-layout';
 import { index } from '@/routes/cart';
+import { updateDefault } from '@/routes/checkout/address';
 import { type BreadcrumbItem } from '@/types';
-import { Head } from '@inertiajs/react';
-import {
-    Banknote,
-    Check,
-    CreditCard,
-    MapPin,
-    Plus,
-    Trash2,
-} from 'lucide-react';
+import { Head, Link } from '@inertiajs/react';
+import { Banknote, Check, CreditCard, Edit, MapPin, Plus } from 'lucide-react';
 import { useState } from 'react';
 const breadcrumbs: BreadcrumbItem[] = [
     {
@@ -30,12 +25,6 @@ const breadcrumbs: BreadcrumbItem[] = [
         href: '#',
     },
 ];
-
-interface OrderItem {
-    name: string;
-    quantity: number;
-    price: number;
-}
 
 export default function Index({
     addresses,
@@ -51,7 +40,6 @@ export default function Index({
     const [showAddForm, setShowAddForm] = useState(false);
     const [selectedPaymentMethod, setSelectedPaymentMethod] = useState('cod');
     const [selectedAddressId, setSelectedAddressId] = useState<string>('');
-    const [open, setOpen] = useState(false);
 
     const handleSetDefault = (address) => {};
     const handleDeleteAddress = (address) => {};
@@ -66,6 +54,8 @@ export default function Index({
     );
     const shipping = 0;
     const total = subtotal + shipping;
+    console.log(addresses);
+    const hasDefaultAddress = addresses.some((address) => address.is_default);
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="Checkout" />
@@ -78,7 +68,7 @@ export default function Index({
                     <div className="space-y-6 lg:col-span-2">
                         {/* Address Management */}
                         <Card className="shadow-card">
-                            <CardHeader className="border-b border-secondary/20">
+                            <CardHeader className="border-b border-secondary/20 pb-2">
                                 <div className="flex items-center justify-between">
                                     <CardTitle className="flex items-center gap-2 text-secondary">
                                         <MapPin className="h-5 w-5" />
@@ -91,7 +81,7 @@ export default function Index({
                                         onClick={() =>
                                             setShowAddForm(!showAddForm)
                                         }
-                                        className="flex items-center gap-2"
+                                        className="flex cursor-pointer items-center gap-2"
                                     >
                                         <Plus className="h-4 w-4" />
                                         Add Address
@@ -110,35 +100,28 @@ export default function Index({
                                                 <div
                                                     key={address.id}
                                                     className={`relative rounded-lg border p-4 transition-all ${
-                                                        selectedAddressId ===
-                                                        address.id
+                                                        address.is_default
                                                             ? 'border-primary bg-primary/5'
                                                             : 'border-border hover:border-primary/50'
                                                     }`}
                                                 >
                                                     <div className="flex items-start gap-3">
-                                                        <RadioGroupItem
-                                                            value={address.id}
-                                                            id={address.id}
-                                                            className="mt-1"
-                                                        />
                                                         <div className="flex-1">
                                                             <Label
                                                                 htmlFor={
                                                                     address.id
                                                                 }
-                                                                className="cursor-pointer"
                                                             >
                                                                 <div className="mb-2 flex items-center gap-2">
                                                                     <span className="font-semibold text-foreground">
                                                                         {
-                                                                            address.firstName
+                                                                            address.first_name
                                                                         }{' '}
                                                                         {
-                                                                            address.lastName
+                                                                            address.last_name
                                                                         }
                                                                     </span>
-                                                                    {address.isDefault && (
+                                                                    {address.is_default && (
                                                                         <span className="rounded-full bg-primary px-2 py-0.5 text-xs text-primary-foreground">
                                                                             Default
                                                                         </span>
@@ -146,16 +129,20 @@ export default function Index({
                                                                 </div>
                                                                 <p className="text-sm text-muted-foreground">
                                                                     {
-                                                                        address.street
+                                                                        address.street_address
                                                                     }
                                                                 </p>
                                                                 <p className="text-sm text-muted-foreground">
                                                                     {
-                                                                        address.city
+                                                                        address
+                                                                            .country
+                                                                            .name
                                                                     }
                                                                     ,{' '}
                                                                     {
-                                                                        address.zipCode
+                                                                        address
+                                                                            .city
+                                                                            .name
                                                                     }
                                                                 </p>
                                                                 <p className="mt-1 text-sm text-muted-foreground">
@@ -166,34 +153,32 @@ export default function Index({
                                                             </Label>
                                                         </div>
                                                         <div className="flex items-center gap-2">
-                                                            {!address.isDefault && (
-                                                                <Button
-                                                                    type="button"
-                                                                    variant="ghost"
-                                                                    size="sm"
-                                                                    onClick={() =>
-                                                                        handleSetDefault(
-                                                                            address.id,
-                                                                        )
-                                                                    }
-                                                                    className="h-8 text-xs"
+                                                            {!address.is_default && (
+                                                                <Link
+                                                                    as="button"
+                                                                    href={updateDefault(
+                                                                        address.id,
+                                                                    )}
+                                                                    preserveScroll
+                                                                    className="flex h-8 cursor-pointer items-center justify-center rounded-2xl px-3 py-1 text-xs hover:bg-primary hover:text-primary-foreground"
                                                                 >
                                                                     <Check className="mr-1 h-3 w-3" />
                                                                     Set Default
-                                                                </Button>
+                                                                </Link>
+                                                            )}
+                                                            {address.is_default || (
+                                                                <DeleteAddressDialog
+                                                                    addressId={
+                                                                        address.id
+                                                                    }
+                                                                />
                                                             )}
                                                             <Button
-                                                                type="button"
                                                                 variant="ghost"
-                                                                size="sm"
-                                                                onClick={() =>
-                                                                    handleDeleteAddress(
-                                                                        address.id,
-                                                                    )
-                                                                }
-                                                                className="h-8 w-8 p-0 text-destructive hover:bg-destructive/10 hover:text-destructive"
+                                                                size="icon"
+                                                                className="cursor-pointer p-0 text-muted-foreground hover:bg-secondary/10 hover:text-foreground"
                                                             >
-                                                                <Trash2 className="h-4 w-4" />
+                                                                <Edit className="h-4 w-4" />
                                                             </Button>
                                                         </div>
                                                     </div>
@@ -365,6 +350,7 @@ export default function Index({
 
                                 <Button
                                     type="submit"
+                                    disabled={!hasDefaultAddress}
                                     className="h-12 w-full bg-primary text-base text-primary-foreground hover:bg-primary/90"
                                 >
                                     Place Order

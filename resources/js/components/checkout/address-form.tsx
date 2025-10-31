@@ -53,7 +53,7 @@ export function AddressForm({ countries, onCancel }: AddressFormProps) {
         phone: '',
         street_address: '',
     });
-    const { data, setData, processing, errors, post } = form;
+    const { data, setData, processing, errors, post, reset } = form;
     const fetchCities = async (query = '', country_id: number) => {
         if (!data.country_id) return;
         setLoading(true);
@@ -79,7 +79,10 @@ export function AddressForm({ countries, onCancel }: AddressFormProps) {
             preserveScroll: true,
             onSuccess: ({ props: { flash } }: any) => {
                 toast.success(flash.message);
+                reset();
+                onCancel();
             },
+            only: ['addresses', 'flash'],
         });
     };
     useEffect(() => {

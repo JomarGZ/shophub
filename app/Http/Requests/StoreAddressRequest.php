@@ -4,7 +4,6 @@ namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Support\Facades\DB;
-use Nnjeim\World\Models\Country;
 
 class StoreAddressRequest extends FormRequest
 {
@@ -26,20 +25,21 @@ class StoreAddressRequest extends FormRequest
         $countryId = (int) $this->get('country_id', null);
         $countryCode = $this->getCountryCode($countryId);
         info($countryCode);
+
         return [
             'first_name' => 'required|string|max:255',
             'last_name' => 'required|string|max:255',
             'country_id' => 'required|exists:countries,id',
             'city_id' => 'required|exists:cities,id',
             'street_address' => 'required|string|max:255',
-            'phone' => ['required', "phone:{$countryCode}"]
+            'phone' => ['required', "phone:{$countryCode}"],
         ];
     }
 
     public function messages(): array
     {
         return [
-            'phone.phone' => 'The phone number is not valid for the selected country.'
+            'phone.phone' => 'The phone number is not valid for the selected country.',
         ];
     }
 

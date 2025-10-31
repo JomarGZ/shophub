@@ -8,7 +8,6 @@ use App\Http\Controllers\HomeController;
 use App\Http\Controllers\OrderController;
 use App\Http\Controllers\ShopController;
 use Illuminate\Support\Facades\Route;
-use Nnjeim\World\Models\City;
 
 Route::get('/', HomeController::class)->name('home');
 Route::get('/shop', [ShopController::class, 'index'])->name('shop.index');
@@ -20,7 +19,8 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/checkout', [CheckoutController::class, 'index'])->name('checkout.index');
     Route::get('/orders', [OrderController::class, 'index'])->name('orders.index');
 
-    Route::post('checkout/address', [AddressController::class, 'store'])->name('address.store');
+    Route::resource('checkout/address', AddressController::class)->only(['store', 'destroy']);
+    Route::patch('checkout/address/{address}/default', [AddressController::class, 'updateDefault'])->name('checkout.address.updateDefault');
 });
 
 Route::get('city/list', [CityController::class, 'index']);

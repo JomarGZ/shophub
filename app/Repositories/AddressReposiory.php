@@ -13,5 +13,4 @@ class AddressReposiory extends Repository
     {
         parent::__construct(new Address);
     }
-
 }
