@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Repositories\AddressRepository;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -27,6 +28,17 @@ class Address extends Model
     protected $casts = [
         'is_default' => 'boolean',
     ];
+
+    protected static function booted()
+    {
+        static::saved(function (Address $address) {
+            app(AddressRepository::class)->clearCache($address->user_id);
+        });
+
+        static::deleted(function (Address $address) {
+            app(AddressRepository::class)->clearCache($address->user_id);
+        });
+    }
 
     public function user(): BelongsTo
     {

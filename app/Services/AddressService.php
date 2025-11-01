@@ -4,12 +4,12 @@ namespace App\Services;
 
 use App\Models\Address;
 use App\Models\User;
-use App\Repositories\AddressReposiory;
+use App\Repositories\AddressRepository;
 use Illuminate\Support\Facades\DB;
 
 class AddressService
 {
-    public function __construct(protected AddressReposiory $addressRepository) {}
+    public function __construct(protected AddressRepository $addressRepository) {}
 
     public function create(User $user, array $data): Address
     {

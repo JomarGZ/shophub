@@ -3,12 +3,14 @@
 namespace App\Http\Controllers;
 
 use App\Http\Resources\AddressResource;
-use App\Models\Address;
+use App\Repositories\AddressRepository;
 use Inertia\Inertia;
 use Nnjeim\World\World;
 
 class CheckoutController extends Controller
 {
+    public function __construct(protected AddressRepository $addressRepository) {}
+
     public function index()
     {
 
@@ -30,11 +32,9 @@ class CheckoutController extends Controller
             ['id' => 'cod', 'name' => 'Cash on Delivery'],
             ['id' => 'paypal', 'name' => 'PayPal'],
         ];
-        $addresses = Address::with(['country:id,name', 'city:id,name'])->where('user_id', auth()->id())->get(['id', 'first_name', 'last_name', 'phone', 'street_address', 'is_default', 'country_id', 'city_id']);
-        
 
         return Inertia::render('checkout/index', [
-            'addresses' => fn () => AddressResource::collection($addresses),
+            'addresses' => fn () => AddressResource::collection($this->addressRepository->getAllForUser(auth()->id())),
             'countries' => $countries->success ? $countries->data : [],
             'cart' => $cart,
             'paymentMethods' => $paymentMethods,

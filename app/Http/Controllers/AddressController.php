@@ -26,7 +26,7 @@ class AddressController extends Controller
 
         return redirect()->back()->with('message', 'Address updated successfully');
     }
-    
+
     public function destroy(Address $address): RedirectResponse
     {
         Gate::authorize('delete', $address);

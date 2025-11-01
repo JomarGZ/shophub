@@ -7,7 +7,6 @@ use App\Models\User;
 
 class AddressPolicy
 {
-
     /**
      * Determine whether the user can update the model.
      */
@@ -21,7 +20,6 @@ class AddressPolicy
      */
     public function delete(User $user, Address $address): bool
     {
-        return !$address->is_default && $user->id === $address->user_id;;
+        return ! $address->is_default && $user->id === $address->user_id;
     }
-    
 }
