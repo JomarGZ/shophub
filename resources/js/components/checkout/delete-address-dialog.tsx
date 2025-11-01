@@ -12,6 +12,7 @@ import { destroy } from '@/routes/address';
 import { router } from '@inertiajs/react';
 import { Trash2 } from 'lucide-react';
 import { useState } from 'react';
+import { toast } from 'sonner';
 
 export default function DeleteAddressDialog({
     addressId,
@@ -27,10 +28,14 @@ export default function DeleteAddressDialog({
         router.delete(destroy(addressId), {
             preserveScroll: true,
             onSuccess: () => {
+                toast.success('Address deleted successfully.');
                 setLoading(false);
                 setOpen(false);
             },
-            onError: () => setLoading(false),
+            onError: () => {
+                setLoading(false);
+                toast.error('Address deletion failed.');
+            },
         });
     };
 

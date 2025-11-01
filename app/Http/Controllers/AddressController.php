@@ -6,6 +6,7 @@ use App\Http\Requests\StoreAddressRequest;
 use App\Models\Address;
 use App\Services\AddressService;
 use Illuminate\Http\RedirectResponse;
+use Illuminate\Support\Facades\Gate;
 
 class AddressController extends Controller
 {
@@ -20,20 +21,23 @@ class AddressController extends Controller
 
     public function update(Address $address, StoreAddressRequest $request)
     {
-        $this->addressService->update(auth()->user(), $address, $request->validated());
+        Gate::authorize('update', $address);
+        $this->addressService->update($address, $request->validated());
 
         return redirect()->back()->with('message', 'Address updated successfully');
     }
     
     public function destroy(Address $address): RedirectResponse
     {
-        $this->addressService->delete(auth()->user(), $address);
+        Gate::authorize('delete', $address);
+        $this->addressService->delete($address);
 
         return redirect()->back()->with('message', 'Address deleted successfully.');
     }
 
     public function updateDefault(Address $address): RedirectResponse
     {
+        Gate::authorize('update', $address);
         $this->addressService->setDefault(auth()->user(), $address);
 
         return redirect()->back()->with('message', 'Address set as default successfully');

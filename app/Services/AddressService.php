@@ -21,30 +21,18 @@ class AddressService
         return $this->addressRepository->create($data);
     }
 
-    public function update(User $user, Address $address, array $data)
+    public function update(Address $address, array $data)
     {
-        if ($address->user_id !== $user->id) {
-            abort(403, 'Unauthorized');
-        }
-
         return $this->addressRepository->update($address, $data);
     }
 
-    public function delete(User $user, Address $address): bool
+    public function delete(Address $address): bool
     {
-        if ($address->user_id !== $user->id || $address->is_default) {
-            throw new \Exception('Unauthorized');
-        }
-
         return $this->addressRepository->delete($address);
     }
 
     public function setDefault(User $user, Address $address)
     {
-        if ($address->user_id !== $user->id || $address->is_default) {
-            abort(403, 'Unauthorized');
-        }
-
         return DB::transaction(function () use ($user, $address) {
             $user->addresses()->update(['is_default' => false]);
 

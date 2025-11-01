@@ -29,7 +29,6 @@ const breadcrumbs: BreadcrumbItem[] = [
 export default function Index({
     addresses,
     countries,
-    cart,
     paymentMethods,
 }: {
     addresses: any[];
@@ -41,7 +40,6 @@ export default function Index({
     const [selectedAddress, setSelectedAddress] = useState<Address | null>(
         null,
     );
-    console.log(selectedAddress);
     const [selectedPaymentMethod, setSelectedPaymentMethod] = useState('cod');
 
     const handleEditAddress = (address: Address) => {

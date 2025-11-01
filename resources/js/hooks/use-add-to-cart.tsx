@@ -19,7 +19,7 @@ export function useAddToCart() {
             },
             {
                 onSuccess: () =>
-                    toast.success(`${product.name} added to carttt!`),
+                    toast.success(`${product.name} added to cart!`),
                 onError: () => toast.error('Failed to add to cart'),
                 onFinish: () => setLoading(false),
                 preserveScroll: true,
