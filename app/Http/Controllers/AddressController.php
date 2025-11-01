@@ -18,6 +18,13 @@ class AddressController extends Controller
         return redirect()->route('checkout.index')->with('message', 'Address added successfully.');
     }
 
+    public function update(Address $address, StoreAddressRequest $request)
+    {
+        $this->addressService->update(auth()->user(), $address, $request->validated());
+
+        return redirect()->back()->with('message', 'Address updated successfully');
+    }
+    
     public function destroy(Address $address): RedirectResponse
     {
         $this->addressService->delete(auth()->user(), $address);

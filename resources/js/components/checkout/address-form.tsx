@@ -1,8 +1,9 @@
 import AddressController from '@/actions/App/Http/Controllers/AddressController';
+import { Address, City, Country } from '@/types';
 import { useForm } from '@inertiajs/react';
 import axios from 'axios';
 import { LoaderCircle } from 'lucide-react';
-import { useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { toast } from 'sonner';
 import { useDebounce } from 'use-debounce';
 import InputError from '../input-error';
@@ -25,35 +26,33 @@ import {
     SelectValue,
 } from '../ui/select';
 
-type City = {
-    id: number;
-    name: string;
-};
-
-interface Country {
-    id: number;
-    name: string;
-}
 interface AddressFormProps {
     countries: Country[];
     onCancel: () => void;
+    address?: Address | null;
 }
-export function AddressForm({ countries, onCancel }: AddressFormProps) {
+export function AddressForm({
+    countries,
+    onCancel,
+    address = null,
+}: AddressFormProps) {
     const [search, setSearch] = useState('');
     const [loading, setLoading] = useState(false);
     const [cities, setCities] = useState<City[]>([]);
     const [open, setOpen] = useState(false);
-    const controllerForm = AddressController.store.form();
+    const controllerForm = address
+        ? AddressController.update.form(address.id)
+        : AddressController.store.form();
     const [debounceSearch] = useDebounce(search, 500);
     const form = useForm({
-        country_id: '',
-        city_id: '',
-        first_name: '',
-        last_name: '',
-        phone: '',
-        street_address: '',
+        country_id: address?.country.id || '',
+        city_id: address?.city.id || '',
+        first_name: address?.first_name || '',
+        last_name: address?.last_name || '',
+        phone: address?.phone || '',
+        street_address: address?.street_address || '',
     });
-    const { data, setData, processing, errors, post, reset } = form;
+    const { data, setData, processing, errors, post, reset, put } = form;
     const fetchCities = async (query = '', country_id: number) => {
         if (!data.country_id) return;
         setLoading(true);
@@ -61,7 +60,7 @@ export function AddressForm({ countries, onCancel }: AddressFormProps) {
             const { data: res } = await axios.get('city/list', {
                 params: {
                     country_id: country_id,
-                    search: query,
+                    search: query ? query : address?.city?.name || query,
                     limit: query ? 20 : 100,
                 },
             });
@@ -73,18 +72,43 @@ export function AddressForm({ countries, onCancel }: AddressFormProps) {
             setLoading(false);
         }
     };
-    const handleSubmit = (e: { preventDefault: () => void }) => {
+    const prefillForm = () => {
+        if (address) {
+            setData({
+                country_id: address.country?.id?.toString() || '',
+                city_id: address.city?.id?.toString() || '',
+                first_name: address.first_name || '',
+                last_name: address.last_name || '',
+                phone: address.phone || '',
+                street_address: address.street_address || '',
+            });
+        } else {
+            reset();
+            setCities([]);
+        }
+    };
+    const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
-        post(controllerForm.action, {
+        const submitAction = address ? put : post;
+        submitAction(controllerForm.action, {
             preserveScroll: true,
             onSuccess: ({ props: { flash } }: any) => {
-                toast.success(flash.message);
+                toast.success(
+                    flash.message ||
+                        (address ? 'Address updated!' : 'Address added!'),
+                );
                 reset();
                 onCancel();
             },
             only: ['addresses', 'flash'],
         });
     };
+    const selectedCity = cities.find(
+        (city) => String(city.id) === String(data.city_id),
+    );
+    useEffect(() => {
+        prefillForm();
+    }, [address]);
     useEffect(() => {
         fetchCities(debounceSearch, Number(data.country_id));
     }, [debounceSearch, data.country_id]);
@@ -94,7 +118,9 @@ export function AddressForm({ countries, onCancel }: AddressFormProps) {
             method={controllerForm.method}
             className="mt-4 rounded-lg border border-border bg-muted/30 p-4"
         >
-            <h3 className="mb-4 font-semibold text-foreground">New Address</h3>
+            <h3 className="mb-4 font-semibold text-foreground">
+                {address ? 'Update' : 'New'} Address
+            </h3>
             <div className="space-y-4">
                 <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                     <div>
@@ -171,12 +197,8 @@ export function AddressForm({ countries, onCancel }: AddressFormProps) {
                                     role="combobox"
                                     className="w-full justify-between"
                                 >
-                                    {data.city_id
-                                        ? cities.find(
-                                              (city) =>
-                                                  city.id ===
-                                                  Number(data.city_id),
-                                          )?.name || 'Select city'
+                                    {selectedCity
+                                        ? selectedCity.name
                                         : 'Select city'}
                                 </Button>
                             </PopoverTrigger>
@@ -254,7 +276,7 @@ export function AddressForm({ countries, onCancel }: AddressFormProps) {
                         {processing && (
                             <LoaderCircle className="h-4 w-4 animate-spin" />
                         )}
-                        Save Address
+                        {address ? 'Update Address' : 'Add Address'}
                     </Button>
                     <Button type="button" variant="outline" onClick={onCancel}>
                         Cancel

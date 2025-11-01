@@ -11,7 +11,7 @@ import { Separator } from '@/components/ui/separator';
 import AppLayout from '@/layouts/app-layout';
 import { index } from '@/routes/cart';
 import { updateDefault } from '@/routes/checkout/address';
-import { type BreadcrumbItem } from '@/types';
+import { Address, type BreadcrumbItem } from '@/types';
 import { Head, Link } from '@inertiajs/react';
 import { Banknote, Check, CreditCard, Edit, MapPin, Plus } from 'lucide-react';
 import { useState } from 'react';
@@ -37,12 +37,21 @@ export default function Index({
     paymentMethods: any[];
     countries: any[];
 }) {
-    const [showAddForm, setShowAddForm] = useState(false);
+    const [showAddressForm, setShowAddressForm] = useState(false);
+    const [selectedAddress, setSelectedAddress] = useState<Address | null>(
+        null,
+    );
+    console.log(selectedAddress);
     const [selectedPaymentMethod, setSelectedPaymentMethod] = useState('cod');
-    const [selectedAddressId, setSelectedAddressId] = useState<string>('');
 
-    const handleSetDefault = (address) => {};
-    const handleDeleteAddress = (address) => {};
+    const handleEditAddress = (address: Address) => {
+        setShowAddressForm(true);
+        setSelectedAddress(address);
+    };
+    const handleShowAddressForm = (isOpen: boolean) => {
+        setSelectedAddress(null);
+        setShowAddressForm(isOpen);
+    };
     const orderItems = [
         { name: 'Wireless Headphones', price: 79.99, quantity: 2 },
         { name: 'Running Shoes', price: 129.99, quantity: 1 },
@@ -54,7 +63,6 @@ export default function Index({
     );
     const shipping = 0;
     const total = subtotal + shipping;
-    console.log(addresses);
     const hasDefaultAddress = addresses.some((address) => address.is_default);
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
@@ -79,7 +87,9 @@ export default function Index({
                                         variant="outline"
                                         size="sm"
                                         onClick={() =>
-                                            setShowAddForm(!showAddForm)
+                                            handleShowAddressForm(
+                                                !showAddressForm,
+                                            )
                                         }
                                         className="flex cursor-pointer items-center gap-2"
                                     >
@@ -91,112 +101,111 @@ export default function Index({
                             <CardContent className="space-y-4 p-6">
                                 {/* Saved Addresses */}
                                 {addresses.length > 0 && (
-                                    <RadioGroup
-                                        value={selectedAddressId}
-                                        onValueChange={setSelectedAddressId}
-                                    >
-                                        <div className="space-y-3">
-                                            {addresses.map((address) => (
-                                                <div
-                                                    key={address.id}
-                                                    className={`relative rounded-lg border p-4 transition-all ${
-                                                        address.is_default
-                                                            ? 'border-primary bg-primary/5'
-                                                            : 'border-border hover:border-primary/50'
-                                                    }`}
-                                                >
-                                                    <div className="flex items-start gap-3">
-                                                        <div className="flex-1">
-                                                            <Label
-                                                                htmlFor={
+                                    <div className="space-y-3">
+                                        {addresses.map((address) => (
+                                            <div
+                                                key={address.id}
+                                                className={`relative rounded-lg border p-4 transition-all ${
+                                                    address.is_default
+                                                        ? 'border-primary bg-primary/5'
+                                                        : 'border-border hover:border-primary/50'
+                                                }`}
+                                            >
+                                                <div className="flex items-start gap-3">
+                                                    <div className="flex-1">
+                                                        <Label
+                                                            htmlFor={address.id}
+                                                        >
+                                                            <div className="mb-2 flex items-center gap-2">
+                                                                <span className="font-semibold text-foreground">
+                                                                    {
+                                                                        address.first_name
+                                                                    }{' '}
+                                                                    {
+                                                                        address.last_name
+                                                                    }
+                                                                </span>
+                                                                {address.is_default && (
+                                                                    <span className="rounded-full bg-primary px-2 py-0.5 text-xs text-primary-foreground">
+                                                                        Default
+                                                                    </span>
+                                                                )}
+                                                            </div>
+                                                            <p className="text-sm text-muted-foreground">
+                                                                {
+                                                                    address.street_address
+                                                                }
+                                                            </p>
+                                                            <p className="text-sm text-muted-foreground">
+                                                                {
+                                                                    address
+                                                                        .country
+                                                                        .name
+                                                                }
+                                                                ,{' '}
+                                                                {
+                                                                    address.city
+                                                                        .name
+                                                                }
+                                                            </p>
+                                                            <p className="mt-1 text-sm text-muted-foreground">
+                                                                {address.phone}
+                                                            </p>
+                                                        </Label>
+                                                    </div>
+                                                    <div className="flex items-center gap-2">
+                                                        {!address.is_default && (
+                                                            <Link
+                                                                as="button"
+                                                                href={updateDefault(
+                                                                    address.id,
+                                                                )}
+                                                                preserveScroll
+                                                                className="flex h-8 cursor-pointer items-center justify-center rounded-2xl px-3 py-1 text-xs hover:bg-primary hover:text-primary-foreground"
+                                                            >
+                                                                <Check className="mr-1 h-3 w-3" />
+                                                                Set Default
+                                                            </Link>
+                                                        )}
+                                                        {address.is_default || (
+                                                            <DeleteAddressDialog
+                                                                addressId={
                                                                     address.id
                                                                 }
-                                                            >
-                                                                <div className="mb-2 flex items-center gap-2">
-                                                                    <span className="font-semibold text-foreground">
-                                                                        {
-                                                                            address.first_name
-                                                                        }{' '}
-                                                                        {
-                                                                            address.last_name
-                                                                        }
-                                                                    </span>
-                                                                    {address.is_default && (
-                                                                        <span className="rounded-full bg-primary px-2 py-0.5 text-xs text-primary-foreground">
-                                                                            Default
-                                                                        </span>
-                                                                    )}
-                                                                </div>
-                                                                <p className="text-sm text-muted-foreground">
-                                                                    {
-                                                                        address.street_address
-                                                                    }
-                                                                </p>
-                                                                <p className="text-sm text-muted-foreground">
-                                                                    {
-                                                                        address
-                                                                            .country
-                                                                            .name
-                                                                    }
-                                                                    ,{' '}
-                                                                    {
-                                                                        address
-                                                                            .city
-                                                                            .name
-                                                                    }
-                                                                </p>
-                                                                <p className="mt-1 text-sm text-muted-foreground">
-                                                                    {
-                                                                        address.phone
-                                                                    }
-                                                                </p>
-                                                            </Label>
-                                                        </div>
-                                                        <div className="flex items-center gap-2">
-                                                            {!address.is_default && (
-                                                                <Link
-                                                                    as="button"
-                                                                    href={updateDefault(
-                                                                        address.id,
-                                                                    )}
-                                                                    preserveScroll
-                                                                    className="flex h-8 cursor-pointer items-center justify-center rounded-2xl px-3 py-1 text-xs hover:bg-primary hover:text-primary-foreground"
-                                                                >
-                                                                    <Check className="mr-1 h-3 w-3" />
-                                                                    Set Default
-                                                                </Link>
-                                                            )}
-                                                            {address.is_default || (
-                                                                <DeleteAddressDialog
-                                                                    addressId={
-                                                                        address.id
-                                                                    }
-                                                                />
-                                                            )}
-                                                            <Button
-                                                                variant="ghost"
-                                                                size="icon"
-                                                                className="cursor-pointer p-0 text-muted-foreground hover:bg-secondary/10 hover:text-foreground"
-                                                            >
-                                                                <Edit className="h-4 w-4" />
-                                                            </Button>
-                                                        </div>
+                                                            />
+                                                        )}
+                                                        <Button
+                                                            variant="ghost"
+                                                            size="icon"
+                                                            type="button"
+                                                            onClick={() =>
+                                                                handleEditAddress(
+                                                                    address,
+                                                                )
+                                                            }
+                                                            className="cursor-pointer p-0 text-muted-foreground hover:bg-secondary/10 hover:text-foreground"
+                                                        >
+                                                            <Edit className="h-4 w-4" />
+                                                        </Button>
                                                     </div>
                                                 </div>
-                                            ))}
-                                        </div>
-                                    </RadioGroup>
+                                            </div>
+                                        ))}
+                                    </div>
                                 )}
 
                                 {/* Add New Address Form */}
-                                {showAddForm && (
+                                {showAddressForm && (
                                     <AddressForm
                                         countries={countries}
-                                        onCancel={() => setShowAddForm(false)}
+                                        address={selectedAddress}
+                                        onCancel={() =>
+                                            handleShowAddressForm(false)
+                                        }
                                     />
                                 )}
 
-                                {addresses.length === 0 && !showAddForm && (
+                                {addresses.length === 0 && !showAddressForm && (
                                     <div className="py-8 text-center text-muted-foreground">
                                         <MapPin className="mx-auto mb-3 h-12 w-12 opacity-50" />
                                         <p>No saved addresses yet</p>

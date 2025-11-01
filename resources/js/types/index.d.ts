@@ -91,6 +91,25 @@ export interface CartItem extends Product {
     product: Product;
 }
 
+export interface City {
+    id: number;
+    name: string;
+}
+
+export interface Country {
+    id: number;
+    name: string;
+}
+export interface Address {
+    id: number;
+    country: Country;
+    city: City;
+    first_name: string;
+    last_name: string;
+    phone: string;
+    street_address: string;
+}
+
 export interface Order {
     id: number;
     customer: string;

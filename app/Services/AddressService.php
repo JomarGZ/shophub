@@ -21,6 +21,15 @@ class AddressService
         return $this->addressRepository->create($data);
     }
 
+    public function update(User $user, Address $address, array $data)
+    {
+        if ($address->user_id !== $user->id) {
+            abort(403, 'Unauthorized');
+        }
+
+        return $this->addressRepository->update($address, $data);
+    }
+
     public function delete(User $user, Address $address): bool
     {
         if ($address->user_id !== $user->id || $address->is_default) {
