@@ -8,8 +8,8 @@ use App\Models\CartItem;
 use App\Models\Product;
 use App\Repositories\CartRepository;
 use App\Services\CartService;
-use Illuminate\Support\Facades\Request;
 use Illuminate\Http\Request as ValidationRequest;
+use Illuminate\Support\Facades\Request;
 use Inertia\Inertia;
 
 class CartController extends Controller
@@ -20,6 +20,7 @@ class CartController extends Controller
     {
         $cart = auth()->user()->load('cart')->cart;
         $orderSummary = $cart ? $this->cartService->calculateTotals($cart) : ['subtotal' => 0, 'shipping_fee' => 0, 'total' => 0];
+
         return Inertia::render('cart/index', [
             'cart_items' => fn () => CartItemResource::collection($this->cartRepo->getPaginatedCartItems(
                 userId: auth()->id(),
@@ -28,7 +29,7 @@ class CartController extends Controller
                 filters: Request::only('search')
             )),
             'filters' => Request::only('search'),
-            'order_summary' => $orderSummary
+            'order_summary' => $orderSummary,
         ]);
     }
 

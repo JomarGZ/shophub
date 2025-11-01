@@ -1,0 +1,41 @@
+<?php
+
+namespace App\Http\Controllers;
+
+use App\Http\Requests\StoreAddressRequest;
+use App\Models\Address;
+use App\Services\AddressService;
+use Illuminate\Http\RedirectResponse;
+
+class AddressController extends Controller
+{
+    public function __construct(protected AddressService $addressService) {}
+
+    public function store(StoreAddressRequest $request): RedirectResponse
+    {
+        $this->addressService->create(auth()->user(), $request->validated());
+
+        return redirect()->route('checkout.index')->with('message', 'Address added successfully.');
+    }
+
+    public function update(Address $address, StoreAddressRequest $request)
+    {
+        $this->addressService->update(auth()->user(), $address, $request->validated());
+
+        return redirect()->back()->with('message', 'Address updated successfully');
+    }
+    
+    public function destroy(Address $address): RedirectResponse
+    {
+        $this->addressService->delete(auth()->user(), $address);
+
+        return redirect()->back()->with('message', 'Address deleted successfully.');
+    }
+
+    public function updateDefault(Address $address): RedirectResponse
+    {
+        $this->addressService->setDefault(auth()->user(), $address);
+
+        return redirect()->back()->with('message', 'Address set as default successfully');
+    }
+}
