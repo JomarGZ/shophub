@@ -20,10 +20,11 @@ class CartController extends Controller
     public function index()
     {
         $cart = auth()->user()->load('cart')->cart;
+        $this->cartService->syncQuantitiesWithStock($cart);
         $orderSummary = $cart ? $this->cartService->calculateTotals($cart) : ['subtotal' => 0, 'shipping_fee' => 0, 'total' => 0];
 
         return Inertia::render('cart/index', [
-            'cart_items' => fn () => CartItemResource::collection($this->cartRepo->getPaginatedCartItems(
+            'cart_items' => fn () => CartItemResource::collection($this->cartRepo->getPaginatedItems(
                 userId: auth()->id(),
                 relations: ['product.category:id,name'],
                 perPage: 10,

@@ -32,7 +32,12 @@ class CartRepository extends Repository
         ]);
     }
 
-    public function getPaginatedCartItems(int $userId, int $perPage = 15, array $columns = ['*'], array $filters = [], array|string $relations = []): Collection|LengthAwarePaginator
+    public function getItemsInStock(Cart $cart, array $columns = ['*'], array|string $relations = []): Collection
+    {
+        return $this->query()->where('cart_id', $cart->id)->whereHas('product', fn ($q) => $q->inStock())->with($relations)->get($columns);
+    }
+
+    public function getPaginatedItems(int $userId, int $perPage = 15, array $columns = ['*'], array $filters = [], array|string $relations = []): Collection|LengthAwarePaginator
     {
         $cartId = Cart::where('user_id', $userId)->value('id');
         if (! $cartId) {

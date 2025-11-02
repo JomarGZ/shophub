@@ -8,6 +8,7 @@ import AppLayout from '@/layouts/app-layout';
 import { index as cartIndex } from '@/routes/cart';
 import { destroy, update } from '@/routes/cart/item';
 import { index } from '@/routes/checkout';
+import { show } from '@/routes/shop';
 import { BreadcrumbItem, CartItem, PaginatedResponse } from '@/types';
 import { Head, Link, router, usePage } from '@inertiajs/react';
 import { Minus, Plus, Search, ShoppingBag, X } from 'lucide-react';
@@ -159,7 +160,7 @@ export default function Index({
                                   <Card key={id} className="shadow-card">
                                       <CardContent className="p-4">
                                           <div className="flex gap-4">
-                                              <Link href={`#`}>
+                                              <Link href={show(product.id)}>
                                                   <img
                                                       src={product.image_url}
                                                       alt={product.name}
@@ -170,7 +171,11 @@ export default function Index({
                                               <div className="flex-1 space-y-2">
                                                   <div className="flex items-start justify-between">
                                                       <div>
-                                                          <Link href={`#`}>
+                                                          <Link
+                                                              href={show(
+                                                                  product.id,
+                                                              )}
+                                                          >
                                                               <h3 className="font-semibold text-foreground transition-colors hover:text-primary">
                                                                   {product.name}
                                                               </h3>
@@ -182,6 +187,11 @@ export default function Index({
                                                                       .name
                                                               }
                                                           </p>
+                                                          <p className="text-sm text-muted-foreground">
+                                                              Stock:{' '}
+                                                              {product.stock}{' '}
+                                                              available
+                                                          </p>
                                                       </div>
                                                       <Button
                                                           variant="ghost"
@@ -191,7 +201,6 @@ export default function Index({
                                                                   Number(id),
                                                               )
                                                           }
-                                                          disabled={loading}
                                                           className="text-muted-foreground hover:text-destructive"
                                                       >
                                                           <X className="h-5 w-5" />
@@ -203,8 +212,7 @@ export default function Index({
                                                           <Button
                                                               variant="ghost"
                                                               size="icon"
-                                                              className="h-8 w-8 cursor-pointer"
-                                                              disabled={loading}
+                                                              className="h-8 w-8"
                                                               onClick={() =>
                                                                   decrementQuantity(
                                                                       Number(
@@ -221,8 +229,7 @@ export default function Index({
                                                           <Button
                                                               variant="ghost"
                                                               size="icon"
-                                                              className="h-8 w-8 cursor-pointer"
-                                                              disabled={loading}
+                                                              className="h-8 w-8"
                                                               onClick={() =>
                                                                   incrementQuantity(
                                                                       Number(
@@ -234,11 +241,17 @@ export default function Index({
                                                               <Plus className="h-4 w-4" />
                                                           </Button>
                                                       </div>
-                                                      <p className="text-xl font-bold text-foreground">
-                                                          $
-                                                          {product.price *
-                                                              quantity}
-                                                      </p>
+                                                      <div className="text-right">
+                                                          <p className="text-sm text-muted-foreground">
+                                                              ${product.price}{' '}
+                                                              each
+                                                          </p>
+                                                          <p className="text-xl font-bold text-foreground">
+                                                              $
+                                                              {product.price *
+                                                                  quantity}
+                                                          </p>
+                                                      </div>
                                                   </div>
                                               </div>
                                           </div>

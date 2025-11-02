@@ -4,30 +4,37 @@ namespace App\Http\Controllers;
 
 use App\Http\Resources\AddressResource;
 use App\Repositories\AddressRepository;
+use App\Repositories\CartRepository;
+use App\Services\CartService;
 use Inertia\Inertia;
 use Nnjeim\World\World;
 
 class CheckoutController extends Controller
 {
-    public function __construct(protected AddressRepository $addressRepository) {}
+    public function __construct(
+        protected AddressRepository $addressRepository, 
+        protected CartRepository $cartRepository, 
+        protected CartService $cartService
+    ) {}
 
     public function index()
     {
 
         $countries = World::countries();
+        $cart = auth()->user()->cart;
+        $this->cartService->syncQuantitiesWithStock($cart);
+        $cartItems = $this->cartRepository->getItemsInStock($cart, relations: ['product']);
+        $cartTotals = $cart 
+            ? $this->cartService->calculateTotals($cart) 
+            : ['subtotal' => 0, 'shipping_fee' => 0, 'total' => 0];
 
-        // Mock cart summary data
-        $cart = [
-            'items' => [
-                ['id' => 101, 'name' => 'Wireless Mouse', 'quantity' => 1, 'price' => 599],
-                ['id' => 102, 'name' => 'Mechanical Keyboard', 'quantity' => 1, 'price' => 2999],
-            ],
-            'subtotal' => 3598,
-            'shipping_fee' => 150,
-            'total' => 3748,
+        $orderSummary = [
+            'items' =>$cartItems,
+            'subtotal' => (int) $cartTotals['subtotal'],
+            'shipping_fee' => (int) $cartTotals['shipping_fee'],
+            'total' => (int) $cartTotals['total'],
         ];
 
-        // Mock available payment methods
         $paymentMethods = [
             ['id' => 'cod', 'name' => 'Cash on Delivery'],
             ['id' => 'paypal', 'name' => 'PayPal'],
@@ -36,7 +43,7 @@ class CheckoutController extends Controller
         return Inertia::render('checkout/index', [
             'addresses' => fn () => AddressResource::collection($this->addressRepository->getAllForUser(auth()->id())),
             'countries' => $countries->success ? $countries->data : [],
-            'cart' => $cart,
+            'order_summary' => $orderSummary,
             'paymentMethods' => $paymentMethods,
         ]);
     }

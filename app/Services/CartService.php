@@ -29,6 +29,33 @@ class CartService
         return $this->cartRepo->save($item);
     }
 
+    public function syncQuantitiesWithStock(Cart $cart)
+    {
+        $cart->loadMissing('cartItems.product');
+
+        if ($cart->cartItems->isEmpty()) {
+            return $cart;
+        }
+
+        foreach($cart->cartItems as $item) {
+            if (!$item->product) {
+                $item->delete();
+                continue;
+            }
+
+            $availableStock = $item->product->stock;
+
+            if ($availableStock <= 0) {
+                $item->delete();
+                continue;
+            }
+            if ($item->quantity > $availableStock) {
+                $item->update(['quantity' => $availableStock]);
+            }
+        }
+
+        return $cart->fresh(['cartItems.product']);
+    }
     public function removeItem(CartItem $item)
     {
         return $this->cartRepo->delete($item);
@@ -44,7 +71,8 @@ class CartService
         $subTotal = DB::table('cart_items')
             ->join('products', 'cart_items.product_id', '=', 'products.id')
             ->where('cart_items.cart_id', $cart->id)
-            ->sum(DB::raw('cart_items.quantity * products.price'));
+            ->where('products.stock', '>', 0)
+            ->sum(DB::raw('LEAST(cart_items.quantity, products.stock) * products.price'));
 
         $shippingFee = config('cart.shipping_fee', 20);
 

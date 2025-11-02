@@ -11,7 +11,7 @@ import { Separator } from '@/components/ui/separator';
 import AppLayout from '@/layouts/app-layout';
 import { index } from '@/routes/cart';
 import { updateDefault } from '@/routes/checkout/address';
-import { Address, type BreadcrumbItem } from '@/types';
+import { Address, Country, type BreadcrumbItem } from '@/types';
 import { Head, Link } from '@inertiajs/react';
 import { Banknote, Check, CreditCard, Edit, MapPin, Plus } from 'lucide-react';
 import { useState } from 'react';
@@ -26,16 +26,25 @@ const breadcrumbs: BreadcrumbItem[] = [
     },
 ];
 
+type orderSummary = {
+    items: any[];
+    subtotal: number;
+    shipping_fee: number;
+    total: number;
+};
+interface IndexProps {
+    addresses: Address[];
+    order_summary: orderSummary;
+    paymentMethods: any[];
+    countries: Country[];
+}
 export default function Index({
     addresses,
     countries,
+    order_summary,
     paymentMethods,
-}: {
-    addresses: any[];
-    cart: any;
-    paymentMethods: any[];
-    countries: any[];
-}) {
+}: IndexProps) {
+    console.log(order_summary);
     const [showAddressForm, setShowAddressForm] = useState(false);
     const [selectedAddress, setSelectedAddress] = useState<Address | null>(
         null,
@@ -55,12 +64,11 @@ export default function Index({
         { name: 'Running Shoes', price: 129.99, quantity: 1 },
     ];
 
-    const subtotal = orderItems.reduce(
-        (sum, item) => sum + item.price * item.quantity,
-        0,
-    );
     const shipping = 0;
-    const total = subtotal + shipping;
+    const checkoutItem = order_summary.items ?? [];
+    const subtotal = order_summary.subtotal ?? 0;
+    const shippingFee = order_summary.shipping_fee ?? 0;
+    const total = order_summary.total ?? 0;
     const hasDefaultAddress = addresses.some((address) => address.is_default);
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
@@ -112,7 +120,9 @@ export default function Index({
                                                 <div className="flex items-start gap-3">
                                                     <div className="flex-1">
                                                         <Label
-                                                            htmlFor={address.id}
+                                                            htmlFor={String(
+                                                                address.id,
+                                                            )}
                                                         >
                                                             <div className="mb-2 flex items-center gap-2">
                                                                 <span className="font-semibold text-foreground">
@@ -313,22 +323,24 @@ export default function Index({
                             <CardContent className="space-y-4 p-6">
                                 {/* Order Items */}
                                 <div className="space-y-3">
-                                    {orderItems.map((item, index) => (
-                                        <div
-                                            key={index}
-                                            className="flex justify-between text-sm"
-                                        >
-                                            <span className="text-foreground">
-                                                {item.name} x{item.quantity}
-                                            </span>
-                                            <span className="font-semibold">
-                                                $
-                                                {(
-                                                    item.price * item.quantity
-                                                ).toFixed(2)}
-                                            </span>
-                                        </div>
-                                    ))}
+                                    {checkoutItem.map(
+                                        ({ id, quantity, product }) => (
+                                            <div
+                                                key={id}
+                                                className="flex justify-between text-sm"
+                                            >
+                                                <span className="text-foreground">
+                                                    {product.name} x{quantity}
+                                                </span>
+                                                <span className="font-semibold">
+                                                    $
+                                                    {(
+                                                        product.price * quantity
+                                                    ).toFixed(2)}
+                                                </span>
+                                            </div>
+                                        ),
+                                    )}
                                 </div>
 
                                 <Separator />
@@ -343,7 +355,7 @@ export default function Index({
                                     <div className="flex justify-between text-foreground">
                                         <span>Shipping</span>
                                         <span className="font-semibold text-primary">
-                                            FREE
+                                            {shippingFee ?? 'FREE'}
                                         </span>
                                     </div>
                                 </div>

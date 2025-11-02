@@ -108,6 +108,7 @@ export interface Address {
     last_name: string;
     phone: string;
     street_address: string;
+    is_default: boolean;
 }
 
 export interface Order {
