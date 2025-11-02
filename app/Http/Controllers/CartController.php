@@ -9,6 +9,7 @@ use App\Models\Product;
 use App\Repositories\CartRepository;
 use App\Services\CartService;
 use Illuminate\Http\Request as ValidationRequest;
+use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Request;
 use Inertia\Inertia;
 
@@ -44,19 +45,22 @@ class CartController extends Controller
 
     public function update(ValidationRequest $request, CartItem $cartItem)
     {
+        Gate::authorize('update', $cartItem);
         $cartItem->load('product');
         $stock = $cartItem->product->stock;
         $request->validate([
             'quantity' => ['required', 'integer', 'min:1', 'max:'.$stock],
         ]);
-        $this->cartService->updateQuantity(user: auth()->user(), cartItem: $cartItem, quantity: $request->quantity);
+        $this->cartService->updateQuantity(cartItem: $cartItem, quantity: $request->quantity);
 
         return redirect()->back();
     }
 
     public function destroy(CartItem $cartItem)
     {
-        $this->cartService->removeItem(user: auth()->user(), item: $cartItem);
+        Gate::authorize('delete', $cartItem);
+
+        $this->cartService->removeItem(item: $cartItem);
 
         return redirect()->back()->with('success', 'Cart item deleted successfully!');
     }
