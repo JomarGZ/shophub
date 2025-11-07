@@ -24,7 +24,7 @@ class Order extends Model
         'shipping_full_name',
         'shipping_city',
         'shipping_country',
-        'shipping_street_address'
+        'shipping_street_address',
     ];
 
     public function orderItems(): HasMany

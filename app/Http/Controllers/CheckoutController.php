@@ -13,8 +13,8 @@ use Nnjeim\World\World;
 class CheckoutController extends Controller
 {
     public function __construct(
-        protected AddressRepository $addressRepository, 
-        protected CartRepository $cartRepository, 
+        protected AddressRepository $addressRepository,
+        protected CartRepository $cartRepository,
         protected CartService $cartService,
         protected CartCalculationService $cartCalculationService
     ) {}
@@ -26,9 +26,9 @@ class CheckoutController extends Controller
         $this->cartService->syncQuantitiesWithStock($cart);
         $cartItems = $this->cartRepository->getItemsInStock($cart, relations: ['product']);
         $cartTotals = $this->cartCalculationService->calculate($cart);
-           
+
         $orderSummary = [
-            'items' =>$cartItems,
+            'items' => $cartItems,
             'subtotal' => (int) $cartTotals['subtotal'],
             'shipping_fee' => (int) $cartTotals['shipping_fee'],
             'total' => (int) $cartTotals['total'],

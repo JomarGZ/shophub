@@ -2,18 +2,16 @@
 
 namespace App\Services;
 
-use App\Models\Order;
 use App\Models\User;
 
 class PlaceOrderService
 {
-
     public function execute(User $user, array $data)
     {
         $user->loadMissing(['cart.cartItems.prodct']);
-        if (!$user->cart) {
+        if (! $user->cart) {
             throw new \Exception('User does not have a cart');
-        } 
+        }
         if ($user->cart->cartItems->isEmpty()) {
             throw new \Exception('Cart is empty');
         }
@@ -25,8 +23,5 @@ class PlaceOrderService
             throw new \InvalidArgumentException('Address is required to process order');
         }
 
-
-
     }
-
 }

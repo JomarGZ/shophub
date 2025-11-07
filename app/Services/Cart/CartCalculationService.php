@@ -14,12 +14,13 @@ class CartCalculationService
             $price = $product->price;
             $quantity = min($item->quantity, $product->stock);
             $lineTotal = $price * $quantity;
+
             return [
                 'product_id' => $product->id,
                 'product_name' => $product->name,
                 'product_price' => $product->price,
                 'quantity' => $item->quantity,
-                'line_total' => $lineTotal
+                'line_total' => $lineTotal,
             ];
         });
 
@@ -31,7 +32,7 @@ class CartCalculationService
             'items' => $items,
             'subtotal' => $subtotal,
             'shipping_fee' => $shippingFee,
-            'total' => $total
+            'total' => $total,
         ];
     }
 }

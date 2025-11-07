@@ -6,7 +6,5 @@ use App\Models\Order;
 
 class CodPaymentMethod implements PaymentMethodInterface
 {
-    public function pay(Order $order): void
-    {
-    }
+    public function pay(Order $order): void {}
 }

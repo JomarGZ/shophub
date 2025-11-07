@@ -7,7 +7,6 @@ use App\Models\CartItem;
 use App\Models\Product;
 use App\Models\User;
 use App\Repositories\CartRepository;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\ValidationException;
 
 class CartService
@@ -18,6 +17,7 @@ class CartService
     {
         return $user->cart ?? $user->cart()->create();
     }
+
     public function addItem(User $user, Product $product, int $quantity): CartItem
     {
         if ($product->stock < $quantity) {
@@ -41,9 +41,10 @@ class CartService
             return $cart;
         }
 
-        foreach($cart->cartItems as $item) {
-            if (!$item->product) {
+        foreach ($cart->cartItems as $item) {
+            if (! $item->product) {
                 $item->delete();
+
                 continue;
             }
 
@@ -51,6 +52,7 @@ class CartService
 
             if ($availableStock <= 0) {
                 $item->delete();
+
                 continue;
             }
             if ($item->quantity > $availableStock) {
@@ -60,6 +62,7 @@ class CartService
 
         return $cart->fresh(['cartItems.product']);
     }
+
     public function removeItem(CartItem $item)
     {
         return $this->cartRepo->delete($item);
@@ -69,5 +72,4 @@ class CartService
     {
         $this->cartRepo->update(model: $cartItem, data: ['quantity' => $quantity]);
     }
-
 }

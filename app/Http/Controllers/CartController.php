@@ -17,7 +17,7 @@ use Inertia\Inertia;
 class CartController extends Controller
 {
     public function __construct(
-        protected CartService $cartService, 
+        protected CartService $cartService,
         protected CartRepository $cartRepo,
         protected CartCalculationService $cartCalculationService
     ) {}
@@ -27,6 +27,7 @@ class CartController extends Controller
         $cart = $this->cartService->getOrCreateCart(request()->user());
         $this->cartService->syncQuantitiesWithStock($cart);
         $orderSummary = $this->cartCalculationService->calculate($cart);
+
         return Inertia::render('cart/index', [
             'cart_items' => fn () => CartItemResource::collection($this->cartRepo->getPaginatedItems(
                 userId: auth()->id(),
