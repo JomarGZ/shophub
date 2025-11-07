@@ -25,7 +25,7 @@ class CheckoutController extends Controller
         $cart = $this->cartService->getOrCreateCart(request()->user());
         $this->cartService->syncQuantitiesWithStock($cart);
         $cartItems = $this->cartRepository->getItemsInStock($cart, relations: ['product']);
-        $cartTotals = $this->cartCalculationService->calculateTotals($cart);
+        $cartTotals = $this->cartCalculationService->calculate($cart);
            
         $orderSummary = [
             'items' =>$cartItems,

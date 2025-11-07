@@ -26,8 +26,7 @@ class CartController extends Controller
     {
         $cart = $this->cartService->getOrCreateCart(request()->user());
         $this->cartService->syncQuantitiesWithStock($cart);
-        $orderSummary = $this->cartCalculationService->calculateTotals($cart);
-
+        $orderSummary = $this->cartCalculationService->calculate($cart);
         return Inertia::render('cart/index', [
             'cart_items' => fn () => CartItemResource::collection($this->cartRepo->getPaginatedItems(
                 userId: auth()->id(),
