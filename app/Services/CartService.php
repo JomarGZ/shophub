@@ -14,13 +14,17 @@ class CartService
 {
     public function __construct(protected CartRepository $cartRepo) {}
 
+    public function getOrCreateCart(User $user)
+    {
+        return $user->cart ?? $user->cart()->create();
+    }
     public function addItem(User $user, Product $product, int $quantity): CartItem
     {
         if ($product->stock < $quantity) {
             throw ValidationException::withMessages(['product' => 'Not enough stock available']);
         }
 
-        $cart = $user->cart ?? $user->cart()->create();
+        $cart = $this->getOrCreateCart($user);
 
         $item = $this->cartRepo->findOrCreateItem(cartId: $cart->id, productId: $product->id);
 
@@ -66,22 +70,4 @@ class CartService
         $this->cartRepo->update(model: $cartItem, data: ['quantity' => $quantity]);
     }
 
-    public function calculateTotals(Cart $cart)
-    {
-        $subTotal = DB::table('cart_items')
-            ->join('products', 'cart_items.product_id', '=', 'products.id')
-            ->where('cart_items.cart_id', $cart->id)
-            ->where('products.stock', '>', 0)
-            ->sum(DB::raw('LEAST(cart_items.quantity, products.stock) * products.price'));
-
-        $shippingFee = config('cart.shipping_fee', 20);
-
-        $total = $shippingFee + $subTotal;
-
-        return [
-            'subtotal' => $subTotal,
-            'shipping_fee' => $shippingFee,
-            'total' => $total,
-        ];
-    }
 }

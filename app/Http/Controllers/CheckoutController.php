@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Http\Resources\AddressResource;
 use App\Repositories\AddressRepository;
 use App\Repositories\CartRepository;
+use App\Services\Cart\CartCalculationService;
 use App\Services\CartService;
 use Inertia\Inertia;
 use Nnjeim\World\World;
@@ -14,20 +15,18 @@ class CheckoutController extends Controller
     public function __construct(
         protected AddressRepository $addressRepository, 
         protected CartRepository $cartRepository, 
-        protected CartService $cartService
+        protected CartService $cartService,
+        protected CartCalculationService $cartCalculationService
     ) {}
 
     public function index()
     {
-
         $countries = World::countries();
-        $cart = auth()->user()->cart;
+        $cart = $this->cartService->getOrCreateCart(request()->user());
         $this->cartService->syncQuantitiesWithStock($cart);
         $cartItems = $this->cartRepository->getItemsInStock($cart, relations: ['product']);
-        $cartTotals = $cart 
-            ? $this->cartService->calculateTotals($cart) 
-            : ['subtotal' => 0, 'shipping_fee' => 0, 'total' => 0];
-
+        $cartTotals = $this->cartCalculationService->calculateTotals($cart);
+           
         $orderSummary = [
             'items' =>$cartItems,
             'subtotal' => (int) $cartTotals['subtotal'],
