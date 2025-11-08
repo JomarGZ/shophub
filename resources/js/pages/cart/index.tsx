@@ -12,7 +12,7 @@ import { show } from '@/routes/shop';
 import { BreadcrumbItem, CartItem, PaginatedResponse } from '@/types';
 import { Head, Link, router, usePage } from '@inertiajs/react';
 import { Minus, Plus, Search, ShoppingBag, X } from 'lucide-react';
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { toast } from 'sonner';
 import { useDebounce } from 'use-debounce';
 const breadcrumbs: BreadcrumbItem[] = [
@@ -70,9 +70,7 @@ export default function Index({
     const [term, setTerm] = useState(filters.search ?? '');
     const [debouncedPending] = useDebounce(pendingUpdate, 500);
     const [debounceSearch] = useDebounce(term, 500);
-    useEffect(() => {
-        setItems(cart_items.data);
-    }, [cart_items]);
+
     useEffect(() => {
         const hasLocalChanges = term !== (filters.search ?? '');
         if (!hasLocalChanges) return;
@@ -131,6 +129,8 @@ export default function Index({
             preserveScroll: true,
         });
     };
+    useEffect(() => setItems(cart_items.data), [cart_items]);
+    const canCheckout = useMemo(() => items.length > 0, [items]);
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="Shop" />
@@ -298,11 +298,13 @@ export default function Index({
                                     <span>${order_summary.total}</span>
                                 </div>
 
-                                <Link href={index()}>
-                                    <Button className="mb-4 h-12 w-full cursor-pointer bg-primary text-base text-primary-foreground hover:bg-primary/90">
-                                        Proceed to Checkout
-                                    </Button>
-                                </Link>
+                                {canCheckout && (
+                                    <Link href={index()}>
+                                        <Button className="mb-4 h-12 w-full cursor-pointer bg-primary text-base text-primary-foreground hover:bg-primary/90">
+                                            Proceed to Checkout
+                                        </Button>
+                                    </Link>
+                                )}
 
                                 <Link href="/shop">
                                     <Button
