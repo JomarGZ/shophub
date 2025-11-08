@@ -12,4 +12,10 @@ enum PaymentMethod: string
             self::COD => 'Cash On Delivery',
         };
     }
+    public function description(): string
+    {
+        return match ($this) {
+            self::COD => 'Pay when you receive your order',
+        };
+    }
 }

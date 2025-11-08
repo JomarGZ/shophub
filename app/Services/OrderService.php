@@ -38,7 +38,7 @@ class OrderService
 
                 $defaultAddress = $this->addressRepository->getAddress($user, default: true);
 
-                $order = $this->createOrder($user, $cartCalcData, $data['payment_method'], $defaultAddress);
+                $order = $this->createOrder($user, $cartCalcData, $data['payment_method'] ?? PaymentMethod::COD, $defaultAddress);
 
                 $this->createOrderItems($order, $cartCalcData['items']);
 

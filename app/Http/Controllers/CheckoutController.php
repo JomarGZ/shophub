@@ -2,11 +2,13 @@
 
 namespace App\Http\Controllers;
 
+use App\Enums\PaymentMethod;
 use App\Http\Resources\AddressResource;
 use App\Repositories\AddressRepository;
 use App\Repositories\CartRepository;
 use App\Services\Cart\CartCalculationService;
 use App\Services\CartService;
+use App\Services\PaymentMethodService;
 use Inertia\Inertia;
 use Nnjeim\World\World;
 
@@ -34,16 +36,13 @@ class CheckoutController extends Controller
             'total' => (int) $cartTotals['total'],
         ];
 
-        $paymentMethods = [
-            ['id' => 'cod', 'name' => 'Cash on Delivery'],
-            ['id' => 'paypal', 'name' => 'PayPal'],
-        ];
+        $paymentMethods = app(PaymentMethodService::class)->all();
 
         return Inertia::render('checkout/index', [
             'addresses' => fn () => AddressResource::collection($this->addressRepository->getAllForUser(auth()->id())),
             'countries' => $countries->success ? $countries->data : [],
             'order_summary' => $orderSummary,
-            'paymentMethods' => $paymentMethods,
+            'payment_methods' => $paymentMethods,
         ]);
     }
 }

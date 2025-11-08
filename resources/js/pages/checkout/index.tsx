@@ -13,7 +13,7 @@ import { index } from '@/routes/cart';
 import { updateDefault } from '@/routes/checkout/address';
 import { Address, Country, type BreadcrumbItem } from '@/types';
 import { Head, Link } from '@inertiajs/react';
-import { Banknote, Check, CreditCard, Edit, MapPin, Plus } from 'lucide-react';
+import { Check, CreditCard, Edit, MapPin, Plus } from 'lucide-react';
 import { useState } from 'react';
 const breadcrumbs: BreadcrumbItem[] = [
     {
@@ -35,16 +35,16 @@ type orderSummary = {
 interface IndexProps {
     addresses: Address[];
     order_summary: orderSummary;
-    paymentMethods: any[];
+    payment_methods: any[];
     countries: Country[];
 }
 export default function Index({
     addresses,
     countries,
     order_summary,
-    paymentMethods,
+    payment_methods,
 }: IndexProps) {
-    console.log(order_summary);
+    console.log(payment_methods);
     const [showAddressForm, setShowAddressForm] = useState(false);
     const [selectedAddress, setSelectedAddress] = useState<Address | null>(
         null,
@@ -59,12 +59,7 @@ export default function Index({
         setSelectedAddress(null);
         setShowAddressForm(isOpen);
     };
-    const orderItems = [
-        { name: 'Wireless Headphones', price: 79.99, quantity: 2 },
-        { name: 'Running Shoes', price: 129.99, quantity: 1 },
-    ];
 
-    const shipping = 0;
     const checkoutItem = order_summary.items ?? [];
     const subtotal = order_summary.subtotal ?? 0;
     const shippingFee = order_summary.shipping_fee ?? 0;
@@ -245,67 +240,43 @@ export default function Index({
                                 >
                                     <div className="space-y-3">
                                         {/* Cash on Delivery */}
-                                        <div
-                                            className={`relative rounded-lg border p-4 transition-all ${
-                                                selectedPaymentMethod === 'cod'
-                                                    ? 'border-primary bg-primary/5'
-                                                    : 'border-border hover:border-primary/50'
-                                            }`}
-                                        >
-                                            <div className="flex items-center gap-3">
-                                                <RadioGroupItem
-                                                    value="cod"
-                                                    id="cod"
-                                                />
-                                                <Label
-                                                    htmlFor="cod"
-                                                    className="flex flex-1 cursor-pointer items-center gap-3"
+                                        {payment_methods.length > 0 &&
+                                            payment_methods.map((method) => (
+                                                <div
+                                                    key={method.value}
+                                                    className={`relative rounded-lg border p-4 transition-all ${
+                                                        selectedPaymentMethod ===
+                                                        'paypal'
+                                                            ? 'border-primary bg-primary/5'
+                                                            : 'border-border hover:border-primary/50'
+                                                    }`}
                                                 >
-                                                    <Banknote className="h-5 w-5 text-primary" />
-                                                    <div>
-                                                        <div className="font-semibold text-foreground">
-                                                            Cash on Delivery
-                                                        </div>
-                                                        <p className="text-sm text-muted-foreground">
-                                                            Pay when you receive
-                                                            your order
-                                                        </p>
+                                                    <div className="flex items-center gap-3">
+                                                        <RadioGroupItem
+                                                            value={method.value}
+                                                            id={method.value}
+                                                        />
+                                                        <Label
+                                                            htmlFor="paypal"
+                                                            className="flex flex-1 cursor-pointer items-center gap-3"
+                                                        >
+                                                            <CreditCard className="h-5 w-5 text-primary" />
+                                                            <div>
+                                                                <div className="font-semibold text-foreground">
+                                                                    {
+                                                                        method.label
+                                                                    }
+                                                                </div>
+                                                                <p className="text-sm text-muted-foreground">
+                                                                    {
+                                                                        method.description
+                                                                    }
+                                                                </p>
+                                                            </div>
+                                                        </Label>
                                                     </div>
-                                                </Label>
-                                            </div>
-                                        </div>
-
-                                        {/* PayPal */}
-                                        <div
-                                            className={`relative rounded-lg border p-4 transition-all ${
-                                                selectedPaymentMethod ===
-                                                'paypal'
-                                                    ? 'border-primary bg-primary/5'
-                                                    : 'border-border hover:border-primary/50'
-                                            }`}
-                                        >
-                                            <div className="flex items-center gap-3">
-                                                <RadioGroupItem
-                                                    value="paypal"
-                                                    id="paypal"
-                                                />
-                                                <Label
-                                                    htmlFor="paypal"
-                                                    className="flex flex-1 cursor-pointer items-center gap-3"
-                                                >
-                                                    <CreditCard className="h-5 w-5 text-primary" />
-                                                    <div>
-                                                        <div className="font-semibold text-foreground">
-                                                            PayPal
-                                                        </div>
-                                                        <p className="text-sm text-muted-foreground">
-                                                            Pay securely with
-                                                            PayPal
-                                                        </p>
-                                                    </div>
-                                                </Label>
-                                            </div>
-                                        </div>
+                                                </div>
+                                            ))}
                                     </div>
                                 </RadioGroup>
                             </CardContent>
