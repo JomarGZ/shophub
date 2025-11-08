@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Enums\OrderStatus;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -17,6 +18,7 @@ class Order extends Model
         'status',
         'subtotal',
         'shipping_fee',
+        'shipping_phone',
         'discount',
         'total',
         'rejection_reason',
@@ -25,6 +27,10 @@ class Order extends Model
         'shipping_city',
         'shipping_country',
         'shipping_street_address',
+    ];
+
+    protected $casts = [
+        'status' => OrderStatus::class,
     ];
 
     public function orderItems(): HasMany

@@ -2,10 +2,17 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\StoreOrderRequest;
+use App\Services\OrderService;
 use Inertia\Inertia;
 
 class OrderController extends Controller
 {
+
+    public function __construct(protected OrderService $orderService)
+    {
+        
+    }
     public function index()
     {
         return Inertia::render('orders/index', [
@@ -66,5 +73,12 @@ class OrderController extends Controller
                 ],
             ],
         ]);
+    }
+
+    public function store(StoreOrderRequest $request)
+    {
+        $this->orderService->execute(request()->user(), $request->validated());
+
+        return redirect()->route('orders.index')->with('message', 'Order is placed successfully');
     }
 }

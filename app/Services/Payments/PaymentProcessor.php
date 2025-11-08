@@ -2,7 +2,9 @@
 
 namespace App\Services\Payments;
 
+use App\Enums\PaymentMethod;
 use App\Models\Order;
+use InvalidArgumentException;
 
 class PaymentProcessor
 {
@@ -13,8 +15,22 @@ class PaymentProcessor
         $this->method = $method;
     }
 
-    public function handle(Order $order)
+    public function make(PaymentMethod $method): static
     {
+        $this->method = match ($method) {
+            PaymentMethod::COD => new CodPaymentMethod(),
+            default => throw new InvalidArgumentException('Unsupported payment method')
+        };
+
+        return $this;
+    }
+
+    public function handle(Order $order): void
+    {
+        if (! isset($this->method)) {
+            throw new InvalidArgumentException('Payment method not set');
+        }
+
         $this->method->pay($order);
     }
 }

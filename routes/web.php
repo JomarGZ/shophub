@@ -1,5 +1,6 @@
 <?php
 
+use App\Enums\PaymentMethod;
 use App\Http\Controllers\AddressController;
 use App\Http\Controllers\CartController;
 use App\Http\Controllers\CheckoutController;
@@ -7,6 +8,7 @@ use App\Http\Controllers\CityController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\OrderController;
 use App\Http\Controllers\ShopController;
+use App\Services\OrderService;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', HomeController::class)->name('home');
@@ -21,6 +23,13 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
     Route::resource('checkout/address', AddressController::class)->only(['store', 'destroy', 'update']);
     Route::patch('checkout/address/{address}/default', [AddressController::class, 'updateDefault'])->name('checkout.address.updateDefault');
+    Route::get('test', function () {
+        $order = app(OrderService::class)->execute(request()->user(), [
+            'payment_method' => PaymentMethod::COD,
+        ]);
+
+        return $order;
+    });
 });
 
 Route::get('city/list', [CityController::class, 'index']);

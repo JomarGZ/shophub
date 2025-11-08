@@ -19,10 +19,10 @@ return new class extends Migration
             $table->foreignIdFor(Address::class)->nullable()->constrained()->nullOnDelete();
             $table->string('status'); // OrderStatusEnum
 
-            $table->decimal('subtotal', 10, 2);
-            $table->decimal('shipping_fee', 10, 2);
-            $table->decimal('discount', 10, 2);
-            $table->decimal('total', 10, 2);
+            $table->decimal('subtotal', 10, 2)->default(0);
+            $table->decimal('shipping_fee', 10, 2)->default(0);
+            $table->decimal('discount', 10, 2)->default(0);
+            $table->decimal('total', 10, 2)->default(0);
 
             $table->string('rejection_reason')->nullable();
             $table->string('payment_method'); // PaymentMethodEnum
