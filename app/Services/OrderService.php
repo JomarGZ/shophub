@@ -4,6 +4,7 @@ namespace App\Services;
 
 use App\Enums\OrderStatus;
 use App\Enums\PaymentMethod;
+use App\Factories\PaymentMethodFactory;
 use App\Models\Address;
 use App\Models\Order;
 use App\Models\User;
@@ -30,7 +31,7 @@ class OrderService
 
         $cartCalcData = $this->cartCalcService->calculate($user->cart);
 
-        $processor = new PaymentProcessor;
+        $processor = new PaymentProcessor(PaymentMethodFactory::make($data['payment_method']));
 
         try {
             return DB::transaction(function () use ($data, $user, $cartCalcData, $processor) {
@@ -41,7 +42,7 @@ class OrderService
 
                 $this->createOrderItems($order, $cartCalcData['items']);
 
-                $processor->make($data['payment_method'])->handle($order);
+                $processor->handle($order);
 
                 $user->cart->cartItems()->delete();
 
