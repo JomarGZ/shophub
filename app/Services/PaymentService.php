@@ -4,15 +4,15 @@ namespace App\Services;
 
 use App\Enums\PaymentMethod;
 
-class PaymentMethodService
+class PaymentService
 {
     public function all()
     {
-        return collect(PaymentMethod::cases())->map(fn($method) => [
+        return collect(PaymentMethod::cases())->map(fn ($method) => [
             'value' => $method->value,
             'label' => $method->label(),
             'description' => $method->description(),
-            'is_default' => $method->value === PaymentMethod::COD->value
+            'is_default' => $method->value === PaymentMethod::COD->value,
         ]);
     }
 }

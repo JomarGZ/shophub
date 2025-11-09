@@ -6,5 +6,10 @@ use App\Models\Order;
 
 interface PaymentMethodInterface
 {
-    public function pay(Order $order): void;
+    /**
+     * Process the payment.
+     *
+     * @return mixed
+     */
+    public function pay(Order $order);
 }

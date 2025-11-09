@@ -12,7 +12,7 @@ class PaymentMethodFactory
     public static function make(PaymentMethod $method): PaymentMethodInterface
     {
         return match ($method) {
-            PaymentMethod::COD => new CodPaymentMethod(),
+            PaymentMethod::COD => app(CodPaymentMethod::class),
             default => throw new InvalidArgumentException('Unsupported payment method')
         };
     }

@@ -8,11 +8,8 @@ use Inertia\Inertia;
 
 class OrderController extends Controller
 {
+    public function __construct(protected OrderService $orderService) {}
 
-    public function __construct(protected OrderService $orderService)
-    {
-        
-    }
     public function index()
     {
         return Inertia::render('orders/index', [

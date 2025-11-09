@@ -1,6 +1,5 @@
 <?php
 
-use App\Enums\PaymentMethod;
 use App\Http\Controllers\AddressController;
 use App\Http\Controllers\CartController;
 use App\Http\Controllers\CheckoutController;
@@ -23,9 +22,8 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
     Route::resource('checkout/address', AddressController::class)->only(['store', 'destroy', 'update']);
     Route::patch('checkout/address/{address}/default', [AddressController::class, 'updateDefault'])->name('checkout.address.updateDefault');
+    Route::get('city/list', [CityController::class, 'index']);
 });
-
-Route::get('city/list', [CityController::class, 'index']);
 
 require __DIR__.'/settings.php';
 require __DIR__.'/auth.php';

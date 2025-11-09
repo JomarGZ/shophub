@@ -5,6 +5,9 @@ namespace App\Repositories;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\Relations\Relation;
+use Illuminate\Support\Facades\DB;
 
 abstract class Repository
 {
@@ -38,5 +41,34 @@ abstract class Repository
     public function delete(Model $model): bool
     {
         return $model->delete();
+    }
+
+    public function transaction(\Closure $callback)
+    {
+        return DB::transaction($callback);
+    }
+
+    public function createWithRelation(array $data, array $relations = [])
+    {
+        return $this->transaction(function () use ($data, $relations) {
+            $model = $this->create($data);
+            foreach ($relations as $relation => $relationData) {
+                if (! method_exists($model, $relation)) {
+                    continue;
+                }
+                $relationInstance = $model->relation();
+
+                if (! $relationInstance instanceof Relation) {
+                    continue;
+                }
+                if ($relationInstance instanceof BelongsToMany) {
+                    $relationInstance->sync($relationData);
+                } elseif (is_array($relationData) && isset($relationData[0])) {
+                    $relationInstance->createMany($relationData);
+                } else {
+                    $relationInstance->create($relationData);
+                }
+            }
+        });
     }
 }

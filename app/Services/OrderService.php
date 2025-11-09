@@ -34,12 +34,11 @@ class OrderService
         $processor = new PaymentProcessor(PaymentMethodFactory::make($method));
 
         try {
-            return DB::transaction(function () use ($data, $user, $cartCalcData, $processor) {
+            return DB::transaction(function () use ($user, $cartCalcData, $processor, $method) {
 
                 $defaultAddress = $this->addressRepository->getAddress($user, default: true);
 
                 $order = $this->createOrder($user, $cartCalcData, $method ?? PaymentMethod::COD, $defaultAddress);
-
                 $this->createOrderItems($order, $cartCalcData['items']);
 
                 $processor->handle($order);
