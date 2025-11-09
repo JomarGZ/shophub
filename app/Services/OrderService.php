@@ -21,7 +21,8 @@ class OrderService
     public function __construct(
         protected CartCalculationService $cartCalcService,
         protected OrderRepository $orderRepository,
-        protected AddressRepository $addressRepository
+        protected AddressRepository $addressRepository,
+        protected StockService $stockService
     ) {}
 
     public function execute(User $user, array $data)
@@ -40,7 +41,7 @@ class OrderService
 
                 $order = $this->createOrder($user, $cartCalcData, $method ?? PaymentMethod::COD, $defaultAddress);
                 $this->createOrderItems($order, $cartCalcData['items']);
-
+                $this->stockService->decrementOrderStock($order);
                 $processor->handle($order);
 
                 $user->cart->cartItems()->delete();

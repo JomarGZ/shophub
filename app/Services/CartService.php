@@ -35,7 +35,7 @@ class CartService
 
     public function syncQuantitiesWithStock(Cart $cart)
     {
-        $cart->loadMissing('cartItems.product');
+        // $cart->loadMissing(['cartItems.product', 'cartItems']);
 
         if ($cart->cartItems->isEmpty()) {
             return $cart;
@@ -60,7 +60,7 @@ class CartService
             }
         }
 
-        return $cart->fresh(['cartItems.product']);
+        return $cart->fresh();
     }
 
     public function removeItem(CartItem $item)
