@@ -30,15 +30,15 @@ class OrderService
         $this->validateOrderPreconditions($user, $data);
 
         $cartCalcData = $this->cartCalcService->calculate($user->cart);
-
-        $processor = new PaymentProcessor(PaymentMethodFactory::make($data['payment_method']));
+        $method = PaymentMethod::from($data['selected_payment_method']);
+        $processor = new PaymentProcessor(PaymentMethodFactory::make($method));
 
         try {
             return DB::transaction(function () use ($data, $user, $cartCalcData, $processor) {
 
                 $defaultAddress = $this->addressRepository->getAddress($user, default: true);
 
-                $order = $this->createOrder($user, $cartCalcData, $data['payment_method'] ?? PaymentMethod::COD, $defaultAddress);
+                $order = $this->createOrder($user, $cartCalcData, $method ?? PaymentMethod::COD, $defaultAddress);
 
                 $this->createOrderItems($order, $cartCalcData['items']);
 
@@ -66,7 +66,7 @@ class OrderService
         if ($user->cart->cartItems->isEmpty()) {
             throw new \Exception('Cart is empty');
         }
-        if (empty($data['payment_method'])) {
+        if (empty($data['selected_payment_method'])) {
             throw new \InvalidArgumentException('Payment method is required to process order');
         }
 

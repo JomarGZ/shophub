@@ -3,6 +3,7 @@
 import { AddressForm } from '@/components/checkout/address-form';
 import DeleteAddressDialog from '@/components/checkout/delete-address-dialog';
 import { Container } from '@/components/container';
+import InputError from '@/components/input-error';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Label } from '@/components/ui/label';
@@ -11,10 +12,11 @@ import { Separator } from '@/components/ui/separator';
 import AppLayout from '@/layouts/app-layout';
 import { index } from '@/routes/cart';
 import { updateDefault } from '@/routes/checkout/address';
+import orders from '@/routes/orders';
 import { Address, Country, type BreadcrumbItem } from '@/types';
-import { Head, Link } from '@inertiajs/react';
-import { Check, CreditCard, Edit, MapPin, Plus } from 'lucide-react';
-import { useState } from 'react';
+import { Head, Link, useForm } from '@inertiajs/react';
+import { Banknote, Check, CreditCard, Edit, MapPin, Plus } from 'lucide-react';
+import React, { useState } from 'react';
 const breadcrumbs: BreadcrumbItem[] = [
     {
         title: 'Cart',
@@ -44,12 +46,16 @@ export default function Index({
     order_summary,
     payment_methods,
 }: IndexProps) {
-    console.log(payment_methods);
     const [showAddressForm, setShowAddressForm] = useState(false);
     const [selectedAddress, setSelectedAddress] = useState<Address | null>(
         null,
     );
-    const [selectedPaymentMethod, setSelectedPaymentMethod] = useState('cod');
+    const defaultPayment =
+        payment_methods.find((m) => m.default)?.value ?? 'cod';
+    const form = useForm<{ selected_payment_method: string }>({
+        selected_payment_method: defaultPayment,
+    });
+    const { data, setData, processing, errors, post } = form;
 
     const handleEditAddress = (address: Address) => {
         setShowAddressForm(true);
@@ -59,12 +65,19 @@ export default function Index({
         setSelectedAddress(null);
         setShowAddressForm(isOpen);
     };
-
+    const handlePlaceOrder = (e: React.FormEvent) => {
+        e.preventDefault();
+        post(orders.store().url, {
+            preserveScroll: true,
+            onSuccess: () => console.log('success'),
+        });
+    };
     const checkoutItem = order_summary.items ?? [];
     const subtotal = order_summary.subtotal ?? 0;
     const shippingFee = order_summary.shipping_fee ?? 0;
     const total = order_summary.total ?? 0;
     const hasDefaultAddress = addresses.some((address) => address.is_default);
+
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="Checkout" />
@@ -220,67 +233,6 @@ export default function Index({
                                 )}
                             </CardContent>
                         </Card>
-
-                        {/* Payment Method */}
-                        <Card className="shadow-card">
-                            <CardHeader className="border-b border-secondary/20">
-                                <CardTitle className="flex items-center gap-2 text-secondary">
-                                    <CreditCard className="h-5 w-5" />
-                                    Payment Method
-                                </CardTitle>
-                            </CardHeader>
-                            <CardContent className="p-6">
-                                <RadioGroup
-                                    value={selectedPaymentMethod}
-                                    onValueChange={(value) =>
-                                        setSelectedPaymentMethod(
-                                            value as 'cod' | 'paypal',
-                                        )
-                                    }
-                                >
-                                    <div className="space-y-3">
-                                        {/* Cash on Delivery */}
-                                        {payment_methods.length > 0 &&
-                                            payment_methods.map((method) => (
-                                                <div
-                                                    key={method.value}
-                                                    className={`relative rounded-lg border p-4 transition-all ${
-                                                        selectedPaymentMethod ===
-                                                        'paypal'
-                                                            ? 'border-primary bg-primary/5'
-                                                            : 'border-border hover:border-primary/50'
-                                                    }`}
-                                                >
-                                                    <div className="flex items-center gap-3">
-                                                        <RadioGroupItem
-                                                            value={method.value}
-                                                            id={method.value}
-                                                        />
-                                                        <Label
-                                                            htmlFor="paypal"
-                                                            className="flex flex-1 cursor-pointer items-center gap-3"
-                                                        >
-                                                            <CreditCard className="h-5 w-5 text-primary" />
-                                                            <div>
-                                                                <div className="font-semibold text-foreground">
-                                                                    {
-                                                                        method.label
-                                                                    }
-                                                                </div>
-                                                                <p className="text-sm text-muted-foreground">
-                                                                    {
-                                                                        method.description
-                                                                    }
-                                                                </p>
-                                                            </div>
-                                                        </Label>
-                                                    </div>
-                                                </div>
-                                            ))}
-                                    </div>
-                                </RadioGroup>
-                            </CardContent>
-                        </Card>
                     </div>
 
                     {/* Order Summary */}
@@ -292,59 +244,144 @@ export default function Index({
                                 </CardTitle>
                             </CardHeader>
                             <CardContent className="space-y-4 p-6">
-                                {/* Order Items */}
-                                <div className="space-y-3">
-                                    {checkoutItem.map(
-                                        ({ id, quantity, product }) => (
-                                            <div
-                                                key={id}
-                                                className="flex justify-between text-sm"
-                                            >
-                                                <span className="text-foreground">
-                                                    {product.name} x{quantity}
-                                                </span>
-                                                <span className="font-semibold">
-                                                    $
-                                                    {(
-                                                        product.price * quantity
-                                                    ).toFixed(2)}
-                                                </span>
-                                            </div>
-                                        ),
-                                    )}
-                                </div>
-
-                                <Separator />
-
-                                <div className="space-y-2">
-                                    <div className="flex justify-between text-foreground">
-                                        <span>Subtotal</span>
-                                        <span className="font-semibold">
-                                            ${subtotal.toFixed(2)}
-                                        </span>
-                                    </div>
-                                    <div className="flex justify-between text-foreground">
-                                        <span>Shipping</span>
-                                        <span className="font-semibold text-primary">
-                                            {shippingFee ?? 'FREE'}
-                                        </span>
-                                    </div>
-                                </div>
-
-                                <Separator />
-
-                                <div className="flex justify-between text-xl font-bold text-foreground">
-                                    <span>Total</span>
-                                    <span>${total.toFixed(2)}</span>
-                                </div>
-
-                                <Button
-                                    type="submit"
-                                    disabled={!hasDefaultAddress}
-                                    className="h-12 w-full bg-primary text-base text-primary-foreground hover:bg-primary/90"
+                                <form
+                                    onSubmit={handlePlaceOrder}
+                                    className="flex flex-col gap-4"
                                 >
-                                    Place Order
-                                </Button>
+                                    <div className="space-y-3">
+                                        {checkoutItem.map(
+                                            ({ id, quantity, product }) => (
+                                                <div
+                                                    key={id}
+                                                    className="flex justify-between text-sm"
+                                                >
+                                                    <span className="text-foreground">
+                                                        {product.name} x
+                                                        {quantity}
+                                                    </span>
+                                                    <span className="font-semibold">
+                                                        $
+                                                        {product.price *
+                                                            quantity}
+                                                    </span>
+                                                </div>
+                                            ),
+                                        )}
+                                    </div>
+                                    <Separator />
+
+                                    <div className="space-y-2">
+                                        <div className="flex justify-between text-foreground">
+                                            <span>Subtotal</span>
+                                            <span className="font-semibold">
+                                                ${subtotal}
+                                            </span>
+                                        </div>
+                                        <div className="flex justify-between text-foreground">
+                                            <span>Shipping</span>
+                                            <span className="font-semibold text-primary">
+                                                {shippingFee ?? 'FREE'}
+                                            </span>
+                                        </div>
+                                    </div>
+
+                                    <Separator />
+
+                                    <div className="flex justify-between text-xl font-bold text-foreground">
+                                        <span>Total</span>
+                                        <span>${total}</span>
+                                    </div>
+
+                                    <Separator />
+
+                                    {/* Payment Method */}
+                                    <div>
+                                        <h3 className="mb-3 flex items-center gap-2 font-semibold text-foreground">
+                                            <CreditCard className="h-5 w-5" />
+                                            Payment Method
+                                        </h3>
+
+                                        <RadioGroup
+                                            value={
+                                                data.selected_payment_method ??
+                                                defaultPayment
+                                            }
+                                            onValueChange={(value) =>
+                                                setData(
+                                                    'selected_payment_method',
+                                                    value as string,
+                                                )
+                                            }
+                                        >
+                                            <div className="space-y-3">
+                                                {/* Cash on Delivery */}
+                                                {payment_methods.length > 0 &&
+                                                    payment_methods.map(
+                                                        (method) => (
+                                                            <div
+                                                                key={
+                                                                    method.value
+                                                                }
+                                                                className={`relative rounded-lg border p-3 transition-all ${
+                                                                    data.selected_payment_method ===
+                                                                    method.value
+                                                                        ? 'border-primary bg-primary/5'
+                                                                        : 'border-border hover:border-primary/50'
+                                                                }`}
+                                                            >
+                                                                <div className="flex items-center gap-3">
+                                                                    <RadioGroupItem
+                                                                        value={
+                                                                            method.value
+                                                                        }
+                                                                        id={
+                                                                            method.value
+                                                                        }
+                                                                    />
+                                                                    <Label
+                                                                        htmlFor={
+                                                                            method.value
+                                                                        }
+                                                                        className="flex flex-1 cursor-pointer items-center gap-3"
+                                                                    >
+                                                                        <Banknote className="h-5 w-5 text-primary" />
+                                                                        <div>
+                                                                            <div className="text-sm font-semibold text-foreground">
+                                                                                {
+                                                                                    method.label
+                                                                                }
+                                                                            </div>
+                                                                            <p className="text-xs text-muted-foreground">
+                                                                                {
+                                                                                    method.description
+                                                                                }
+                                                                            </p>
+                                                                        </div>
+                                                                    </Label>
+                                                                </div>
+                                                            </div>
+                                                        ),
+                                                    )}
+                                            </div>
+                                        </RadioGroup>
+                                        <InputError
+                                            message={
+                                                errors.selected_payment_method
+                                            }
+                                            className="mt-2"
+                                        />
+                                    </div>
+
+                                    <Button
+                                        type="submit"
+                                        disabled={
+                                            !hasDefaultAddress || processing
+                                        }
+                                        className="h-12 w-full bg-primary text-base text-primary-foreground hover:bg-primary/90"
+                                    >
+                                        Place Order
+                                    </Button>
+                                </form>
                             </CardContent>
                         </Card>
                     </div>

@@ -11,7 +11,8 @@ class PaymentMethodService
         return collect(PaymentMethod::cases())->map(fn($method) => [
             'value' => $method->value,
             'label' => $method->label(),
-            'description' => $method->description()
+            'description' => $method->description(),
+            'is_default' => $method->value === PaymentMethod::COD->value
         ]);
     }
 }

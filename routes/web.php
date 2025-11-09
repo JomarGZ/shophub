@@ -20,16 +20,10 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::patch('cart/{cartItem}', [CartController::class, 'update'])->name('cart.item.update');
     Route::get('/checkout', [CheckoutController::class, 'index'])->name('checkout.index');
     Route::get('/orders', [OrderController::class, 'index'])->name('orders.index');
+    Route::post('/orders', [OrderController::class, 'store'])->name('orders.store');
 
     Route::resource('checkout/address', AddressController::class)->only(['store', 'destroy', 'update']);
     Route::patch('checkout/address/{address}/default', [AddressController::class, 'updateDefault'])->name('checkout.address.updateDefault');
-    Route::get('test', function () {
-        $order = app(OrderService::class)->execute(request()->user(), [
-            'payment_method' => PaymentMethod::COD,
-        ]);
-
-        return $order;
-    });
 });
 
 Route::get('city/list', [CityController::class, 'index']);

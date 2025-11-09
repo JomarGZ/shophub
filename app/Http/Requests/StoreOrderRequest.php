@@ -24,7 +24,7 @@ class StoreOrderRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'payment_method' => ['required', Rule::enum(PaymentMethod::class)]
+            'selected_payment_method' => ['required', Rule::enum(PaymentMethod::class)]
         ];
     }
 }
