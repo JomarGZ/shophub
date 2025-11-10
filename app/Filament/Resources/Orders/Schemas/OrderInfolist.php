@@ -2,7 +2,9 @@
 
 namespace App\Filament\Resources\Orders\Schemas;
 
+use Filament\Forms\Components\Repeater;
 use Filament\Infolists\Components\TextEntry;
+use Filament\Schemas\Components\Section;
 use Filament\Schemas\Schema;
 
 class OrderInfolist
@@ -11,35 +13,52 @@ class OrderInfolist
     {
         return $schema
             ->components([
-                TextEntry::make('user_id')
-                    ->numeric(),
-                TextEntry::make('address_id')
-                    ->numeric()
-                    ->placeholder('-'),
-                TextEntry::make('status')
-                    ->badge(),
-                TextEntry::make('subtotal')
-                    ->numeric(),
-                TextEntry::make('shipping_fee')
-                    ->numeric(),
-                TextEntry::make('discount')
-                    ->numeric(),
-                TextEntry::make('total')
-                    ->numeric(),
-                TextEntry::make('rejection_reason')
-                    ->placeholder('-'),
-                TextEntry::make('payment_method'),
-                TextEntry::make('shipping_full_name'),
-                TextEntry::make('shipping_phone'),
-                TextEntry::make('shipping_country'),
-                TextEntry::make('shipping_city'),
-                TextEntry::make('shipping_street_address'),
-                TextEntry::make('created_at')
-                    ->dateTime()
-                    ->placeholder('-'),
-                TextEntry::make('updated_at')
-                    ->dateTime()
-                    ->placeholder('-'),
+                Section::make('Customer Information')
+                    ->components([
+                        TextEntry::make('shipping_full_name')
+                            ->label('Customer Name'),
+                        TextEntry::make('shipping_phone')
+                            ->label('Contact Number'),
+                        TextEntry::make('payment_method')
+                            ->label('Payment Method'),
+                    ]),
+                Section::make('Order Details')
+                    ->components([
+                        TextEntry::make('status')
+                            ->label('Order Status')
+                            ->badge(),
+                        TextEntry::make('created_at')
+                            ->label('Date Ordered')
+                            ->dateTime()
+                            ->placeholder('-'),
+                        TextEntry::make('rejection_reason')
+                            ->label('Rejection Reason')
+                            ->placeholder('-'),
+                    ]),
+                Section::make('Financial Summary')
+                    ->components([
+                        TextEntry::make('subtotal')
+                            ->label('Subtotal')
+                            ->numeric(),
+                        TextEntry::make('shipping_fee')
+                            ->label('Shipping Fee')
+                            ->numeric(),
+                        TextEntry::make('discount')
+                            ->label('Discount')
+                            ->numeric(),
+                        TextEntry::make('total')
+                            ->label('Total Amount')
+                            ->numeric(),
+                    ]),
+                Section::make('Shipping Address')
+                    ->components([
+                        TextEntry::make('shipping_country')
+                            ->label('Country'),
+                        TextEntry::make('shipping_city')
+                            ->label('City'),
+                        TextEntry::make('shipping_street_address')
+                            ->label('Street Address'),
+                    ]),
             ]);
     }
 }

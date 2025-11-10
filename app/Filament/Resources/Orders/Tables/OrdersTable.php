@@ -3,6 +3,7 @@
 namespace App\Filament\Resources\Orders\Tables;
 
 use App\Enums\PaymentStatus;
+use Filament\Actions\Action;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
@@ -33,6 +34,9 @@ class OrdersTable
                 TextColumn::make('payment.status')
                     ->badge()
                     ->color(fn ($record) => $record->payment->status->color())
+                    ->searchable(),
+                TextColumn::make('status')
+                    ->badge()
                     ->searchable(),
                 TextColumn::make('created_at')
                     ->label('Date Ordered')
