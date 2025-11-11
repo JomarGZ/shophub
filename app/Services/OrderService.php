@@ -39,7 +39,7 @@ class OrderService
 
                 $defaultAddress = $this->addressRepository->getAddress($user, default: true);
 
-                $order = $this->createOrder($user, $cartCalcData, $method ?? PaymentMethod::COD, $defaultAddress);
+                $order = $this->createOrder($cartCalcData, $method ?? PaymentMethod::COD, $defaultAddress);
                 $this->createOrderItems($order, $cartCalcData['items']);
                 $this->stockService->decrementOrderStock($order);
                 $processor->handle($order);
@@ -75,10 +75,9 @@ class OrderService
         }
     }
 
-    private function createOrder(User $user, array $cartTotals, PaymentMethod $paymentMethod, Address $address)
+    private function createOrder(array $cartTotals, PaymentMethod $paymentMethod, Address $address)
     {
         return $this->orderRepository->create([
-            'user_id' => $user->id,
             'address_id' => $address->id,
             'status' => OrderStatus::PENDING,
             'subtotal' => $cartTotals['subtotal'],
