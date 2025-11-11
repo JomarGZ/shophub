@@ -15,7 +15,6 @@ class Payment extends Model
 
     protected $fillable = [
         'order_id',
-        'provider',
         'status',
         'amount',
         'currency',
@@ -30,12 +29,15 @@ class Payment extends Model
     ];
 
     protected $casts = [
-        'provider' => PaymentMethod::class,
         'status' => PaymentStatus::class,
     ];
 
     public function order(): BelongsTo
     {
         return $this->belongsTo(Order::class);
+    }
+    public function isPaid(): Bool
+    {
+        return $this->status === PaymentStatus::PAID;
     }
 }

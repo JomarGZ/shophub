@@ -13,7 +13,6 @@ class CodPaymentMethod implements PaymentMethodInterface
     {
         $this->paymentRepository->create([
             'order_id' => $order->id,
-            'provider' => $order->payment_method,
             'amount' => $order->total,
         ]);
     }

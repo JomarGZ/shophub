@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Enums\OrderStatus;
+use App\Enums\PaymentMethod;
 use App\Observers\OrderObserver;
 use Illuminate\Database\Eloquent\Attributes\ObservedBy;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -35,6 +36,7 @@ class Order extends Model
 
     protected $casts = [
         'status' => OrderStatus::class,
+        'payment_method' => PaymentMethod::class
     ];
 
     public function orderItems(): HasMany
@@ -45,5 +47,10 @@ class Order extends Model
     public function payment(): HasOne
     {
         return $this->hasOne(Payment::class);
+    }
+
+    public function isCOD(): Bool
+    {
+        return $this->payment_method === PaymentMethod::COD;
     }
 }
