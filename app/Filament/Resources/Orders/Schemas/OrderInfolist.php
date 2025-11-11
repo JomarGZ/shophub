@@ -2,7 +2,6 @@
 
 namespace App\Filament\Resources\Orders\Schemas;
 
-use Filament\Forms\Components\Repeater;
 use Filament\Infolists\Components\TextEntry;
 use Filament\Schemas\Components\Section;
 use Filament\Schemas\Schema;
@@ -26,7 +25,9 @@ class OrderInfolist
                     ->components([
                         TextEntry::make('status')
                             ->label('Order Status')
-                            ->badge(),
+                            ->badge()
+                            ->color(fn ($record) => $record->status->color())
+                            ->getStateUsing(fn ($record) => $record->status->label()),
                         TextEntry::make('created_at')
                             ->label('Date Ordered')
                             ->dateTime()
