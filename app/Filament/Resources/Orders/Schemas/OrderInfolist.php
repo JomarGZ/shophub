@@ -40,16 +40,16 @@ class OrderInfolist
                     ->components([
                         TextEntry::make('subtotal')
                             ->label('Subtotal')
-                            ->numeric(),
+                            ->money('USD'),
                         TextEntry::make('shipping_fee')
                             ->label('Shipping Fee')
-                            ->numeric(),
+                            ->money('USD'),
                         TextEntry::make('discount')
                             ->label('Discount')
-                            ->numeric(),
+                            ->money('USD'),
                         TextEntry::make('total')
                             ->label('Total Amount')
-                            ->numeric(),
+                            ->money('USD'),
                     ]),
                 Section::make('Shipping Address')
                     ->components([
