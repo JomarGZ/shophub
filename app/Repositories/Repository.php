@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\Relation;
+use Illuminate\Pagination\Paginator;
 use Illuminate\Support\Facades\DB;
 
 abstract class Repository
@@ -26,6 +27,11 @@ abstract class Repository
     public function paginate(int $perPage = 15, array $columns = ['*'], array|string $relations = []): LengthAwarePaginator
     {
         return $this->query()->with($relations)->paginate($perPage, $columns);
+    }
+
+    public function simplePaginate(int $perPage = 15, array $columns = ['*'], array|string $relations = []): Paginator
+    {
+        return $this->query()->with($relations)->simplePaginate($perPage, $columns);
     }
 
     public function create(array $data): Model

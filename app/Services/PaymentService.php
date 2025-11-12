@@ -24,6 +24,7 @@ class PaymentService
             return true;
         }
         $payment->status = PaymentStatus::PAID;
+
         return $payment->save();
     }
 }

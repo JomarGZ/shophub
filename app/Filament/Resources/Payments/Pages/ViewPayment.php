@@ -6,7 +6,6 @@ use App\Filament\Resources\Payments\PaymentResource;
 use App\Models\Payment;
 use App\Services\PaymentService;
 use Filament\Actions\Action;
-use Filament\Actions\EditAction;
 use Filament\Resources\Pages\ViewRecord;
 
 class ViewPayment extends ViewRecord
@@ -17,10 +16,10 @@ class ViewPayment extends ViewRecord
     {
         return [
             Action::make('mark_as_paid')
-                ->label(fn (Payment $record) => $record->isPaid() ? "Paid" : "Mark as Paid")
-                ->hidden(fn (Payment $record) => !$record->order->isCOD())
+                ->label(fn (Payment $record) => $record->isPaid() ? 'Paid' : 'Mark as Paid')
+                ->hidden(fn (Payment $record) => ! $record->order->isCOD())
                 ->disabled(fn (Payment $record) => $record->isPaid())
-                ->action(fn (Payment $record) => app(PaymentService::class)->markAsPaid($record))
+                ->action(fn (Payment $record) => app(PaymentService::class)->markAsPaid($record)),
         ];
     }
 }

@@ -2,7 +2,6 @@
 
 namespace App\Models;
 
-use App\Enums\PaymentMethod;
 use App\Enums\PaymentStatus;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -36,7 +35,8 @@ class Payment extends Model
     {
         return $this->belongsTo(Order::class);
     }
-    public function isPaid(): Bool
+
+    public function isPaid(): bool
     {
         return $this->status === PaymentStatus::PAID;
     }

@@ -110,7 +110,7 @@ class OrderInfolist
                             ]),
                     ])
                     ->columns(1),
-                      Section::make('Order Items')
+                Section::make('Order Items')
                     ->icon('heroicon-o-shopping-cart')
                     ->description('Products included in this order')
                     ->schema([

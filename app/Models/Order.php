@@ -6,10 +6,12 @@ use App\Enums\OrderStatus;
 use App\Enums\PaymentMethod;
 use App\Observers\OrderObserver;
 use Illuminate\Database\Eloquent\Attributes\ObservedBy;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
+use Illuminate\Support\Facades\Auth;
 
 #[ObservedBy(OrderObserver::class)]
 class Order extends Model
@@ -36,8 +38,17 @@ class Order extends Model
 
     protected $casts = [
         'status' => OrderStatus::class,
-        'payment_method' => PaymentMethod::class
+        'payment_method' => PaymentMethod::class,
     ];
+
+    public static function booted()
+    {
+        static::addGlobalScope('user_orders', function (Builder $query) {
+            if (Auth::check()) {
+                $query->where('user_id', Auth::id());
+            }
+        });
+    }
 
     public function orderItems(): HasMany
     {
@@ -49,7 +60,7 @@ class Order extends Model
         return $this->hasOne(Payment::class);
     }
 
-    public function isCOD(): Bool
+    public function isCOD(): bool
     {
         return $this->payment_method === PaymentMethod::COD;
     }

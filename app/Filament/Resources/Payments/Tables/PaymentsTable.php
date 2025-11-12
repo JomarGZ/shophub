@@ -2,10 +2,6 @@
 
 namespace App\Filament\Resources\Payments\Tables;
 
-use Filament\Actions\BulkActionGroup;
-use Filament\Actions\DeleteBulkAction;
-use Filament\Actions\EditAction;
-use Filament\Actions\ViewAction;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
 
@@ -28,7 +24,7 @@ class PaymentsTable
                     ->searchable(),
                 TextColumn::make('status')
                     ->badge()
-                    ->color(fn($record) => $record->status->color())
+                    ->color(fn ($record) => $record->status->color())
                     ->searchable(),
                 TextColumn::make('amount')
                     ->money('USD')

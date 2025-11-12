@@ -13,7 +13,7 @@ class PaymentInfolist
         return $schema
             ->columns(2) // Display in two columns for better use of space
             ->components([
-                
+
                 Section::make('Order Details')
                     ->schema([
                         TextEntry::make('order.id')
