@@ -44,7 +44,7 @@ class CartController extends Controller
     {
         $product = Product::findOrFail($request->validated('product_id'));
 
-        $this->cartService->addItem(auth()->user(), $product, quantity: $request->validated('quantity'));
+        $this->cartService->addItem(request()->user(), $product, quantity: $request->validated('quantity'));
 
         return redirect()->back()->with('success', 'Product added to cart successfully!');
     }

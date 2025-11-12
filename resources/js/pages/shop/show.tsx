@@ -3,13 +3,13 @@ import { ProductCard } from '@/components/products/product-card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
+import { useAddToCart } from '@/hooks/use-add-to-cart';
 import AppLayout from '@/layouts/app-layout';
 import { index } from '@/routes/shop';
 import { BreadcrumbItem, Product } from '@/types';
 import { Head } from '@inertiajs/react';
 import { Heart, Minus, Plus, Share2, ShoppingCart, Star } from 'lucide-react';
 import { useState } from 'react';
-import { toast } from 'sonner';
 
 export default function Show({
     product,
@@ -18,8 +18,7 @@ export default function Show({
     product: Product;
     related_products: Product[];
 }) {
-    console.log(product);
-    console.log(related_products);
+    const { addToCart, loading } = useAddToCart();
     const breadcrumbs: BreadcrumbItem[] = [
         {
             title: 'Shop',
@@ -31,10 +30,13 @@ export default function Show({
         },
     ];
     const [quantity, setQuantity] = useState(1);
-
+    const [mainLoading, setMainLoading] = useState(false);
+    const increment = () => setQuantity((prev) => prev + 1);
+    const decrement = () => setQuantity((prev) => Math.max(prev - 1, 1));
     const handleAddToCart = () => {
-        toast.success(`${quantity}x ${product.name} added to cart!`);
+        console.log(addToCart(product, quantity));
     };
+
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="Shop" />
@@ -111,9 +113,7 @@ export default function Show({
                                 <Button
                                     variant="ghost"
                                     size="icon"
-                                    onClick={() =>
-                                        setQuantity(Math.max(1, quantity - 1))
-                                    }
+                                    onClick={decrement}
                                     disabled={quantity <= 1}
                                 >
                                     <Minus className="h-4 w-4" />
@@ -124,14 +124,7 @@ export default function Show({
                                 <Button
                                     variant="ghost"
                                     size="icon"
-                                    onClick={() =>
-                                        setQuantity(
-                                            Math.min(
-                                                product.stock,
-                                                quantity + 1,
-                                            ),
-                                        )
-                                    }
+                                    onClick={increment}
                                     disabled={quantity >= product.stock}
                                 >
                                     <Plus className="h-4 w-4" />
@@ -148,7 +141,7 @@ export default function Show({
                         <Button
                             onClick={handleAddToCart}
                             className="h-12 flex-1 bg-primary text-base text-primary-foreground hover:bg-primary/90"
-                            disabled={product.stock === 0}
+                            disabled={product.stock === 0 || mainLoading}
                         >
                             <ShoppingCart className="mr-2 h-5 w-5" />
                             Add to Cart
@@ -177,13 +170,10 @@ export default function Show({
                 <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
                     {related_products.map((related_product) => (
                         <ProductCard
+                            loading={loading}
                             key={related_product.id}
                             product={related_product}
-                            onAddToCart={() =>
-                                toast.success(
-                                    `${related_product.name} added to cart!`,
-                                )
-                            }
+                            onAddToCart={addToCart}
                         />
                     ))}
                 </div>

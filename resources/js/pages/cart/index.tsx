@@ -160,7 +160,7 @@ export default function Index({
                                   <Card key={id} className="shadow-card">
                                       <CardContent className="p-4">
                                           <div className="flex gap-4">
-                                              <Link href={show(product.id)}>
+                                              <Link href={show(product.slug)}>
                                                   <img
                                                       src={product.image_url}
                                                       alt={product.name}
