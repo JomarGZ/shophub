@@ -11,24 +11,17 @@ import {
     TableRow,
 } from '@/components/ui/table';
 import AppLayout from '@/layouts/app-layout';
+import { getOrderVariant, getPaymentVariant } from '@/lib/utils';
 import { Head } from '@inertiajs/react';
 import { ChevronDown, ChevronUp, Package } from 'lucide-react';
 import { useState } from 'react';
 
-export default function Index({
-    orders,
-    orders2,
-}: {
-    orders: any[];
-    orders2: any[];
-}) {
-    console.log(orders2);
+export default function Index({ orders }: { orders: any[] }) {
     const [expandedOrders, setExpandedOrders] = useState<Set<string>>(
         new Set(),
     );
     const [visibleCount, setVisibleCount] = useState(5);
 
-    const visibleOrders = orders.slice(0, visibleCount);
     const hasMore = visibleCount < orders.length;
 
     const loadMore = () => {
@@ -43,34 +36,6 @@ export default function Index({
             newExpanded.add(orderId);
         }
         setExpandedOrders(newExpanded);
-    };
-
-    const getStatusVariant = (status: string) => {
-        switch (status) {
-            case 'delivered':
-                return 'default';
-            case 'shipped':
-                return 'secondary';
-            case 'pending':
-                return 'outline';
-            case 'cancelled':
-                return 'destructive';
-            default:
-                return 'outline';
-        }
-    };
-
-    const getPaymentStatusVariant = (status: string) => {
-        switch (status) {
-            case 'paid':
-                return 'default';
-            case 'unpaid':
-                return 'outline';
-            case 'rejected':
-                return 'destructive';
-            default:
-                return 'outline';
-        }
     };
 
     const formatDate = (dateString: string) => {
@@ -94,7 +59,7 @@ export default function Index({
             </Container>
             <Container>
                 <div className="space-y-4">
-                    {orders.length === 0 ? (
+                    {orders.data.length === 0 ? (
                         <Card>
                             <CardContent className="py-16 text-center">
                                 <Package className="mx-auto mb-4 h-16 w-16 text-muted-foreground" />
@@ -111,7 +76,7 @@ export default function Index({
                         </Card>
                     ) : (
                         <>
-                            {visibleOrders.map((order) => (
+                            {orders.data.map((order) => (
                                 <Card
                                     key={order.id}
                                     className="overflow-hidden"
@@ -124,7 +89,9 @@ export default function Index({
                                                 </CardTitle>
                                                 <p className="text-sm text-muted-foreground">
                                                     Ordered on{' '}
-                                                    {formatDate(order.date)}
+                                                    {formatDate(
+                                                        order.date_ordered,
+                                                    )}
                                                 </p>
                                             </div>
                                             <div className="flex items-center gap-4">
@@ -133,19 +100,15 @@ export default function Index({
                                                         Total
                                                     </p>
                                                     <p className="text-xl font-bold">
-                                                        $
-                                                        {order.total.toFixed(2)}
+                                                        ${order.total}
                                                     </p>
                                                 </div>
                                                 <Badge
-                                                    variant={getStatusVariant(
-                                                        order.status,
+                                                    variant={getOrderVariant(
+                                                        order.status.value,
                                                     )}
                                                 >
-                                                    {order.status
-                                                        .charAt(0)
-                                                        .toUpperCase() +
-                                                        order.status.slice(1)}
+                                                    {order.status.label}
                                                 </Badge>
                                             </div>
                                         </div>
@@ -154,8 +117,8 @@ export default function Index({
                                     <CardContent className="p-6">
                                         <div className="flex items-center justify-between">
                                             <p className="text-sm text-muted-foreground">
-                                                {order.items.length} item
-                                                {order.items.length !== 1
+                                                {order.order_items.length} item
+                                                {order.order_items.length !== 1
                                                     ? 's'
                                                     : ''}
                                             </p>
@@ -199,18 +162,17 @@ export default function Index({
                                                                     Status:
                                                                 </span>
                                                                 <Badge
-                                                                    variant={getPaymentStatusVariant(
-                                                                        order.paymentStatus,
+                                                                    variant={getPaymentVariant(
+                                                                        order
+                                                                            .payment
+                                                                            .status,
                                                                     )}
                                                                 >
-                                                                    {order.paymentStatus
-                                                                        .charAt(
-                                                                            0,
-                                                                        )
-                                                                        .toUpperCase() +
-                                                                        order.paymentStatus.slice(
-                                                                            1,
-                                                                        )}
+                                                                    {
+                                                                        order
+                                                                            .payment
+                                                                            .status
+                                                                    }
                                                                 </Badge>
                                                             </div>
                                                             <div className="flex justify-between">
@@ -239,9 +201,9 @@ export default function Index({
                                                                 </span>
                                                                 <span className="text-sm font-medium">
                                                                     $
-                                                                    {order.shippingFee.toFixed(
-                                                                        2,
-                                                                    )}
+                                                                    {
+                                                                        order.shipping_fee
+                                                                    }
                                                                 </span>
                                                             </div>
                                                             <div>
@@ -297,19 +259,16 @@ export default function Index({
                                                                 </TableRow>
                                                             </TableHeader>
                                                             <TableBody>
-                                                                {order.items.map(
-                                                                    (
-                                                                        item,
-                                                                        index,
-                                                                    ) => (
+                                                                {order.order_items.map(
+                                                                    (item) => (
                                                                         <TableRow
                                                                             key={
-                                                                                index
+                                                                                item.id
                                                                             }
                                                                         >
                                                                             <TableCell className="font-medium">
                                                                                 {
-                                                                                    item.productName
+                                                                                    item.product_name
                                                                                 }
                                                                             </TableCell>
                                                                             <TableCell className="text-right">
@@ -319,18 +278,14 @@ export default function Index({
                                                                             </TableCell>
                                                                             <TableCell className="text-right">
                                                                                 $
-                                                                                {item.price.toFixed(
-                                                                                    2,
-                                                                                )}
+                                                                                {
+                                                                                    item.product_price
+                                                                                }
                                                                             </TableCell>
                                                                             <TableCell className="text-right font-medium">
                                                                                 $
-                                                                                {(
-                                                                                    item.quantity *
-                                                                                    item.price
-                                                                                ).toFixed(
-                                                                                    2,
-                                                                                )}
+                                                                                {item.quantity *
+                                                                                    item.product_price}
                                                                             </TableCell>
                                                                         </TableRow>
                                                                     ),
@@ -348,7 +303,7 @@ export default function Index({
                                                                         $
                                                                         {(
                                                                             order.total -
-                                                                            order.shippingFee
+                                                                            order.shipping_fee
                                                                         ).toFixed(
                                                                             2,
                                                                         )}
@@ -366,9 +321,9 @@ export default function Index({
                                                                     </TableCell>
                                                                     <TableCell className="text-right font-medium">
                                                                         $
-                                                                        {order.shippingFee.toFixed(
-                                                                            2,
-                                                                        )}
+                                                                        {
+                                                                            order.shipping_fee
+                                                                        }
                                                                     </TableCell>
                                                                 </TableRow>
                                                                 <TableRow>
@@ -383,9 +338,9 @@ export default function Index({
                                                                     </TableCell>
                                                                     <TableCell className="text-right text-lg font-bold">
                                                                         $
-                                                                        {order.total.toFixed(
-                                                                            2,
-                                                                        )}
+                                                                        {
+                                                                            order.total
+                                                                        }
                                                                     </TableCell>
                                                                 </TableRow>
                                                             </TableBody>

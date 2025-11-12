@@ -17,8 +17,12 @@ class OrderResource extends JsonResource
         return [
             'id' => $this->id,
             'customer' => $this->shipping_full_name,
+            'status' => [
+                'label' =>  $this->status->label(),
+                'value' => $this->status
+            ],
             'date_ordered' => $this->created_at,
-            'payment_nethod' => $this->payment_nethod,
+            'payment_method' => $this->payment_nethod,
             'shipping_fee' => $this->shipping_fee,
             'total' => $this->total,
             'address' => [
