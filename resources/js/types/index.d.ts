@@ -55,6 +55,22 @@ export interface PaginationMetaLink {
     active: boolean;
 }
 
+export interface SimplePaginationMeta {
+    current_page: number;
+    current_page_url: string;
+    from: number;
+    path: string;
+    per_page: number;
+    to: number;
+}
+
+export interface SimplePaginationLink {
+    first: string;
+    last: string | null;
+    next: null | string;
+    prev: null | string;
+}
+
 export interface PaginationMeta {
     current_page: number;
     from: number | null;
@@ -86,9 +102,23 @@ export interface PaginatedResponse<T> {
     links: PaginationLinks;
 }
 
+export interface SimplePaginatedResponse<T> {
+    data: T[];
+    has_more: Boolean;
+    next_page_url: String | null | URL;
+}
+
 export interface CartItem extends Product {
     quantity: number;
     product: Product;
+}
+
+export interface OrderItem {
+    id: number;
+    product_name: string;
+    product_price: number | string;
+    total: string | number;
+    quantity: number;
 }
 
 export interface City {
@@ -114,8 +144,27 @@ export interface Address {
 export interface Order {
     id: number;
     customer: string;
-    date: string;
+    date_ordered: string;
+    payment_method: string;
+    payment?: { id: number; status: string };
+    shipping_fee: number | string;
+    address: {
+        city: string;
+        country: string;
+        street: string;
+    };
     total: number;
-    status: 'pending' | 'completed' | 'cancelled';
-    items: number;
+    status: {
+        label: string;
+        value:
+            | 'pending'
+            | 'rejected'
+            | 'processing'
+            | 'preparing_for_shipment'
+            | 'shipped'
+            | 'out_for_delivery'
+            | 'delivered'
+            | 'cancelled';
+    };
+    order_items?: OrderItem[];
 }

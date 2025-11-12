@@ -18,15 +18,20 @@ class OrderController extends Controller
     public function index()
     {
         $orders = $this->orderRepository->simplePaginate(
+            perPage: 10,
             columns: ['id', 'shipping_full_name', 'status', 'payment_method', 'created_at', 'shipping_fee', 'total', 'shipping_city', 'shipping_country', 'shipping_street_address'],
             relations: [
-                'orderItems:id,order_id,product_name,product_price,line_total,quantity', 
-                'payment:id,order_id,status'
+                'orderItems:id,order_id,product_name,product_price,line_total,quantity',
+                'payment:id,order_id,status',
             ]
         );
 
         return Inertia::render('orders/index', [
-            'orders' => fn () => OrderResource::collection($orders),
+            'orders' => [
+                'data' => fn () => OrderResource::collection($orders)->resolve(),
+                'next_page_url' => $orders->nextPageUrl(),
+                'has_more' => $orders->hasMorePages(),
+            ],
         ]);
     }
 

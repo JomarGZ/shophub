@@ -16,7 +16,7 @@ class PaymentResource extends JsonResource
     {
         return [
             'id' => $this->id,
-            'status' => $this->status
+            'status' => $this->status,
         ];
     }
 }

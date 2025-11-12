@@ -12,22 +12,24 @@ import {
 } from '@/components/ui/table';
 import AppLayout from '@/layouts/app-layout';
 import { getOrderVariant, getPaymentVariant } from '@/lib/utils';
-import { Head } from '@inertiajs/react';
+import { Order, SimplePaginatedResponse } from '@/types';
+import { Head, router } from '@inertiajs/react';
 import { ChevronDown, ChevronUp, Package } from 'lucide-react';
 import { useState } from 'react';
 
-export default function Index({ orders }: { orders: any[] }) {
+type IndexProps = {
+    orders: SimplePaginatedResponse<Order>;
+};
+export default function Index({ orders }: IndexProps) {
+    const [orderList, setOrderList] = useState<Order[]>(orders.data);
+    const [nextPageUrl, setNextPageUrl] = useState<string | null>(
+        orders.next_page_url ? String(orders.next_page_url) : null,
+    );
+
+    const [hasMore, setHasMore] = useState<Boolean>(orders.has_more);
     const [expandedOrders, setExpandedOrders] = useState<Set<string>>(
         new Set(),
     );
-    const [visibleCount, setVisibleCount] = useState(5);
-
-    const hasMore = visibleCount < orders.length;
-
-    const loadMore = () => {
-        setVisibleCount((prev) => Math.min(prev + 5, orders.length));
-    };
-
     const toggleOrderDetails = (orderId: string) => {
         const newExpanded = new Set(expandedOrders);
         if (newExpanded.has(orderId)) {
@@ -37,7 +39,9 @@ export default function Index({ orders }: { orders: any[] }) {
         }
         setExpandedOrders(newExpanded);
     };
-
+    const formatOrderId = (id: string | number) => {
+        return `ORD-${id}`;
+    };
     const formatDate = (dateString: string) => {
         return new Date(dateString).toLocaleDateString('en-US', {
             year: 'numeric',
@@ -45,7 +49,29 @@ export default function Index({ orders }: { orders: any[] }) {
             day: 'numeric',
         });
     };
+    const loadMore = () => {
+        if (!hasMore || !nextPageUrl) return;
 
+        router.get(
+            nextPageUrl,
+            {},
+            {
+                preserveScroll: true,
+                preserveState: true,
+                onSuccess: (page) => {
+                    const orders = page.props
+                        .orders as SimplePaginatedResponse<Order>;
+                    setOrderList((prev) => [...prev, ...orders.data]);
+                    setNextPageUrl(
+                        orders.next_page_url
+                            ? String(orders.next_page_url)
+                            : null,
+                    );
+                    setHasMore(orders.has_more);
+                },
+            },
+        );
+    };
     return (
         <AppLayout>
             <Head title="Orders" />
@@ -76,7 +102,7 @@ export default function Index({ orders }: { orders: any[] }) {
                         </Card>
                     ) : (
                         <>
-                            {orders.data.map((order) => (
+                            {orderList.map((order) => (
                                 <Card
                                     key={order.id}
                                     className="overflow-hidden"
@@ -85,7 +111,7 @@ export default function Index({ orders }: { orders: any[] }) {
                                         <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
                                             <div className="space-y-1">
                                                 <CardTitle className="text-xl">
-                                                    {order.id}
+                                                    {formatOrderId(order.id)}
                                                 </CardTitle>
                                                 <p className="text-sm text-muted-foreground">
                                                     Ordered on{' '}
@@ -117,8 +143,8 @@ export default function Index({ orders }: { orders: any[] }) {
                                     <CardContent className="p-6">
                                         <div className="flex items-center justify-between">
                                             <p className="text-sm text-muted-foreground">
-                                                {order.order_items.length} item
-                                                {order.order_items.length !== 1
+                                                {order.order_items?.length} item
+                                                {order.order_items?.length !== 1
                                                     ? 's'
                                                     : ''}
                                             </p>
@@ -126,12 +152,14 @@ export default function Index({ orders }: { orders: any[] }) {
                                                 variant="ghost"
                                                 size="sm"
                                                 onClick={() =>
-                                                    toggleOrderDetails(order.id)
+                                                    toggleOrderDetails(
+                                                        String(order.id),
+                                                    )
                                                 }
                                                 className="gap-2"
                                             >
                                                 {expandedOrders.has(
-                                                    order.id,
+                                                    String(order.id),
                                                 ) ? (
                                                     <>
                                                         Hide Details{' '}
@@ -147,7 +175,9 @@ export default function Index({ orders }: { orders: any[] }) {
                                         </div>
 
                                         {/* Order Items Details */}
-                                        {expandedOrders.has(order.id) && (
+                                        {expandedOrders.has(
+                                            String(order.id),
+                                        ) && (
                                             <div className="mt-6 space-y-6 border-t pt-6">
                                                 {/* Payment & Shipping Information */}
                                                 <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
@@ -165,14 +195,14 @@ export default function Index({ orders }: { orders: any[] }) {
                                                                     variant={getPaymentVariant(
                                                                         order
                                                                             .payment
-                                                                            .status,
+                                                                            ?.status ??
+                                                                            'unknown',
                                                                     )}
                                                                 >
-                                                                    {
-                                                                        order
-                                                                            .payment
-                                                                            .status
-                                                                    }
+                                                                    {order
+                                                                        .payment
+                                                                        ?.status ??
+                                                                        'Unknown'}
                                                                 </Badge>
                                                             </div>
                                                             <div className="flex justify-between">
@@ -182,7 +212,7 @@ export default function Index({ orders }: { orders: any[] }) {
                                                                 </span>
                                                                 <span className="text-sm font-medium">
                                                                     {
-                                                                        order.paymentMethod
+                                                                        order.payment_method
                                                                     }
                                                                 </span>
                                                             </div>
@@ -215,7 +245,7 @@ export default function Index({ orders }: { orders: any[] }) {
                                                                     {
                                                                         order
                                                                             .address
-                                                                            .street
+                                                                            .country
                                                                     }
                                                                     <br />
                                                                     {
@@ -227,7 +257,7 @@ export default function Index({ orders }: { orders: any[] }) {
                                                                     {
                                                                         order
                                                                             .address
-                                                                            .zipCode
+                                                                            .street
                                                                     }
                                                                 </p>
                                                             </div>
@@ -259,7 +289,10 @@ export default function Index({ orders }: { orders: any[] }) {
                                                                 </TableRow>
                                                             </TableHeader>
                                                             <TableBody>
-                                                                {order.order_items.map(
+                                                                {(
+                                                                    order.order_items ??
+                                                                    []
+                                                                ).map(
                                                                     (item) => (
                                                                         <TableRow
                                                                             key={
@@ -285,7 +318,9 @@ export default function Index({ orders }: { orders: any[] }) {
                                                                             <TableCell className="text-right font-medium">
                                                                                 $
                                                                                 {item.quantity *
-                                                                                    item.product_price}
+                                                                                    Number(
+                                                                                        item.product_price,
+                                                                                    )}
                                                                             </TableCell>
                                                                         </TableRow>
                                                                     ),
@@ -303,7 +338,9 @@ export default function Index({ orders }: { orders: any[] }) {
                                                                         $
                                                                         {(
                                                                             order.total -
-                                                                            order.shipping_fee
+                                                                            Number(
+                                                                                order.shipping_fee,
+                                                                            )
                                                                         ).toFixed(
                                                                             2,
                                                                         )}

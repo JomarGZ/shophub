@@ -18,11 +18,11 @@ class OrderResource extends JsonResource
             'id' => $this->id,
             'customer' => $this->shipping_full_name,
             'status' => [
-                'label' =>  $this->status->label(),
-                'value' => $this->status
+                'label' => $this->status->label(),
+                'value' => $this->status,
             ],
             'date_ordered' => $this->created_at,
-            'payment_method' => $this->payment_nethod,
+            'payment_method' => $this->payment_method,
             'shipping_fee' => $this->shipping_fee,
             'total' => $this->total,
             'address' => [
