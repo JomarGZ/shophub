@@ -36,11 +36,7 @@ class OrderController extends Controller
                 'next_page_url' => $orders->nextPageUrl(),
                 'has_more' => $orders->hasMorePages(),
             ],
-            'order_statuses' => array_column(
-                OrderStatus::cases(),
-                'value',
-                'name'
-            )
+            'order_statuses' => OrderStatus::fullOptions()
         ]);
     }
 

@@ -49,4 +49,16 @@ enum OrderStatus: string
             array_map(fn ($status) => $status->label(), self::cases())
         );
     }
+
+    public static function fullOptions()
+    {
+        return array_map(
+            fn (self $status) => [
+                'value' => $status->value,
+                'label' => $status->label(),
+                'color' => $status->color(),
+            ],
+            self::cases()
+        );
+    }
 }

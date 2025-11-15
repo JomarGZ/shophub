@@ -25,15 +25,24 @@ import {
 import { useState } from 'react';
 import { toast } from 'sonner';
 
+type OrderStatusOption = {
+    value: string;
+    label: string;
+    color: string;
+};
 type IndexProps = {
     orders: SimplePaginatedResponse<Order>;
-    order_statuses: Record<string, string>;
+    order_statuses: OrderStatusOption[];
 };
 export default function Index({ orders, order_statuses }: IndexProps) {
     const [orderList, setOrderList] = useState<Order[]>(orders.data);
     const [nextPageUrl, setNextPageUrl] = useState<string | null>(
         orders.next_page_url ? String(orders.next_page_url) : null,
     );
+    const statusMap: Record<string, OrderStatusOption> = Object.fromEntries(
+        order_statuses.map((s) => [s.value, s]),
+    );
+    console.log(statusMap);
     const [loading, setLoading] = useState<boolean>(false);
 
     const [hasMore, setHasMore] = useState<Boolean>(orders.has_more);
@@ -54,14 +63,27 @@ export default function Index({ orders, order_statuses }: IndexProps) {
         router.patch(
             OrderController.update(id),
             {
-                status: order_statuses.DELIVERED,
+                status: statusMap['delivered'].value,
             },
             {
                 preserveScroll: true,
-                onSuccess: ({ props: { flash } }: any) =>
+                onSuccess: ({ props: { flash } }: any) => {
                     toast.success(
                         flash.success || 'Mark as Recieved Successfully',
-                    ),
+                    );
+                    setOrderList((prev) =>
+                        prev.map((o) =>
+                            o.id === id
+                                ? {
+                                      ...o,
+                                      status: statusMap[
+                                          'delivered'
+                                      ] as unknown as Order['status'],
+                                  }
+                                : o,
+                        ),
+                    );
+                },
                 onError: ({ props: { flash } }: any) =>
                     toast.error(flash.error || 'Failed to mark as Recieved'),
                 onStart: () => setLoading(true),
@@ -74,12 +96,25 @@ export default function Index({ orders, order_statuses }: IndexProps) {
         router.patch(
             OrderController.update(id),
             {
-                status: order_statuses.CANCELLED,
+                status: statusMap['cancelled'].value,
             },
             {
                 preserveScroll: true,
-                onSuccess: ({ props: { flash } }: any) =>
-                    toast.success(flash.success || 'Cancel Order Successfully'),
+                onSuccess: ({ props: { flash } }: any) => {
+                    toast.success(flash.success || 'Cancel Order Successfully');
+                    setOrderList((prev) =>
+                        prev.map((o) =>
+                            o.id === id
+                                ? {
+                                      ...o,
+                                      status: statusMap[
+                                          'cancelled'
+                                      ] as unknown as Order['status'],
+                                  }
+                                : o,
+                        ),
+                    );
+                },
                 onError: ({ props: { flash } }: any) =>
                     toast.error(flash.error || 'Cancel Order Failed'),
                 onStart: () => setLoading(true),
@@ -196,7 +231,8 @@ export default function Index({ orders, order_statuses }: IndexProps) {
                                             </p>
                                             <div className="flex flex-wrap items-center gap-2">
                                                 {order.status.value ===
-                                                    order_statuses.SHIPPED && (
+                                                    statusMap['shipped']
+                                                        .value && (
                                                     <Button
                                                         disabled={loading}
                                                         variant="default"
@@ -213,7 +249,8 @@ export default function Index({ orders, order_statuses }: IndexProps) {
                                                     </Button>
                                                 )}
                                                 {order.status.value ===
-                                                    order_statuses.PENDING && (
+                                                    statusMap['pending']
+                                                        .value && (
                                                     <Button
                                                         disabled={loading}
                                                         variant="destructive"
