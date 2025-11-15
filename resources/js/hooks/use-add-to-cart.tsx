@@ -8,6 +8,7 @@ export function useAddToCart() {
     const [loading, setLoading] = useState(false);
     const addToCart = (
         product: Product,
+        quantity: number = 1,
         extraOptions: Parameters<typeof router.post>[2] = {},
     ) => {
         if (loading) return;
@@ -16,6 +17,7 @@ export function useAddToCart() {
             store(),
             {
                 product_id: product.id,
+                quantity: quantity,
             },
             {
                 onSuccess: () =>
@@ -23,6 +25,7 @@ export function useAddToCart() {
                 onError: () => toast.error('Failed to add to cart'),
                 onFinish: () => setLoading(false),
                 preserveScroll: true,
+                only: ['cart_items'],
                 ...extraOptions,
             },
         );

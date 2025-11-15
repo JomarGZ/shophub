@@ -79,4 +79,9 @@ class User extends Authenticatable implements FilamentUser
     {
         return $this->role === UserRole::ADMIN;
     }
+
+    public static function admin()
+    {
+        return static::query()->firstWhere('role', UserRole::ADMIN);
+    }
 }

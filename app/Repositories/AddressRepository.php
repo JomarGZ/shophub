@@ -3,6 +3,7 @@
 namespace App\Repositories;
 
 use App\Models\Address;
+use App\Models\User;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Cache;
 
@@ -28,6 +29,13 @@ class AddressRepository extends Repository
                 'country_id',
                 'city_id']);
         });
+    }
+
+    public function getAddress(User $user, $default = false)
+    {
+        $user->loadMissing('addresses');
+
+        return $this->query()->where('user_id', $user->id)->firstWhere('is_default', $default);
     }
 
     public function clearCache(int $userId)

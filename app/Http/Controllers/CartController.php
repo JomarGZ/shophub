@@ -7,6 +7,7 @@ use App\Http\Resources\CartItemResource;
 use App\Models\CartItem;
 use App\Models\Product;
 use App\Repositories\CartRepository;
+use App\Services\Cart\CartCalculationService;
 use App\Services\CartService;
 use Illuminate\Http\Request as ValidationRequest;
 use Illuminate\Support\Facades\Gate;
@@ -15,13 +16,17 @@ use Inertia\Inertia;
 
 class CartController extends Controller
 {
-    public function __construct(protected CartService $cartService, protected CartRepository $cartRepo) {}
+    public function __construct(
+        protected CartService $cartService,
+        protected CartRepository $cartRepo,
+        protected CartCalculationService $cartCalculationService
+    ) {}
 
     public function index()
     {
-        $cart = auth()->user()->load('cart')->cart;
+        $cart = $this->cartService->getOrCreateCart(request()->user());
         $this->cartService->syncQuantitiesWithStock($cart);
-        $orderSummary = $cart ? $this->cartService->calculateTotals($cart) : ['subtotal' => 0, 'shipping_fee' => 0, 'total' => 0];
+        $orderSummary = $this->cartCalculationService->calculate($cart);
 
         return Inertia::render('cart/index', [
             'cart_items' => fn () => CartItemResource::collection($this->cartRepo->getPaginatedItems(
@@ -39,7 +44,7 @@ class CartController extends Controller
     {
         $product = Product::findOrFail($request->validated('product_id'));
 
-        $this->cartService->addItem(auth()->user(), $product, quantity: $request->validated('quantity'));
+        $this->cartService->addItem(request()->user(), $product, quantity: $request->validated('quantity'));
 
         return redirect()->back()->with('success', 'Product added to cart successfully!');
     }
