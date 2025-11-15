@@ -94,7 +94,7 @@ export function AddressForm({
             preserveScroll: true,
             onSuccess: ({ props: { flash } }: any) => {
                 toast.success(
-                    flash.message ||
+                    flash.success ||
                         (address ? 'Address updated!' : 'Address added!'),
                 );
                 reset();

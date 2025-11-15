@@ -31,7 +31,7 @@ class OrdersTable
                     ->searchable(),
                 TextColumn::make('status')
                     ->badge()
-                    ->color(fn ($record) => $record->status->color())
+                    ->color('neutral')
                     ->getStateUsing(fn ($record) => $record->status->label())
                     ->searchable(),
                 TextColumn::make('created_at')

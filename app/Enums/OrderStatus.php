@@ -30,15 +30,15 @@ enum OrderStatus: string
     public function color()
     {
         return match ($this) {
-            self::PENDING => 'amber',
-            self::PROCESSING => 'blue',
-            self::PREPARING_FOR_SHIPMENT => 'cyan',
-            self::SHIPPED => 'slate',
-            self::OUT_FOR_DELIVERY => 'sky',
-            self::DELIVERED => 'green',
-            self::CANCELLED => 'red',
-            self::REJECTED => 'rose',
-            default => 'gray'
+            self::PENDING => 'warning',          // Amber
+            self::PROCESSING => 'info',          // Blue
+            self::PREPARING_FOR_SHIPMENT => 'secondary', // Cyan
+            self::SHIPPED => 'accent',           // Cyan (alternate tone)
+            self::OUT_FOR_DELIVERY => 'neutral', // Slate
+            self::DELIVERED => 'success',        // Green
+            self::CANCELLED => 'primary',        // Orange
+            self::REJECTED => 'destructive',     // Red
+            default => 'muted',                  // Gray (fallback)
         };
     }
 

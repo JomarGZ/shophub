@@ -19,6 +19,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/checkout', [CheckoutController::class, 'index'])->name('checkout.index');
     Route::get('/orders', [OrderController::class, 'index'])->name('orders.index');
     Route::post('/orders', [OrderController::class, 'store'])->name('orders.store');
+    Route::patch('/orders/{order}', [OrderController::class, 'update'])->name('orders.status.update');
 
     Route::resource('checkout/address', AddressController::class)->only(['store', 'destroy', 'update']);
     Route::patch('checkout/address/{address}/default', [AddressController::class, 'updateDefault'])->name('checkout.address.updateDefault');

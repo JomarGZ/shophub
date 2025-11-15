@@ -156,15 +156,18 @@ export interface Order {
     total: number;
     status: {
         label: string;
-        value:
-            | 'pending'
-            | 'rejected'
-            | 'processing'
-            | 'preparing_for_shipment'
-            | 'shipped'
-            | 'out_for_delivery'
-            | 'delivered'
-            | 'cancelled';
+        value: string;
+        color:
+            | 'default'
+            | 'secondary'
+            | 'destructive'
+            | 'outline'
+            | 'success'
+            | 'warning'
+            | 'info'
+            | 'neutral'
+            | 'accent'
+            | 'muted';
     };
     order_items?: OrderItem[];
 }

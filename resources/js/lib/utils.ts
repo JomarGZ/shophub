@@ -9,21 +9,17 @@ export function cn(...inputs: ClassValue[]) {
 type BadgeVariant = NonNullable<VariantProps<typeof badgeVariants>['variant']>;
 export const orderStatusVariants: Record<string, BadgeVariant> = {
     pending: 'warning', // amber
-    rejected: 'danger', // rose/red
     processing: 'info', // blue
     preparing_for_shipment: 'accent', // cyan
     shipped: 'neutral', // slate
     out_for_delivery: 'info', // sky
     delivered: 'success', // green
-    cancelled: 'danger', // red
 };
 
 export const paymentStatusVariants: Record<string, BadgeVariant> = {
     unpaid: 'destructive',
     paid: 'success',
-    failed: 'danger',
     refunded: 'warning',
-    rejected: 'danger',
     cancelled: 'destructive',
 };
 

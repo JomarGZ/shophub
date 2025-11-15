@@ -1,3 +1,4 @@
+import OrderController from '@/actions/App/Http/Controllers/OrderController';
 import { Container } from '@/components/container';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -11,20 +12,29 @@ import {
     TableRow,
 } from '@/components/ui/table';
 import AppLayout from '@/layouts/app-layout';
-import { getOrderVariant, getPaymentVariant } from '@/lib/utils';
+import { getPaymentVariant } from '@/lib/utils';
 import { Order, SimplePaginatedResponse } from '@/types';
 import { Head, router } from '@inertiajs/react';
-import { ChevronDown, ChevronUp, Package } from 'lucide-react';
+import {
+    CheckCircle,
+    ChevronDown,
+    ChevronUp,
+    Package,
+    XCircle,
+} from 'lucide-react';
 import { useState } from 'react';
+import { toast } from 'sonner';
 
 type IndexProps = {
     orders: SimplePaginatedResponse<Order>;
+    order_statuses: Record<string, string>;
 };
-export default function Index({ orders }: IndexProps) {
+export default function Index({ orders, order_statuses }: IndexProps) {
     const [orderList, setOrderList] = useState<Order[]>(orders.data);
     const [nextPageUrl, setNextPageUrl] = useState<string | null>(
         orders.next_page_url ? String(orders.next_page_url) : null,
     );
+    const [loading, setLoading] = useState<boolean>(false);
 
     const [hasMore, setHasMore] = useState<Boolean>(orders.has_more);
     const [expandedOrders, setExpandedOrders] = useState<Set<string>>(
@@ -38,6 +48,44 @@ export default function Index({ orders }: IndexProps) {
             newExpanded.add(orderId);
         }
         setExpandedOrders(newExpanded);
+    };
+    const handleMarkReceived = (id: number) => {
+        if (loading) return;
+        router.patch(
+            OrderController.update(id),
+            {
+                status: order_statuses.DELIVERED,
+            },
+            {
+                preserveScroll: true,
+                onSuccess: ({ props: { flash } }: any) =>
+                    toast.success(
+                        flash.success || 'Mark as Recieved Successfully',
+                    ),
+                onError: ({ props: { flash } }: any) =>
+                    toast.error(flash.error || 'Failed to mark as Recieved'),
+                onStart: () => setLoading(true),
+                onFinish: () => setLoading(false),
+            },
+        );
+    };
+    const handleCancelOrder = (id: number) => {
+        if (loading) return;
+        router.patch(
+            OrderController.update(id),
+            {
+                status: order_statuses.CANCELLED,
+            },
+            {
+                preserveScroll: true,
+                onSuccess: ({ props: { flash } }: any) =>
+                    toast.success(flash.success || 'Cancel Order Successfully'),
+                onError: ({ props: { flash } }: any) =>
+                    toast.error(flash.error || 'Cancel Order Failed'),
+                onStart: () => setLoading(true),
+                onFinish: () => setLoading(false),
+            },
+        );
     };
     const formatOrderId = (id: string | number) => {
         return `ORD-${id}`;
@@ -130,9 +178,7 @@ export default function Index({ orders }: IndexProps) {
                                                     </p>
                                                 </div>
                                                 <Badge
-                                                    variant={getOrderVariant(
-                                                        order.status.value,
-                                                    )}
+                                                    variant={order.status.color}
                                                 >
                                                     {order.status.label}
                                                 </Badge>
@@ -148,30 +194,66 @@ export default function Index({ orders }: IndexProps) {
                                                     ? 's'
                                                     : ''}
                                             </p>
-                                            <Button
-                                                variant="ghost"
-                                                size="sm"
-                                                onClick={() =>
-                                                    toggleOrderDetails(
-                                                        String(order.id),
-                                                    )
-                                                }
-                                                className="gap-2"
-                                            >
-                                                {expandedOrders.has(
-                                                    String(order.id),
-                                                ) ? (
-                                                    <>
-                                                        Hide Details{' '}
-                                                        <ChevronUp className="h-4 w-4" />
-                                                    </>
-                                                ) : (
-                                                    <>
-                                                        View Details{' '}
-                                                        <ChevronDown className="h-4 w-4" />
-                                                    </>
+                                            <div className="flex flex-wrap items-center gap-2">
+                                                {order.status.value ===
+                                                    order_statuses.SHIPPED && (
+                                                    <Button
+                                                        disabled={loading}
+                                                        variant="default"
+                                                        size="sm"
+                                                        onClick={() =>
+                                                            handleMarkReceived(
+                                                                order.id,
+                                                            )
+                                                        }
+                                                        className="cursor-pointer gap-2"
+                                                    >
+                                                        <CheckCircle className="h-4 w-4" />
+                                                        Mark as Received
+                                                    </Button>
                                                 )}
-                                            </Button>
+                                                {order.status.value ===
+                                                    order_statuses.PENDING && (
+                                                    <Button
+                                                        disabled={loading}
+                                                        variant="destructive"
+                                                        size="sm"
+                                                        onClick={() =>
+                                                            handleCancelOrder(
+                                                                order.id,
+                                                            )
+                                                        }
+                                                        className="cursor-pointer gap-2"
+                                                    >
+                                                        <XCircle className="h-4 w-4" />
+                                                        Cancel Order
+                                                    </Button>
+                                                )}
+                                                <Button
+                                                    variant="ghost"
+                                                    size="sm"
+                                                    onClick={() =>
+                                                        toggleOrderDetails(
+                                                            String(order.id),
+                                                        )
+                                                    }
+                                                    className="gap-2"
+                                                >
+                                                    {expandedOrders.has(
+                                                        String(order.id),
+                                                    ) ? (
+                                                        <>
+                                                            Hide Details{' '}
+                                                            <ChevronUp className="h-4 w-4" />
+                                                        </>
+                                                    ) : (
+                                                        <>
+                                                            View Details{' '}
+                                                            <ChevronDown className="h-4 w-4" />
+                                                        </>
+                                                    )}
+                                                </Button>
+                                            </div>
                                         </div>
 
                                         {/* Order Items Details */}

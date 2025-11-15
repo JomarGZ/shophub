@@ -16,7 +16,7 @@ class AddressController extends Controller
     {
         $this->addressService->create(auth()->user(), $request->validated());
 
-        return redirect()->route('checkout.index')->with('message', 'Address added successfully.');
+        return redirect()->route('checkout.index')->with('success', 'Address added successfully.');
     }
 
     public function update(Address $address, StoreAddressRequest $request)
@@ -24,7 +24,7 @@ class AddressController extends Controller
         Gate::authorize('update', $address);
         $this->addressService->update($address, $request->validated());
 
-        return redirect()->back()->with('message', 'Address updated successfully');
+        return redirect()->back()->with('success', 'Address updated successfully');
     }
 
     public function destroy(Address $address): RedirectResponse
@@ -32,7 +32,7 @@ class AddressController extends Controller
         Gate::authorize('delete', $address);
         $this->addressService->delete($address);
 
-        return redirect()->back()->with('message', 'Address deleted successfully.');
+        return redirect()->back()->with('success', 'Address deleted successfully.');
     }
 
     public function updateDefault(Address $address): RedirectResponse
@@ -40,6 +40,6 @@ class AddressController extends Controller
         Gate::authorize('update', $address);
         $this->addressService->setDefault(auth()->user(), $address);
 
-        return redirect()->back()->with('message', 'Address set as default successfully');
+        return redirect()->back()->with('success', 'Address set as default successfully');
     }
 }

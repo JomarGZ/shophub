@@ -19,6 +19,7 @@ class OrderResource extends JsonResource
             'customer' => $this->shipping_full_name,
             'status' => [
                 'label' => $this->status->label(),
+                'color' => $this->status->color(),
                 'value' => $this->status,
             ],
             'date_ordered' => $this->created_at,

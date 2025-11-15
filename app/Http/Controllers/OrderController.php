@@ -2,10 +2,14 @@
 
 namespace App\Http\Controllers;
 
+use App\Enums\OrderStatus;
 use App\Http\Requests\StoreOrderRequest;
 use App\Http\Resources\OrderResource;
+use App\Models\Order;
 use App\Repositories\OrderRepository;
 use App\Services\OrderService;
+use Illuminate\Http\Request;
+use Illuminate\Validation\Rule;
 use Inertia\Inertia;
 
 class OrderController extends Controller
@@ -32,6 +36,11 @@ class OrderController extends Controller
                 'next_page_url' => $orders->nextPageUrl(),
                 'has_more' => $orders->hasMorePages(),
             ],
+            'order_statuses' => array_column(
+                OrderStatus::cases(),
+                'value',
+                'name'
+            )
         ]);
     }
 
@@ -39,6 +48,19 @@ class OrderController extends Controller
     {
         $this->orderService->execute(request()->user(), $request->validated());
 
-        return redirect()->route('orders.index')->with('message', 'Order is placed successfully');
+        return redirect()->route('orders.index')->with('success', 'Order is placed successfully');
+    }
+
+    public function update(Order $order, Request $request)
+    {
+        $validated = $request->validate([
+            'status' => ['required', Rule::in([OrderStatus::CANCELLED, OrderStatus::DELIVERED])]
+        ]);
+
+        $newStatus = OrderStatus::from($validated['status']);
+        
+        $this->orderRepository->updateStatus($order, $newStatus);
+
+        return redirect()->back()->with('success', 'Order status updated successfully');
     }
 }

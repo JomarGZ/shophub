@@ -14,13 +14,13 @@ enum PaymentStatus: string
     public function color()
     {
         return match ($this) {
-            self::UNPAID => 'gray',
-            self::PAID => 'success',
-            self::FAILED => 'danger',
-            self::REFUNDED => 'yellow',
-            self::REJECTED => 'danger',
-            self::CANCELLED => 'gray',
-            default => 'gray'
+            self::UNPAID => 'muted',         // Gray
+            self::PAID => 'success',         // Green
+            self::FAILED => 'destructive',   // Red
+            self::REFUNDED => 'warning',     // Amber
+            self::REJECTED => 'destructive', // Red
+            self::CANCELLED => 'neutral',    // Slate
+            default => 'muted',              // Gray (fallback)
         };
     }
 }
