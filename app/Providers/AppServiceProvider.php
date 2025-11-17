@@ -2,7 +2,6 @@
 
 namespace App\Providers;
 
-use App\Enums\OrderStatus;
 use Filament\Support\Colors\Color;
 use Filament\Support\Facades\FilamentColor;
 use Illuminate\Http\Resources\Json\JsonResource;

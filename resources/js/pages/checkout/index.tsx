@@ -11,8 +11,8 @@ import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Separator } from '@/components/ui/separator';
 import AppLayout from '@/layouts/app-layout';
 import { index } from '@/routes/cart';
+import checkout from '@/routes/checkout';
 import { updateDefault } from '@/routes/checkout/address';
-import orders from '@/routes/orders';
 import { Address, Country, type BreadcrumbItem } from '@/types';
 import { Head, Link, useForm } from '@inertiajs/react';
 import { Banknote, Check, CreditCard, Edit, MapPin, Plus } from 'lucide-react';
@@ -67,7 +67,7 @@ export default function Index({
     };
     const handlePlaceOrder = (e: React.FormEvent) => {
         e.preventDefault();
-        post(orders.store().url, {
+        post(checkout.store().url, {
             preserveScroll: true,
             onSuccess: () => console.log('success'),
         });

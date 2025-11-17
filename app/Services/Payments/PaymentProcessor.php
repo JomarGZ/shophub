@@ -8,8 +8,8 @@ class PaymentProcessor
 {
     public function __construct(protected PaymentMethodInterface $method) {}
 
-    public function handle(Order $order): void
+    public function handle(Order $order)
     {
-        $this->method->pay($order);
+        return $this->method->pay($order);
     }
 }

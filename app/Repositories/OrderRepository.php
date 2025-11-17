@@ -22,10 +22,10 @@ class OrderRepository extends Repository
     {
         $rules = [
             OrderStatus::CANCELLED->value => fn () => $order->status === OrderStatus::PENDING,
-            OrderStatus::DELIVERED->value => fn () => $order->status === OrderStatus::SHIPPED
+            OrderStatus::DELIVERED->value => fn () => $order->status === OrderStatus::SHIPPED,
         ];
 
-        if (!isset($rules[$newStatus->value]) || !$rules[$newStatus->value]()) {
+        if (! isset($rules[$newStatus->value]) || ! $rules[$newStatus->value]()) {
             abort(403, 'Invalid status transition.');
         }
 

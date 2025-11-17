@@ -27,6 +27,10 @@ class OrderService
 
     public function execute(User $user, array $data)
     {
+        $result = [
+            'order' => null,
+            'payment_url' => null,
+        ];
         $user->loadMissing(['cart.cartItems.product']);
         $this->validateOrderPreconditions($user, $data);
 
@@ -35,26 +39,32 @@ class OrderService
         $processor = new PaymentProcessor(PaymentMethodFactory::make($method));
 
         try {
-            return DB::transaction(function () use ($user, $cartCalcData, $processor, $method) {
+            $order = DB::transaction(function () use ($user, $cartCalcData, $method) {
 
                 $defaultAddress = $this->addressRepository->getAddress($user, default: true);
 
                 $order = $this->createOrder($cartCalcData, $method ?? PaymentMethod::COD, $defaultAddress);
                 $this->createOrderItems($order, $cartCalcData['items']);
                 $this->stockService->decrementOrderStock($order);
-                $processor->handle($order);
 
                 $user->cart->cartItems()->delete();
 
                 return $order;
 
             });
+            $paymentUrl = $processor->handle($order);
+            $result['order'] = $order;
+            $result['payment_url'] = $paymentUrl;
+
+            return $result;
 
         } catch (\Exception $e) {
             Log::error('Order proccessing failed:'.$e->getMessage(), [
                 'user_id' => $user->id,
                 'stack' => $e->getTraceAsString(),
             ]);
+
+            return $result;
         }
     }
 

@@ -9,6 +9,7 @@ use App\Models\Order;
 use App\Repositories\OrderRepository;
 use App\Services\OrderService;
 use Illuminate\Http\Request;
+use Illuminate\Support\Str;
 use Illuminate\Validation\Rule;
 use Inertia\Inertia;
 
@@ -36,13 +37,18 @@ class OrderController extends Controller
                 'next_page_url' => $orders->nextPageUrl(),
                 'has_more' => $orders->hasMorePages(),
             ],
-            'order_statuses' => OrderStatus::fullOptions()
+            'order_statuses' => OrderStatus::fullOptions(),
         ]);
     }
 
     public function store(StoreOrderRequest $request)
     {
-        $this->orderService->execute(request()->user(), $request->validated());
+        $result = $this->orderService->execute(request()->user(), $request->validated());
+        $paymentUrl = isset($result['payment_url']) ? $result['payment_url'] : null;
+        $isValidPaymentUrl = $paymentUrl && Str::isUrl($paymentUrl, ['https']);
+        if ($isValidPaymentUrl) {
+            return Inertia::location($paymentUrl);
+        }
 
         return redirect()->route('orders.index')->with('success', 'Order is placed successfully');
     }
@@ -50,11 +56,11 @@ class OrderController extends Controller
     public function update(Order $order, Request $request)
     {
         $validated = $request->validate([
-            'status' => ['required', Rule::in([OrderStatus::CANCELLED, OrderStatus::DELIVERED])]
+            'status' => ['required', Rule::in([OrderStatus::CANCELLED, OrderStatus::DELIVERED])],
         ]);
 
         $newStatus = OrderStatus::from($validated['status']);
-        
+
         $this->orderRepository->updateStatus($order, $newStatus);
 
         return redirect()->back()->with('success', 'Order status updated successfully');

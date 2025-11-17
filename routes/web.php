@@ -17,8 +17,9 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::delete('cart/{cartItem}', [CartController::class, 'destroy'])->name('cart.item.destroy');
     Route::patch('cart/{cartItem}', [CartController::class, 'update'])->name('cart.item.update');
     Route::get('/checkout', [CheckoutController::class, 'index'])->name('checkout.index');
+    Route::post('/checkout', [CheckoutController::class, 'store'])->name('checkout.store');
+    Route::get('/checkout/success', [CheckoutController::class, 'success'])->name('checkout.store.success');
     Route::get('/orders', [OrderController::class, 'index'])->name('orders.index');
-    Route::post('/orders', [OrderController::class, 'store'])->name('orders.store');
     Route::patch('/orders/{order}', [OrderController::class, 'update'])->name('orders.status.update');
 
     Route::resource('checkout/address', AddressController::class)->only(['store', 'destroy', 'update']);

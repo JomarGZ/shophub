@@ -2,12 +2,15 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\StoreOrderRequest;
 use App\Http\Resources\AddressResource;
 use App\Repositories\AddressRepository;
 use App\Repositories\CartRepository;
 use App\Services\Cart\CartCalculationService;
 use App\Services\CartService;
+use App\Services\OrderService;
 use App\Services\PaymentService;
+use Illuminate\Support\Str;
 use Inertia\Inertia;
 use Nnjeim\World\World;
 
@@ -17,6 +20,7 @@ class CheckoutController extends Controller
         protected AddressRepository $addressRepository,
         protected CartRepository $cartRepository,
         protected CartService $cartService,
+        protected OrderService $orderService,
         protected CartCalculationService $cartCalculationService
     ) {}
 
@@ -43,5 +47,22 @@ class CheckoutController extends Controller
             'order_summary' => $orderSummary,
             'payment_methods' => $paymentMethods,
         ]);
+    }
+
+    public function store(StoreOrderRequest $request)
+    {
+        $result = $this->orderService->execute(request()->user(), $request->validated());
+        $paymentUrl = isset($result['payment_url']) ? $result['payment_url'] : null;
+        $isValidPaymentUrl = $paymentUrl && Str::isUrl($paymentUrl, ['https']);
+        if ($isValidPaymentUrl) {
+            return Inertia::location($paymentUrl);
+        }
+
+        return redirect()->route('orders.index')->with('success', 'Order is placed successfully');
+    }
+
+    public function success()
+    {
+        return Inertia::render('checkout/success');
     }
 }
