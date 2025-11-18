@@ -53,7 +53,8 @@ class CheckoutController extends Controller
     {
         $result = $this->orderService->execute(request()->user(), $request->validated());
         $paymentUrl = isset($result['payment_url']) ? $result['payment_url'] : null;
-        $isValidPaymentUrl = $paymentUrl && Str::isUrl($paymentUrl, ['https']);
+        $protocols = config('payment.url_protocols', ['https']);
+        $isValidPaymentUrl = $paymentUrl && Str::isUrl($paymentUrl, $protocols);
         if ($isValidPaymentUrl) {
             return Inertia::location($paymentUrl);
         }
@@ -63,6 +64,11 @@ class CheckoutController extends Controller
 
     public function success()
     {
-        return Inertia::render('checkout/success');
+        return Inertia::render('checkout/processing');
+    }
+
+    public function cancel()
+    {
+        return Inertia::render('checkout/cancelled');
     }
 }
