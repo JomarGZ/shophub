@@ -6,7 +6,6 @@ use App\Models\Order;
 use Exception;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Route;
-use Laravel\Cashier\Cashier;
 use Stripe\Exception\ApiErrorException;
 
 class StripePaymentMethod implements PaymentMethodInterface
@@ -18,7 +17,7 @@ class StripePaymentMethod implements PaymentMethodInterface
         try {
             $lineItems = $this->prepareLineItems($order);
             $session = $this->createCheckoutSession($order, $lineItems);
-            
+
             return $session->url;
         } catch (ApiErrorException $e) {
             Log::error('Stripe Checkout error', [
@@ -76,14 +75,16 @@ class StripePaymentMethod implements PaymentMethodInterface
 
     private function createCheckoutSession(Order $order, array $lineItems)
     {
-        return Cashier::stripe()->checkout->sessions->create([
-            'line_items' => $lineItems,
-            'mode' => 'payment',
-            'metadata' => [
-                'order_id' => $order->id,
-            ],
-            'success_url' => route('checkout.store.success', [], true),
-            'cancel_url' => route('checkout.store.cancelled', [], true),
-        ]);
+        return request()->user()->checkout(
+            $lineItems,
+            [
+                'mode' => 'payment',
+                'metadata' => [
+                    'order_id' => $order->id,
+                ],
+                'success_url' => route('checkout.store.success', [], true),
+                'cancel_url' => route('checkout.store.cancelled', [], true),
+            ]
+        );
     }
 }
