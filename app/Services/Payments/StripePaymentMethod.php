@@ -22,6 +22,16 @@ class StripePaymentMethod implements PaymentMethodInterface
                 'quantity' => (int) $item->quantity,
             ];
         })->toArray();
+        $lineItems[] = [
+             'price_data' => [
+                    'currency' => 'usd',
+                    'product_data' => [
+                        'name' => 'Shipping Fee',
+                    ],
+                    'unit_amount' => (int) ($order->shipping_fee * 100),
+                ],
+                'quantity' => 1,
+        ];
         $checkout_session = Cashier::stripe()->checkout->sessions->create([
             'line_items' => $lineItems,
             'mode' => 'payment',
