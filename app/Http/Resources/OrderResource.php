@@ -32,7 +32,6 @@ class OrderResource extends JsonResource
                 'street' => $this->shipping_street_address,
             ],
             'order_items' => OrderItemResource::collection($this->whenLoaded('orderItems')),
-            'payment' => PaymentResource::make($this->whenLoaded('payment')),
         ];
     }
 }

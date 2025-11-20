@@ -6,6 +6,8 @@ use App\Models\Order;
 use Exception;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Route;
+use Laravel\Cashier\Checkout;
+use RuntimeException;
 use Stripe\Exception\ApiErrorException;
 
 class StripePaymentMethod implements PaymentMethodInterface
@@ -17,7 +19,18 @@ class StripePaymentMethod implements PaymentMethodInterface
         try {
             $lineItems = $this->prepareLineItems($order);
             $session = $this->createCheckoutSession($order, $lineItems);
-
+            
+            if (!$session || !($session instanceof Checkout)) {
+                throw new RuntimeException('Failed to create stripe checkout session.');
+            }
+            if ($order->external_reference !== $session->id) {
+                $paymentStatus = StripePaymentMapper::toPaymentStatus($session->payment_status ?? null);
+                $order->update([
+                    'external_reference' => $session->id,
+                    'payment_status' => $paymentStatus
+                ]);
+            }
+           
             return $session->url;
         } catch (ApiErrorException $e) {
             Log::error('Stripe Checkout error', [
@@ -39,8 +52,8 @@ class StripePaymentMethod implements PaymentMethodInterface
 
     private function validateCheckoutRoutes()
     {
-        if (!Route::has('checkout.store.success') || !Route::has('checkout.store.cancelled')) {
-            throw  new Exception('Checkout routes are missing.');
+        if (! Route::has('checkout.store.success') || ! Route::has('checkout.store.cancelled')) {
+            throw new Exception('Checkout routes are missing.');
         }
     }
 

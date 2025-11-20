@@ -10,6 +10,7 @@ enum PaymentStatus: string
     case REFUNDED = 'refunded';
     case REJECTED = 'rejected';
     case CANCELLED = 'cancelled';
+    case PENDING = 'pending';
 
     public function color()
     {
@@ -20,6 +21,7 @@ enum PaymentStatus: string
             self::REFUNDED => 'warning',     // Amber
             self::REJECTED => 'destructive', // Red
             self::CANCELLED => 'neutral',    // Slate
+            self::PENDING => 'muted',
             default => 'muted',              // Gray (fallback)
         };
     }

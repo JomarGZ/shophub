@@ -68,6 +68,13 @@ class CartService
         return $this->cartRepo->delete($item);
     }
 
+    public function removePurchaseItem(int $userId, array $productIds)
+    {
+        return CartItem::whereHas('cart', fn($q) => $q->where('user_id', $userId))
+            ->whereIn('product_id', $productIds)
+            ->delete();
+    }
+
     public function updateQuantity(CartItem $cartItem, int $quantity)
     {
         $this->cartRepo->update(model: $cartItem, data: ['quantity' => $quantity]);

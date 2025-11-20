@@ -4,6 +4,7 @@ namespace App\Services;
 
 use App\Enums\OrderStatus;
 use App\Enums\PaymentMethod;
+use App\Enums\PaymentStatus;
 use App\Factories\PaymentMethodFactory;
 use App\Models\Address;
 use App\Models\Order;
@@ -39,15 +40,25 @@ class OrderService
         $processor = new PaymentProcessor(PaymentMethodFactory::make($method));
 
         try {
+            if ($method->isOnline()) {
+                $existingOrder = $user->orders()
+                    ->where('payment_method', $method)
+                    ->where('payment_status', PaymentStatus::UNPAID)
+                    ->where('status', OrderStatus::PENDING)
+                    ->latest()
+                    ->first();
+                    
+                if ($existingOrder) {
+                    $existingOrder->status = OrderStatus::CANCELLED;
+                    $existingOrder->save();
+                }
+            }
             $order = DB::transaction(function () use ($user, $cartCalcData, $method) {
 
                 $defaultAddress = $this->addressRepository->getAddress($user, default: true);
 
                 $order = $this->createOrder($cartCalcData, $method ?? PaymentMethod::COD, $defaultAddress);
                 $this->createOrderItems($order, $cartCalcData['items']);
-                $this->stockService->decrementOrderStock($order);
-
-                $user->cart->cartItems()->delete();
 
                 return $order;
 
@@ -90,6 +101,7 @@ class OrderService
         return $this->orderRepository->create([
             'address_id' => $address->id,
             'status' => OrderStatus::PENDING,
+            'payment_status' => PaymentStatus::UNPAID,
             'subtotal' => $cartTotals['subtotal'],
             'shipping_fee' => $cartTotals['shipping_fee'],
             'total' => $cartTotals['total'],

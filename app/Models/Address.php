@@ -26,9 +26,12 @@ class Address extends Model
         'is_default',
     ];
 
-    protected $casts = [
-        'is_default' => 'boolean',
-    ];
+    protected function casts()
+    {
+        return [ 
+            'is_default' => 'boolean',
+        ];
+    }
 
     protected static function booted()
     {

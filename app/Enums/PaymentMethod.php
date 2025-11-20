@@ -7,6 +7,10 @@ enum PaymentMethod: string
     case COD = 'cod';
     case STRIPE = 'stripe';
 
+    public function isOnline(): bool
+    {
+        return in_array($this, [self::STRIPE]);
+    }
     public function label(): string
     {
         return match ($this) {
