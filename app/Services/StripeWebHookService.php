@@ -19,7 +19,8 @@ class StripeWebHookService
     public function __construct(
         protected OrderRepository $orderRepository, 
         protected StockService $stockService,
-        protected CartService $cartService
+        protected CartService $cartService,
+        protected OrderService $orderService
     ){}
 
     public function handleSuccessfulSession(array $session)
@@ -52,7 +53,7 @@ class StripeWebHookService
         $paymentStatus = StripePaymentMapper::toPaymentStatus($session['payment_status'] ?? null);
 
         if ($paymentStatus === PaymentStatus::PAID) {
-            $this->completeOrder($order, $session);
+            $this->orderService->completeOrder(order: $order, data: $session, status: OrderStatus::PROCESSING, method: $order->payment_method);
         } else {
            
             $order->update([
@@ -79,33 +80,33 @@ class StripeWebHookService
         ]);
     }
 
-    private function completeOrder(Order $order, array $session)
-    {
-        $status = StripePaymentMapper::toPaymentStatus($session['payment_status'] ?? null);
-        try {
-            DB::transaction(function () use ($order, $session, $status) {
-                $order->update([
-                    'payment_status' => $status->value,
-                    'status' => OrderStatus::PROCESSING,
-                    'transaction_id' => $session['payment_intent'] ?? null,
-                    'external_reference' => $session['id'] ?? null,
-                    'paid_at' => now()
-                ]);
-                $this->stockService->decrementOrderStock($order);
-                $this->cartService->removePurchaseItem($order->user_id, $order->orderItems->pluck('product_id')->toArray());
+    // private function completeOrder(Order $order, array $session)
+    // {
+    //     $status = StripePaymentMapper::toPaymentStatus($session['payment_status'] ?? null);
+    //     try {
+    //         DB::transaction(function () use ($order, $session, $status) {
+    //             $order->update([
+    //                 'payment_status' => $status->value,
+    //                 'status' => OrderStatus::PROCESSING,
+    //                 'transaction_id' => $session['payment_intent'] ?? null,
+    //                 'external_reference' => $session['id'] ?? null,
+    //                 'paid_at' => now()
+    //             ]);
+    //             $this->stockService->decrementOrderStock($order);
+    //             $this->cartService->removePurchaseItem($order->user_id, $order->orderItems->pluck('product_id')->toArray());
 
-                Log::info('Order Completed', [
-                    'order_id' => $order->id,
-                    'amount' => $order->total,
-                    'provider' => 'stripe'
-                ]);
-            });
-        } catch (Exception $e) {
-            Log::error('Failed to complete order', [
-                'order_id' => $order->id,
-                'error' => $e->getMessage()
-            ]);
-        }
+    //             Log::info('Order Completed', [
+    //                 'order_id' => $order->id,
+    //                 'amount' => $order->total,
+    //                 'provider' => 'stripe'
+    //             ]);
+    //         });
+    //     } catch (Exception $e) {
+    //         Log::error('Failed to complete order', [
+    //             'order_id' => $order->id,
+    //             'error' => $e->getMessage()
+    //         ]);
+    //     }
 
-    }
+    // }
 }

@@ -15,10 +15,7 @@ class StripeEventListener implements ShouldQueue
     /**
      * Create the event listener.
      */
-    public function __construct(protected StripeWebHookService $stripeWebhookService)
-    {
-        //
-    }
+    public function __construct(protected StripeWebHookService $stripeWebhookService){}
 
     /**
      * Handle the event.

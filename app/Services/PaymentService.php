@@ -8,6 +8,8 @@ use App\Models\Payment;
 
 class PaymentService
 {
+    protected array $drivers = [];
+    
     public function all()
     {
         return collect(PaymentMethod::cases())->map(fn ($method) => [
@@ -18,13 +20,5 @@ class PaymentService
         ]);
     }
 
-    public function markAsPaid(Payment $payment): bool
-    {
-        if ($payment->status === PaymentStatus::PAID || $payment->order->payment_method !== PaymentMethod::COD) {
-            return true;
-        }
-        $payment->status = PaymentStatus::PAID;
 
-        return $payment->save();
-    }
 }

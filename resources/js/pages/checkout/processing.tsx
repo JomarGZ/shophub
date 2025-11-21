@@ -5,18 +5,25 @@ import shop from '@/routes/shop';
 import { Link } from '@inertiajs/react';
 import { ArrowRight, CheckCircle, Package, ShoppingBag } from 'lucide-react';
 
-export default function Processing() {
-    const orderData = {
-        orderNumber:
-            'ORD-' + Math.random().toString(36).substr(2, 9).toUpperCase(),
-        items: [
-            { name: 'Organic Green Tea', quantity: 2, price: 24.99 },
-            { name: 'Natural Honey', quantity: 1, price: 15.99 },
-        ],
-        subtotal: 65.97,
-        shipping: 5.99,
-        total: 71.96,
-    };
+type Order = {
+    id: string;
+    shipping_fee: number;
+    subtotal: number;
+    total: number;
+};
+
+type Items = {
+    id: number;
+    product_name: string;
+    quantity: number;
+    line_total: number;
+    product_price: number;
+};
+interface ProcessingProps {
+    order: Order;
+    items: Items[];
+}
+export default function Processing({ order, items }: ProcessingProps) {
     return (
         <div className="min-h-screen bg-gradient-to-br from-background via-background to-primary/5 px-4 py-12">
             <div className="animate-fade-in mx-auto max-w-3xl space-y-8">
@@ -43,7 +50,7 @@ export default function Processing() {
                     <div className="inline-flex items-center gap-2 rounded-full bg-muted/50 px-4 py-2">
                         <Package className="h-4 w-4 text-primary" />
                         <span className="text-sm font-medium text-foreground">
-                            Order #{orderData.orderNumber}
+                            Order #{order.id}
                         </span>
                     </div>
                 </div>
@@ -59,14 +66,14 @@ export default function Processing() {
                     <CardContent className="space-y-6 p-6">
                         {/* Items List */}
                         <div className="space-y-4">
-                            {orderData.items.map((item, index) => (
+                            {items.map((item) => (
                                 <div
-                                    key={index}
+                                    key={item.id}
                                     className="flex items-start justify-between gap-4"
                                 >
                                     <div className="flex-1">
                                         <h3 className="font-medium text-foreground">
-                                            {item.name}
+                                            {item.product_name}
                                         </h3>
                                         <p className="text-sm text-muted-foreground">
                                             Quantity: {item.quantity}
@@ -74,13 +81,10 @@ export default function Processing() {
                                     </div>
                                     <div className="text-right">
                                         <p className="font-semibold text-foreground">
-                                            $
-                                            {(
-                                                item.price * item.quantity
-                                            ).toFixed(2)}
+                                            ${item.line_total}
                                         </p>
                                         <p className="text-sm text-muted-foreground">
-                                            ${item.price.toFixed(2)} each
+                                            ${item.product_price} each
                                         </p>
                                     </div>
                                 </div>
@@ -96,7 +100,7 @@ export default function Processing() {
                                     Subtotal
                                 </span>
                                 <span className="font-medium text-foreground">
-                                    ${orderData.subtotal.toFixed(2)}
+                                    ${order.subtotal}
                                 </span>
                             </div>
                             <div className="flex justify-between text-sm">
@@ -104,7 +108,7 @@ export default function Processing() {
                                     Shipping
                                 </span>
                                 <span className="font-medium text-foreground">
-                                    ${orderData.shipping.toFixed(2)}
+                                    ${order.shipping_fee}
                                 </span>
                             </div>
 
@@ -113,7 +117,7 @@ export default function Processing() {
                             <div className="flex justify-between text-lg font-bold">
                                 <span className="text-foreground">Total</span>
                                 <span className="text-primary">
-                                    ${orderData.total.toFixed(2)}
+                                    ${order.total}
                                 </span>
                             </div>
                         </div>

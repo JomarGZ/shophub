@@ -3,13 +3,10 @@
 namespace App\Services\Payments;
 
 use App\Models\Order;
+use Illuminate\Http\Request;
 
 interface PaymentMethodInterface
 {
-    /**
-     * Process the payment.
-     *
-     * @return mixed
-     */
     public function pay(Order $order);
+    public function handleSuccess(Request $request);
 }

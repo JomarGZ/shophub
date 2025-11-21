@@ -13,6 +13,7 @@ use App\Repositories\AddressRepository;
 use App\Repositories\OrderRepository;
 use App\Services\Cart\CartCalculationService;
 use App\Services\Payments\PaymentProcessor;
+use Exception;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
@@ -21,6 +22,7 @@ class OrderService
 {
     public function __construct(
         protected CartCalculationService $cartCalcService,
+        protected CartService $cartService,
         protected OrderRepository $orderRepository,
         protected AddressRepository $addressRepository,
         protected StockService $stockService
@@ -117,5 +119,35 @@ class OrderService
     private function createOrderItems(Order $order, Collection $items)
     {
         $items->each(fn ($item) => $order->orderItems()->create($item));
+    }
+
+   
+    public function completeOrder(Order $order, array $data = [], ?OrderStatus $status, $method = null)
+    {
+        try {
+            DB::transaction(function () use ($order, $data, $status, $method) {
+                $order->update([
+                    'payment_status' => PaymentStatus::tryFrom($data['payment_status'] ?? null),
+                    'status' => $status ?? OrderStatus::PENDING,
+                    'transaction_id' => $data['payment_intent'] ?? null,
+                    'external_reference' => $data['id'] ?? null,
+                    'paid_at' => PaymentStatus::tryFrom($data['payment_status']) === PaymentStatus::PAID ? now() : null
+                ]);
+                $this->stockService->decrementOrderStock($order);
+                $this->cartService->removePurchaseItem($order->user_id, $order->orderItems->pluck('product_id')->toArray());
+
+                Log::info('Order Completed', [
+                    'order_id' => $order->id,
+                    'amount' => $order->total,
+                    'provider' => $method
+                ]);
+            });
+        } catch (Exception $e) {
+            Log::error('Failed to complete order', [
+                'order_id' => $order->id,
+                'error' => $e->getMessage()
+            ]);
+        }
+
     }
 }
