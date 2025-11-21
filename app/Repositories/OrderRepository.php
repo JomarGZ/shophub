@@ -15,7 +15,7 @@ class OrderRepository extends Repository
 
     public function simplePaginate(int $perPage = 15, array $columns = ['*'], array|string $relations = []): Paginator
     {
-        return $this->query()->with($relations)->simplePaginate($perPage, $columns);
+        return $this->query()->with($relations)->latest()->simplePaginate($perPage, $columns);
     }
 
     public function updateStatus(Order $order, OrderStatus $newStatus)

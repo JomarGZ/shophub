@@ -15,7 +15,7 @@ class StripeEventListener implements ShouldQueue
     /**
      * Create the event listener.
      */
-    public function __construct(protected StripeWebHookService $stripeWebhookService){}
+    public function __construct(protected StripeWebHookService $stripeWebhookService) {}
 
     /**
      * Handle the event.
@@ -31,24 +31,22 @@ class StripeEventListener implements ShouldQueue
             'created' => $event->payload['created'] ?? null,
         ]);
 
-
         // Detailed logs for each e-commerce event
         switch ($type) {
             case 'checkout.session.completed':
-                $this->stripeWebhookService->handleSuccessfulSession($data);
+                $this->stripeWebhookService->handleCheckoutCompleted($data);
                 break;
 
             case 'checkout.session.async_payment_succeeded':
-                $this->stripeWebhookService->handleSuccessfulSession($data);
+                $this->stripeWebhookService->handleAsyncPaymentSucceeded($data);
                 break;
 
             case 'checkout.session.async_payment_failed':
-                $this->stripeWebhookService->handleFailedSession($data);
+                $this->stripeWebhookService->handleAsyncPaymentFailed($data);
                 break;
 
             default:
                 Log::info('Unhandled Stripe event type', ['type' => $type]);
         }
     }
-
 }

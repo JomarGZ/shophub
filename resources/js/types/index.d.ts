@@ -146,7 +146,7 @@ export interface Order {
     customer: string;
     date_ordered: string;
     payment_method: string;
-    payment?: { id: number; status: string };
+    payment_status: string;
     shipping_fee: number | string;
     address: {
         city: string;

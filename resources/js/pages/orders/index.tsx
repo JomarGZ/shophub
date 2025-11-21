@@ -35,6 +35,7 @@ type IndexProps = {
     order_statuses: OrderStatusOption[];
 };
 export default function Index({ orders, order_statuses }: IndexProps) {
+    console.log(orders);
     const [orderList, setOrderList] = useState<Order[]>(orders.data);
     const [nextPageUrl, setNextPageUrl] = useState<string | null>(
         orders.next_page_url ? String(orders.next_page_url) : null,
@@ -42,7 +43,6 @@ export default function Index({ orders, order_statuses }: IndexProps) {
     const statusMap: Record<string, OrderStatusOption> = Object.fromEntries(
         order_statuses.map((s) => [s.value, s]),
     );
-    console.log(statusMap);
     const [loading, setLoading] = useState<boolean>(false);
 
     const [hasMore, setHasMore] = useState<Boolean>(orders.has_more);
@@ -168,7 +168,7 @@ export default function Index({ orders, order_statuses }: IndexProps) {
             </Container>
             <Container>
                 <div className="space-y-4">
-                    {orders.data.length === 0 ? (
+                    {orderList.length === 0 ? (
                         <Card>
                             <CardContent className="py-16 text-center">
                                 <Package className="mx-auto mb-4 h-16 w-16 text-muted-foreground" />
@@ -312,15 +312,11 @@ export default function Index({ orders, order_statuses }: IndexProps) {
                                                                 </span>
                                                                 <Badge
                                                                     variant={getPaymentVariant(
-                                                                        order
-                                                                            .payment
-                                                                            ?.status ??
+                                                                        order.payment_status ??
                                                                             'unknown',
                                                                     )}
                                                                 >
-                                                                    {order
-                                                                        .payment
-                                                                        ?.status ??
+                                                                    {order.payment_status ??
                                                                         'Unknown'}
                                                                 </Badge>
                                                             </div>

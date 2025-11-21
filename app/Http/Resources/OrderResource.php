@@ -22,6 +22,7 @@ class OrderResource extends JsonResource
                 'color' => $this->status->color(),
                 'value' => $this->status,
             ],
+            'payment_status' => $this->payment_status,
             'date_ordered' => $this->created_at,
             'payment_method' => $this->payment_method,
             'shipping_fee' => $this->shipping_fee,

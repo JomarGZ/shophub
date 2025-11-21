@@ -10,13 +10,14 @@ use Illuminate\Http\Request;
 
 class CodPaymentMethod implements PaymentMethodInterface
 {
-    public function __construct(protected OrderService $orderService){}
-    public function pay(Order $order) 
+    public function __construct(protected OrderService $orderService) {}
+
+    public function pay(Order $order)
     {
         $data = [
-           'payment_status' => PaymentStatus::UNPAID->value,
+            'payment_status' => PaymentStatus::UNPAID->value,
         ];
-        $this->orderService->completeOrder(order: $order,data: $data, status: OrderStatus::PENDING);
+        $this->orderService->completeOrder(order: $order, data: $data, status: OrderStatus::PENDING);
     }
 
     public function handleSuccess(Request $request)

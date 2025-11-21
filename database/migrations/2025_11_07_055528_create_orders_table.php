@@ -18,7 +18,7 @@ return new class extends Migration
             $table->foreignIdFor(User::class)->constrained()->cascadeOnDelete();
             $table->foreignIdFor(Address::class)->nullable()->constrained()->nullOnDelete();
             $table->string('status'); // OrderStatus enum
-            $table->string('payment_status'); //PaymentStatus enum
+            $table->string('payment_status'); // PaymentStatus enum
 
             $table->decimal('subtotal', 10, 2)->default(0);
             $table->decimal('shipping_fee', 10, 2)->default(0);

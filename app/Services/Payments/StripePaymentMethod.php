@@ -16,6 +16,7 @@ use Stripe\Exception\ApiErrorException;
 class StripePaymentMethod implements PaymentMethodInterface
 {
     public function __construct(protected OrderRepository $orderRepository) {}
+
     public function pay(Order $order)
     {
         $this->validateCheckoutRoutes();
@@ -23,18 +24,18 @@ class StripePaymentMethod implements PaymentMethodInterface
         try {
             $lineItems = $this->prepareLineItems($order);
             $session = $this->createCheckoutSession($order, $lineItems);
-            
-            if (!$session || !($session instanceof Checkout)) {
+
+            if (! $session || ! ($session instanceof Checkout)) {
                 throw new RuntimeException('Failed to create stripe checkout session.');
             }
             if ($order->external_reference !== $session->id) {
                 $paymentStatus = StripePaymentMapper::toPaymentStatus($session->payment_status ?? null);
                 $order->update([
                     'external_reference' => $session->id,
-                    'payment_status' => $paymentStatus
+                    'payment_status' => $paymentStatus,
                 ]);
             }
-           
+
             return $session->url;
         } catch (ApiErrorException $e) {
             Log::error('Stripe Checkout error', [
@@ -58,7 +59,7 @@ class StripePaymentMethod implements PaymentMethodInterface
     {
         $user = $request->user();
         $sessionId = $request->get('session_id');
-        if (!$sessionId) {
+        if (! $sessionId) {
             throw new \Exception('Missing session_id in request.');
         }
         try {
@@ -71,19 +72,19 @@ class StripePaymentMethod implements PaymentMethodInterface
             throw new \Exception('Unable to retrieve Stripe session.');
         }
         $orderId = $checkoutSession->metadata->order_id ?? null;
-        if (!$orderId) {
+        if (! $orderId) {
 
             Log::error('Checkout session missing order_id', [
-                'session_id' => $checkoutSession->id
+                'session_id' => $checkoutSession->id,
             ]);
             throw new \Exception('Order ID is missing from payment session.');
         }
         $order = $this->orderRepository->model()->with('orderItems')->find($orderId);
 
-        if (!$order) {
+        if (! $order) {
             Log::error('Order not found for checkout session', [
                 'session_id' => $checkoutSession->id,
-                'order_id' => $orderId
+                'order_id' => $orderId,
             ]);
 
             throw new Exception('Order not found');
@@ -104,10 +105,10 @@ class StripePaymentMethod implements PaymentMethodInterface
                     'product_name' => $item->product_name,
                     'product_price' => $item->product_price,
                     'quantity' => $item->quantity,
-                    'total' => $item->line_total
+                    'total' => $item->line_total,
                 ];
-            })
-        
+            }),
+
         ];
     }
 
@@ -156,7 +157,7 @@ class StripePaymentMethod implements PaymentMethodInterface
                 'metadata' => [
                     'order_id' => $order->id,
                 ],
-                'success_url' => route('checkout.store.success', [], true) . '?session_id={CHECKOUT_SESSION_ID}&type=' . PaymentMethod::STRIPE->value,
+                'success_url' => route('checkout.store.success', [], true).'?session_id={CHECKOUT_SESSION_ID}&type='.PaymentMethod::STRIPE->value,
                 'cancel_url' => route('checkout.store.cancelled', [], true),
             ]
         );

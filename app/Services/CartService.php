@@ -70,7 +70,7 @@ class CartService
 
     public function removePurchaseItem(int $userId, array $productIds)
     {
-        return CartItem::whereHas('cart', fn($q) => $q->where('user_id', $userId))
+        return CartItem::whereHas('cart', fn ($q) => $q->where('user_id', $userId))
             ->whereIn('product_id', $productIds)
             ->delete();
     }

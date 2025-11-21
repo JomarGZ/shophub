@@ -3,13 +3,11 @@
 namespace App\Services;
 
 use App\Enums\PaymentMethod;
-use App\Enums\PaymentStatus;
-use App\Models\Payment;
 
 class PaymentService
 {
     protected array $drivers = [];
-    
+
     public function all()
     {
         return collect(PaymentMethod::cases())->map(fn ($method) => [
@@ -19,6 +17,4 @@ class PaymentService
             'is_default' => $method->value === PaymentMethod::COD->value,
         ]);
     }
-
-
 }

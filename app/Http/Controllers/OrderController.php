@@ -24,9 +24,9 @@ class OrderController extends Controller
     {
         $orders = $this->orderRepository->simplePaginate(
             perPage: 10,
-            columns: ['id', 'shipping_full_name', 'status', 'payment_method', 'created_at', 'shipping_fee', 'total', 'shipping_city', 'shipping_country', 'shipping_street_address'],
+            columns: ['id', 'shipping_full_name', 'status', 'payment_status', 'payment_method', 'created_at', 'shipping_fee', 'total', 'shipping_city', 'shipping_country', 'shipping_street_address'],
             relations: [
-                'orderItems:id,order_id,product_name,product_price,line_total,quantity'
+                'orderItems:id,order_id,product_name,product_price,line_total,quantity',
             ]
         );
 

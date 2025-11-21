@@ -49,7 +49,7 @@ class OrderService
                     ->where('status', OrderStatus::PENDING)
                     ->latest()
                     ->first();
-                    
+
                 if ($existingOrder) {
                     $existingOrder->status = OrderStatus::CANCELLED;
                     $existingOrder->save();
@@ -121,8 +121,7 @@ class OrderService
         $items->each(fn ($item) => $order->orderItems()->create($item));
     }
 
-   
-    public function completeOrder(Order $order, array $data = [], ?OrderStatus $status, $method = null)
+    public function completeOrder(Order $order, array $data, ?OrderStatus $status, $method = null)
     {
         try {
             DB::transaction(function () use ($order, $data, $status, $method) {
@@ -131,7 +130,7 @@ class OrderService
                     'status' => $status ?? OrderStatus::PENDING,
                     'transaction_id' => $data['payment_intent'] ?? null,
                     'external_reference' => $data['id'] ?? null,
-                    'paid_at' => PaymentStatus::tryFrom($data['payment_status']) === PaymentStatus::PAID ? now() : null
+                    'paid_at' => PaymentStatus::tryFrom($data['payment_status']) === PaymentStatus::PAID ? now() : null,
                 ]);
                 $this->stockService->decrementOrderStock($order);
                 $this->cartService->removePurchaseItem($order->user_id, $order->orderItems->pluck('product_id')->toArray());
@@ -139,13 +138,13 @@ class OrderService
                 Log::info('Order Completed', [
                     'order_id' => $order->id,
                     'amount' => $order->total,
-                    'provider' => $method
+                    'provider' => $method,
                 ]);
             });
         } catch (Exception $e) {
             Log::error('Failed to complete order', [
                 'order_id' => $order->id,
-                'error' => $e->getMessage()
+                'error' => $e->getMessage(),
             ]);
         }
 

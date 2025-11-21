@@ -3,7 +3,6 @@
 namespace App\Http\Controllers;
 
 use App\Enums\PaymentMethod;
-use App\Enums\PaymentStatus;
 use App\Factories\PaymentMethodFactory;
 use App\Http\Requests\StoreOrderRequest;
 use App\Http\Resources\AddressResource;
@@ -70,11 +69,11 @@ class CheckoutController extends Controller
 
     public function success(Request $request)
     {
-        if (!$request->has('type')) {
+        if (! $request->has('type')) {
             abort(400, 'Missing payment type');
         }
-  
-        if (!PaymentMethod::tryFrom($request->get('type'))->isOnline()) {
+
+        if (! PaymentMethod::tryFrom($request->get('type'))->isOnline()) {
             abort(400, 'Online payment is only allowed');
         }
 
@@ -82,28 +81,26 @@ class CheckoutController extends Controller
         $paymentHandler = PaymentMethodFactory::make(PaymentMethod::from($type));
         $result = $paymentHandler->handleSuccess($request);
         $order = $result['order'];
-        if (!isset($order['id'], $order['shipping_fee'], $order['subtotal'], $order['total'])) {
+        if (! isset($order['id'], $order['shipping_fee'], $order['subtotal'], $order['total'])) {
             abort(500, 'Incomplete order data.');
         }
-        info('trigger', [
-            'items' => $result['items']
-        ]);
+
         return Inertia::render('checkout/processing', [
             'order' => [
                 'id' => $order['id'],
                 'shipping_fee' => (int) $order['shipping_fee'],
                 'subtotal' => (int) $order['subtotal'],
-                'total' => (int) $order['total']
+                'total' => (int) $order['total'],
             ],
             'items' => collect($result['items'])->map(function ($item) {
-                return   [
+                return [
                     'id' => $item['id'],
                     'product_name' => $item['product_name'] ?? 'Unkown',
                     'quantity' => $item['quantity'] ?? 0,
                     'line_total' => (int) $item['total'] ?? 0,
-                    'product_price' => (int) $item['product_price'] ?? 0
+                    'product_price' => (int) $item['product_price'] ?? 0,
                 ];
-            })
+            }),
         ]);
     }
 

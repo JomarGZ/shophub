@@ -28,7 +28,7 @@ class Address extends Model
 
     protected function casts()
     {
-        return [ 
+        return [
             'is_default' => 'boolean',
         ];
     }

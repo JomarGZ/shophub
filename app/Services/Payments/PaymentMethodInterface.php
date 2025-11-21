@@ -8,5 +8,6 @@ use Illuminate\Http\Request;
 interface PaymentMethodInterface
 {
     public function pay(Order $order);
+
     public function handleSuccess(Request $request);
 }

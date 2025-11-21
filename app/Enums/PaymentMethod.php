@@ -11,6 +11,7 @@ enum PaymentMethod: string
     {
         return in_array($this, [self::STRIPE]);
     }
+
     public function label(): string
     {
         return match ($this) {
