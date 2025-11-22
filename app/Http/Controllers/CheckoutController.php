@@ -36,7 +36,9 @@ class CheckoutController extends Controller
         $this->cartService->syncQuantitiesWithStock($cart);
         $cartItems = $this->cartRepository->getItemsInStock($cart, relations: ['product']);
         $cartTotals = $this->cartCalculationService->calculate($cart);
-
+        if ($cartItems->isEmpty()) {
+            return redirect()->route('cart.index');
+        }
         $orderSummary = [
             'items' => $cartItems,
             'subtotal' => (int) $cartTotals['subtotal'],

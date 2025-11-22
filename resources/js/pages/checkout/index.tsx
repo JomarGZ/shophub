@@ -375,7 +375,9 @@ export default function Index({
                                     <Button
                                         type="submit"
                                         disabled={
-                                            !hasDefaultAddress || processing
+                                            !hasDefaultAddress ||
+                                            processing ||
+                                            checkoutItem.length === 0
                                         }
                                         className="h-12 w-full bg-primary text-base text-primary-foreground hover:bg-primary/90"
                                     >

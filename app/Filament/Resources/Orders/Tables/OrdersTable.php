@@ -10,6 +10,7 @@ class OrdersTable
     public static function configure(Table $table): Table
     {
         return $table
+            ->defaultSort('created_at', 'desc')
             ->columns([
                 TextColumn::make('id')
                     ->label('ID')
@@ -25,14 +26,14 @@ class OrdersTable
                     ->label('Total Amount')
                     ->money('USD')
                     ->sortable(),
-                TextColumn::make('payment.status')
+                TextColumn::make('payment_status')
                     ->badge()
-                    ->color(fn ($record) => $record->payment->status->color())
+                    ->color(fn ($record) => $record->payment_status?->color() ?? 'muted')
                     ->searchable(),
                 TextColumn::make('status')
                     ->badge()
-                    ->color('neutral')
-                    ->getStateUsing(fn ($record) => $record->status->label())
+                    ->color(fn ($record) => $record->status?->color() ?? 'muted')
+                    ->getStateUsing(fn ($record) => $record->status?->label() ?? 'Unknown')
                     ->searchable(),
                 TextColumn::make('created_at')
                     ->label('Date Ordered')
