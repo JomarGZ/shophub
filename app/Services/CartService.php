@@ -7,12 +7,16 @@ use App\Models\CartItem;
 use App\Models\Product;
 use App\Models\User;
 use App\Repositories\CartRepository;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\ValidationException;
 
 class CartService
 {
     public function __construct(protected CartRepository $cartRepo) {}
+
+    public function getOrCreateCart(User $user)
+    {
+        return $user->cart ?? $user->cart()->create();
+    }
 
     public function addItem(User $user, Product $product, int $quantity): CartItem
     {
@@ -20,7 +24,7 @@ class CartService
             throw ValidationException::withMessages(['product' => 'Not enough stock available']);
         }
 
-        $cart = $user->cart ?? $user->cart()->create();
+        $cart = $this->getOrCreateCart($user);
 
         $item = $this->cartRepo->findOrCreateItem(cartId: $cart->id, productId: $product->id);
 
@@ -31,15 +35,16 @@ class CartService
 
     public function syncQuantitiesWithStock(Cart $cart)
     {
-        $cart->loadMissing('cartItems.product');
+        // $cart->loadMissing(['cartItems.product', 'cartItems']);
 
         if ($cart->cartItems->isEmpty()) {
             return $cart;
         }
 
-        foreach($cart->cartItems as $item) {
-            if (!$item->product) {
+        foreach ($cart->cartItems as $item) {
+            if (! $item->product) {
                 $item->delete();
+
                 continue;
             }
 
@@ -47,6 +52,7 @@ class CartService
 
             if ($availableStock <= 0) {
                 $item->delete();
+
                 continue;
             }
             if ($item->quantity > $availableStock) {
@@ -54,34 +60,23 @@ class CartService
             }
         }
 
-        return $cart->fresh(['cartItems.product']);
+        return $cart->fresh();
     }
+
     public function removeItem(CartItem $item)
     {
         return $this->cartRepo->delete($item);
     }
 
+    public function removePurchaseItem(int $userId, array $productIds)
+    {
+        return CartItem::whereHas('cart', fn ($q) => $q->where('user_id', $userId))
+            ->whereIn('product_id', $productIds)
+            ->delete();
+    }
+
     public function updateQuantity(CartItem $cartItem, int $quantity)
     {
         $this->cartRepo->update(model: $cartItem, data: ['quantity' => $quantity]);
-    }
-
-    public function calculateTotals(Cart $cart)
-    {
-        $subTotal = DB::table('cart_items')
-            ->join('products', 'cart_items.product_id', '=', 'products.id')
-            ->where('cart_items.cart_id', $cart->id)
-            ->where('products.stock', '>', 0)
-            ->sum(DB::raw('LEAST(cart_items.quantity, products.stock) * products.price'));
-
-        $shippingFee = config('cart.shipping_fee', 20);
-
-        $total = $shippingFee + $subTotal;
-
-        return [
-            'subtotal' => $subTotal,
-            'shipping_fee' => $shippingFee,
-            'total' => $total,
-        ];
     }
 }

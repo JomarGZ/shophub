@@ -2,69 +2,66 @@
 
 namespace App\Http\Controllers;
 
+use App\Enums\OrderStatus;
+use App\Http\Requests\StoreOrderRequest;
+use App\Http\Resources\OrderResource;
+use App\Models\Order;
+use App\Repositories\OrderRepository;
+use App\Services\OrderService;
+use Illuminate\Http\Request;
+use Illuminate\Support\Str;
+use Illuminate\Validation\Rule;
 use Inertia\Inertia;
 
 class OrderController extends Controller
 {
+    public function __construct(
+        protected OrderService $orderService,
+        protected OrderRepository $orderRepository
+    ) {}
+
     public function index()
     {
+        $orders = $this->orderRepository->simplePaginate(
+            perPage: 10,
+            columns: ['id', 'shipping_full_name', 'status', 'payment_status', 'payment_method', 'created_at', 'shipping_fee', 'total', 'shipping_city', 'shipping_country', 'shipping_street_address'],
+            relations: [
+                'orderItems:id,order_id,product_name,product_price,line_total,quantity',
+            ]
+        );
+
         return Inertia::render('orders/index', [
             'orders' => [
-                [
-                    'id' => 'ORD-001',
-                    'customer' => 'John Smith',
-                    'date' => '2024-01-15',
-                    'total' => 289.97,
-                    'status' => 'delivered',
-                    'items' => [
-                        ['productName' => 'Wireless Headphones', 'quantity' => 2, 'price' => 79.99],
-                        ['productName' => 'Yoga Mat', 'quantity' => 1, 'price' => 39.99],
-                        ['productName' => 'Water Bottle', 'quantity' => 4, 'price' => 24.99],
-                    ],
-                ],
-                [
-                    'id' => 'ORD-002',
-                    'customer' => 'Emma Wilson',
-                    'date' => '2024-01-14',
-                    'total' => 79.99,
-                    'status' => 'pending',
-                    'items' => [
-                        ['productName' => 'Wireless Headphones', 'quantity' => 1, 'price' => 79.99],
-                    ],
-                ],
-                [
-                    'id' => 'ORD-003',
-                    'customer' => 'Michael Brown',
-                    'date' => '2024-01-14',
-                    'total' => 159.98,
-                    'status' => 'shipped',
-                    'items' => [
-                        ['productName' => 'Smart Watch', 'quantity' => 1, 'price' => 199.99],
-                    ],
-                ],
-                [
-                    'id' => 'ORD-004',
-                    'customer' => 'Sarah Davis',
-                    'date' => '2024-01-13',
-                    'total' => 449.95,
-                    'status' => 'pending',
-                    'items' => [
-                        ['productName' => 'Running Shoes', 'quantity' => 2, 'price' => 129.99],
-                        ['productName' => 'Coffee Maker', 'quantity' => 1, 'price' => 149.99],
-                        ['productName' => 'Desk Lamp', 'quantity' => 1, 'price' => 49.99],
-                    ],
-                ],
-                [
-                    'id' => 'ORD-005',
-                    'customer' => 'James Johnson',
-                    'date' => '2024-01-12',
-                    'total' => 199.99,
-                    'status' => 'cancelled',
-                    'items' => [
-                        ['productName' => 'Smart Watch', 'quantity' => 1, 'price' => 199.99],
-                    ],
-                ],
+                'data' => fn () => OrderResource::collection($orders)->resolve(),
+                'next_page_url' => $orders->nextPageUrl(),
+                'has_more' => $orders->hasMorePages(),
             ],
+            'order_statuses' => OrderStatus::fullOptions(),
         ]);
+    }
+
+    public function store(StoreOrderRequest $request)
+    {
+        $result = $this->orderService->execute(request()->user(), $request->validated());
+        $paymentUrl = isset($result['payment_url']) ? $result['payment_url'] : null;
+        $isValidPaymentUrl = $paymentUrl && Str::isUrl($paymentUrl, ['https']);
+        if ($isValidPaymentUrl) {
+            return Inertia::location($paymentUrl);
+        }
+
+        return redirect()->route('orders.index')->with('success', 'Order is placed successfully');
+    }
+
+    public function update(Order $order, Request $request)
+    {
+        $validated = $request->validate([
+            'status' => ['required', Rule::in([OrderStatus::CANCELLED, OrderStatus::DELIVERED])],
+        ]);
+
+        $newStatus = OrderStatus::from($validated['status']);
+
+        $this->orderRepository->updateStatus($order, $newStatus);
+
+        return redirect()->back()->with('success', 'Order status updated successfully');
     }
 }

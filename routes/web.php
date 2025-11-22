@@ -17,13 +17,16 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::delete('cart/{cartItem}', [CartController::class, 'destroy'])->name('cart.item.destroy');
     Route::patch('cart/{cartItem}', [CartController::class, 'update'])->name('cart.item.update');
     Route::get('/checkout', [CheckoutController::class, 'index'])->name('checkout.index');
+    Route::post('/checkout', [CheckoutController::class, 'store'])->name('checkout.store');
+    Route::get('/checkout/success', [CheckoutController::class, 'success'])->name('checkout.store.success');
+    Route::get('/checkout/cancelled', [CheckoutController::class, 'cancel'])->name('checkout.store.cancelled');
     Route::get('/orders', [OrderController::class, 'index'])->name('orders.index');
+    Route::patch('/orders/{order}', [OrderController::class, 'update'])->name('orders.status.update');
 
     Route::resource('checkout/address', AddressController::class)->only(['store', 'destroy', 'update']);
     Route::patch('checkout/address/{address}/default', [AddressController::class, 'updateDefault'])->name('checkout.address.updateDefault');
+    Route::get('city/list', [CityController::class, 'index']);
 });
-
-Route::get('city/list', [CityController::class, 'index']);
 
 require __DIR__.'/settings.php';
 require __DIR__.'/auth.php';
