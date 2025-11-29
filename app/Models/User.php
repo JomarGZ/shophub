@@ -76,6 +76,11 @@ class User extends Authenticatable implements FilamentUser
         return $this->hasMany(Order::class);
     }
 
+    public function wishlist()
+    {
+        return $this->belongsToMany(Product::class, 'user_wishlist');
+    }
+
     public function hasDefaultAddress(): bool
     {
         return $this->addresses()->where('is_default', true)->exists();

@@ -1,3 +1,4 @@
+import { toggle } from '@/actions/App/Http/Controllers/WishlistController';
 import { Container } from '@/components/container';
 import { ProductCard } from '@/components/products/product-card';
 import { Badge } from '@/components/ui/badge';
@@ -8,8 +9,10 @@ import AppLayout from '@/layouts/app-layout';
 import { index } from '@/routes/shop';
 import { BreadcrumbItem, Product } from '@/types';
 import { Head } from '@inertiajs/react';
+import axios from 'axios';
 import { Heart, Minus, Plus, Share2, ShoppingCart, Star } from 'lucide-react';
 import { useState } from 'react';
+import { toast } from 'sonner';
 
 export default function Show({
     product,
@@ -30,11 +33,36 @@ export default function Show({
         },
     ];
     const [quantity, setQuantity] = useState(1);
-    const [mainLoading, setMainLoading] = useState(false);
+    const [favoriteLoading, setFavoriteLoading] = useState(false);
+    const [isFavorite, setFavorite] = useState(product.is_favorited || false);
+
     const increment = () => setQuantity((prev) => prev + 1);
     const decrement = () => setQuantity((prev) => Math.max(prev - 1, 1));
     const handleAddToCart = () => {
-        console.log(addToCart(product, quantity));
+        addToCart(product, quantity);
+    };
+
+    const handleFavorite = async (slug: string) => {
+        if (favoriteLoading) return;
+        setFavoriteLoading(true);
+        try {
+            const {
+                data: {
+                    data: { is_favorited },
+                    message,
+                    success,
+                },
+            } = await axios.post(toggle(slug).url);
+            if (success) {
+                setFavorite(is_favorited);
+                toast.success(message);
+            }
+        } catch (error) {
+            console.error('Error adding to wishlist', error);
+            toast.error('Error adding to wishlist');
+        } finally {
+            setFavoriteLoading(false);
+        }
     };
 
     return (
@@ -141,7 +169,7 @@ export default function Show({
                         <Button
                             onClick={handleAddToCart}
                             className="h-12 flex-1 bg-primary text-base text-primary-foreground hover:bg-primary/90"
-                            disabled={product.stock === 0 || mainLoading}
+                            disabled={product.stock === 0 || loading}
                         >
                             <ShoppingCart className="mr-2 h-5 w-5" />
                             Add to Cart
@@ -149,9 +177,13 @@ export default function Show({
                         <Button
                             variant="outline"
                             size="icon"
-                            className="h-12 w-12"
+                            disabled={favoriteLoading}
+                            onClick={() => handleFavorite(product.slug)}
+                            className="h-12 w-12 cursor-pointer"
                         >
-                            <Heart className="h-5 w-5" />
+                            <Heart
+                                className={`h-5 w-5 ${isFavorite ? 'text-red-700' : ''}`}
+                            />
                         </Button>
                         <Button
                             variant="outline"

@@ -94,6 +94,7 @@ export interface Product {
     description: string;
     stock: number;
     rating: number;
+    is_favorited?: boolean;
 }
 
 export interface PaginatedResponse<T> {

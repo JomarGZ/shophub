@@ -96,6 +96,7 @@ export function AppHeader({ breadcrumbs = [] }: AppHeaderProps) {
                                                     key={item.title}
                                                     href={item.href}
                                                     className="flex items-center space-x-2 font-medium"
+                                                    prefetch
                                                 >
                                                     {item.icon && (
                                                         <Icon
@@ -157,6 +158,7 @@ export function AppHeader({ breadcrumbs = [] }: AppHeaderProps) {
                                     >
                                         <Link
                                             href={item.href}
+                                            prefetch
                                             className={cn(
                                                 navigationMenuTriggerStyle(),
                                                 page.url ===

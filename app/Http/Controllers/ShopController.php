@@ -38,7 +38,7 @@ class ShopController extends Controller
     public function show(Product $product)
     {
         return Inertia::render('shop/show', [
-            'product' => ProductResource::make($product->load('category:id,name')),
+            'product' => ProductResource::make($product->load(['category:id,name', 'wishListedBy'])),
             'related_products' => ProductResource::collection($this->productRepository->getRelatedProducts(
                 catId: $product->category_id,
                 relation: 'category:id,name',

@@ -74,6 +74,11 @@ class Product extends Model
         return $this->hasMany(CartItem::class);
     }
 
+    public function wishListedBy()
+    {
+        return $this->belongsToMany(User::class, 'user_wishlist');
+    }
+
     #[Scope]
     protected function inStock(Builder $query): Builder
     {
