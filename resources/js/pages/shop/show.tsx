@@ -182,7 +182,7 @@ export default function Show({
                             className="h-12 w-12 cursor-pointer"
                         >
                             <Heart
-                                className={`h-5 w-5 ${isFavorite ? 'text-red-700' : ''}`}
+                                className={`h-5 w-5 transition-all ${isFavorite ? 'fill-red-500 text-red-500' : ''}`}
                             />
                         </Button>
                         <Button
