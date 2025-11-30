@@ -1,4 +1,4 @@
-import { toggle } from '@/actions/App/Http/Controllers/WishlistController';
+import WishlistToggleController from '@/actions/App/Http/Controllers/WishlistToggleController';
 import { Container } from '@/components/container';
 import { ProductCard } from '@/components/products/product-card';
 import { Badge } from '@/components/ui/badge';
@@ -7,8 +7,8 @@ import { Label } from '@/components/ui/label';
 import { useAddToCart } from '@/hooks/use-add-to-cart';
 import AppLayout from '@/layouts/app-layout';
 import { index } from '@/routes/shop';
-import { BreadcrumbItem, Product } from '@/types';
-import { Head } from '@inertiajs/react';
+import { BreadcrumbItem, Product, SharedData } from '@/types';
+import { Head, usePage } from '@inertiajs/react';
 import axios from 'axios';
 import { Heart, Minus, Plus, Share2, ShoppingCart, Star } from 'lucide-react';
 import { useState } from 'react';
@@ -21,6 +21,7 @@ export default function Show({
     product: Product;
     related_products: Product[];
 }) {
+    const { user } = usePage<SharedData>().props.auth;
     const { addToCart, loading } = useAddToCart();
     const breadcrumbs: BreadcrumbItem[] = [
         {
@@ -52,7 +53,7 @@ export default function Show({
                     message,
                     success,
                 },
-            } = await axios.post(toggle(slug).url);
+            } = await axios.post(WishlistToggleController(slug).url);
             if (success) {
                 setFavorite(is_favorited);
                 toast.success(message);
@@ -174,17 +175,20 @@ export default function Show({
                             <ShoppingCart className="mr-2 h-5 w-5" />
                             Add to Cart
                         </Button>
-                        <Button
-                            variant="outline"
-                            size="icon"
-                            disabled={favoriteLoading}
-                            onClick={() => handleFavorite(product.slug)}
-                            className="h-12 w-12 cursor-pointer"
-                        >
-                            <Heart
-                                className={`h-5 w-5 transition-all ${isFavorite ? 'fill-red-500 text-red-500' : ''}`}
-                            />
-                        </Button>
+                        {user && (
+                            <Button
+                                variant="outline"
+                                size="icon"
+                                disabled={favoriteLoading}
+                                onClick={() => handleFavorite(product.slug)}
+                                className="h-12 w-12 cursor-pointer"
+                            >
+                                <Heart
+                                    className={`h-5 w-5 transition-all ${isFavorite ? 'fill-red-500 text-red-500' : ''}`}
+                                />
+                            </Button>
+                        )}
+
                         <Button
                             variant="outline"
                             size="icon"

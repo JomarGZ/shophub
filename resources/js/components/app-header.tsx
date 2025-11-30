@@ -31,6 +31,7 @@ import { useInitials } from '@/hooks/use-initials';
 import { cn } from '@/lib/utils';
 import { home } from '@/routes';
 import { index } from '@/routes/shop';
+import wishlist from '@/routes/wishlist';
 import { type BreadcrumbItem, type NavItem, type SharedData } from '@/types';
 import { Link, usePage } from '@inertiajs/react';
 import { Menu, Search, User } from 'lucide-react';
@@ -47,6 +48,11 @@ const mainNavItems: NavItem[] = [
         title: 'Shop',
         href: index(),
     },
+    {
+        title: 'Favorites',
+        href: wishlist.index(),
+        authOnly: true,
+    },
 ];
 
 const rightNavItems: NavItem[] = [];
@@ -62,6 +68,9 @@ export function AppHeader({ breadcrumbs = [] }: AppHeaderProps) {
     const page = usePage<SharedData>();
     const { auth } = page.props;
     const getInitials = useInitials();
+    const navItemsToRender = mainNavItems.filter(
+        (item) => !item.authOnly || (item.authOnly && auth.user),
+    );
     return (
         <>
             <div className="border-b border-sidebar-border/80 bg-white">
@@ -91,7 +100,7 @@ export function AppHeader({ breadcrumbs = [] }: AppHeaderProps) {
                                 <div className="flex h-full flex-1 flex-col space-y-4 p-4">
                                     <div className="flex h-full flex-col justify-between text-sm">
                                         <div className="flex flex-col space-y-4">
-                                            {mainNavItems.map((item) => (
+                                            {navItemsToRender.map((item) => (
                                                 <Link
                                                     key={item.title}
                                                     href={item.href}
@@ -151,7 +160,7 @@ export function AppHeader({ breadcrumbs = [] }: AppHeaderProps) {
                     <div className="ml-6 hidden h-full items-center space-x-6 lg:flex">
                         <NavigationMenu className="flex h-full items-stretch">
                             <NavigationMenuList className="flex h-full items-stretch space-x-2">
-                                {mainNavItems.map((item, index) => (
+                                {navItemsToRender.map((item, index) => (
                                     <NavigationMenuItem
                                         key={index}
                                         className="relative flex h-full items-center"

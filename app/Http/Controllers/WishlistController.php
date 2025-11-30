@@ -2,26 +2,26 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Product;
+use App\Http\Resources\ProductResource;
 use App\Services\WishlistService;
-use App\Traits\ApiResponse;
 use Illuminate\Http\Request;
+use Inertia\Inertia;
 
 class WishlistController extends Controller
 {
-    use ApiResponse;
-
     public function __construct(protected WishlistService $wishlistService) {}
 
-    public function toggle(Request $request, Product $product)
+    public function index(Request $request)
     {
         $user = $request->user();
+        $wishlistProducts = $this->wishlistService->getSimplePaginatedWishlistProducts(user: $user, relations: ['category:id,name']);
 
-        $this->wishlistService->toggle($user, $product);
-
-        return $this->successResponse(
-            data: ['is_favorited' => $user->wishlist->contains($product)],
-            message: $user->wishlist->contains($product) ? 'Product added to wishlist' : 'Product removed from wishlist',
-        );
+        return Inertia::render('favorites/index', [
+            'wishlist_products' => [
+                'data' => fn () => ProductResource::collection($wishlistProducts)->resolve(),
+                'next_page_url' => $wishlistProducts->nextPageUrl(),
+                'has_more' => $wishlistProducts->hasMorePages(),
+            ],
+        ]);
     }
 }

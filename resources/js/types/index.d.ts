@@ -20,10 +20,12 @@ export interface NavItem {
     href: NonNullable<InertiaLinkProps['href']>;
     icon?: LucideIcon | null;
     isActive?: boolean;
+    authOnly?: boolean;
 }
 
 export interface SharedData {
     name: string;
+    flash: { success: string; error: string };
     quote: { message: string; author: string };
     auth: Auth;
     sidebarOpen: boolean;
@@ -113,6 +115,8 @@ export interface CartItem extends Product {
     quantity: number;
     product: Product;
 }
+
+export interface WishlistProduct extends Product {}
 
 export interface OrderItem {
     id: number;
