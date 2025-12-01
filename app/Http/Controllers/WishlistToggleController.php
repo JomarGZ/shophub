@@ -22,6 +22,7 @@ class WishlistToggleController extends Controller
         $message = !empty($favorite['attached'])
             ? 'Product added to wishlist.'
             : 'Product removed from wishlist.';
+      
         return redirect()->back()->with('success', $message);
     }
 }

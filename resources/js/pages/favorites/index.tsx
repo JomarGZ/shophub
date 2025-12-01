@@ -15,26 +15,29 @@ interface WishlistIndexProps {
     wishlist_products: PaginatedResponse<WishlistProduct>;
 }
 export default function Index({ wishlist_products }: WishlistIndexProps) {
-    console.log(wishlist_products);
     const { addToCart, loading } = useAddToCart();
-    const [loadingMore, setLoadingMore] = useState<boolean>(false);
+
+    const [mainLoading, setMainLoading] = useState<boolean>(false);
     const loadMore = () => {
-        if (loadingMore) return;
+        if (mainLoading) return;
         router.reload({
             only: ['wishlist_products'],
             data: {
                 page: wishlist_products.meta.current_page + 1,
             },
-            onStart: () => setLoadingMore(true),
-            onFinish: () => setLoadingMore(false),
+            onStart: () => setMainLoading(true),
+            onFinish: () => setMainLoading(false),
         });
     };
     const removeItems = (slug: string) => {
+        if (mainLoading) return;
         router.post(
             WishlistToggleController(slug),
             {},
             {
                 preserveScroll: true,
+                onStart: () => setMainLoading(true),
+                onFinish: () => setMainLoading(false),
             },
         );
     };
@@ -176,7 +179,7 @@ export default function Index({ wishlist_products }: WishlistIndexProps) {
                                         toggleFavorite={(product) =>
                                             removeItems(product.slug)
                                         }
-                                        loading={loading}
+                                        loading={loading || mainLoading}
                                         isFavorite={true}
                                     />
                                 ))}
@@ -187,7 +190,7 @@ export default function Index({ wishlist_products }: WishlistIndexProps) {
                                         variant="outline"
                                         size="lg"
                                         onClick={loadMore}
-                                        disabled={loadingMore}
+                                        disabled={mainLoading}
                                         className="min-w-[200px] cursor-pointer"
                                     >
                                         Load More Orders
