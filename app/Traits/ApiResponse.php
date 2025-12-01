@@ -4,7 +4,7 @@ namespace App\Traits;
 
 trait ApiResponse
 {
-    protected function successResponse($data = [], $message = 'Success', $statusCode = 200)
+    protected function successResponse(array $data = [], string $message = 'Success',int $statusCode = 200)
     {
         return response()->json([
             'success' => true,
@@ -13,7 +13,7 @@ trait ApiResponse
         ], $statusCode);
     }
 
-    protected function errorResponse($data = [], $message = 'Error', $statusCode = 400)
+    protected function errorResponse(array $data = [], string $message = 'Error', int $statusCode = 400)
     {
         return response()->json([
             'success' => false,
