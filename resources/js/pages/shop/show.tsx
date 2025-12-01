@@ -21,6 +21,7 @@ export default function Show({
     product: Product;
     related_products: Product[];
 }) {
+    console.log(related_products);
     const { user } = usePage<SharedData>().props.auth;
     const { addToCart, loading } = useAddToCart();
     const breadcrumbs: BreadcrumbItem[] = [
@@ -210,6 +211,7 @@ export default function Show({
                             key={related_product.id}
                             product={related_product}
                             onAddToCart={addToCart}
+                            isFavorite={related_product.is_favorited}
                         />
                     ))}
                 </div>

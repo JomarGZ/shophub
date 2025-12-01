@@ -35,6 +35,7 @@ export function FeaturedProducts({ featuredProducts }: FeatureProductsProps) {
                         loading={loading}
                         product={product}
                         onAddToCart={handleAddToCart}
+                        isFavorite={product.is_favorited}
                     />
                 ))}
             </div>

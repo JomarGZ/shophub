@@ -14,7 +14,7 @@ class WishlistController extends Controller
     public function index(Request $request)
     {
         $user = $request->user();
-        $wishlistProducts = $this->wishlistService->getSimplePaginatedWishlistProducts(user: $user, relations: ['category:id,name']);
+        $wishlistProducts = $this->wishlistService->getSimplePaginatedWishlistProducts(user: $user, relations: ['category:id,name', 'wishlistedBy']);
 
         return Inertia::render('favorites/index', [
             'wishlist_products' => [

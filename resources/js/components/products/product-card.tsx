@@ -2,7 +2,7 @@ import { show } from '@/actions/App/Http/Controllers/ShopController';
 import { login } from '@/routes';
 import { Product, SharedData } from '@/types';
 import { Link, usePage } from '@inertiajs/react';
-import { ShoppingCart, Star } from 'lucide-react';
+import { Heart, ShoppingCart, Star } from 'lucide-react';
 import { Badge } from '../ui/badge';
 import { Button } from '../ui/button';
 import { Card, CardContent, CardFooter } from '../ui/card';
@@ -10,23 +10,46 @@ import { Card, CardContent, CardFooter } from '../ui/card';
 interface ProductCardProps {
     product: Product;
     onAddToCart?: (product: Product) => void;
+    toggleFavorite?: (product: Product) => void;
     loading: boolean;
+    isFavorite?: boolean;
 }
 export function ProductCard({
     product,
     onAddToCart,
+    toggleFavorite,
+    isFavorite,
     loading,
 }: ProductCardProps) {
     const { auth } = usePage<SharedData>().props;
+
     return (
         <Card className="group hover:shadow-hover overflow-hidden border-border transition-all duration-300">
             <Link href={show({ slug: product.slug })}>
-                <div className="aspect-square overflow-hidden bg-muted">
+                <div className="relative aspect-square overflow-hidden bg-muted">
                     <img
                         src={product.image_url}
                         alt={product.name}
                         className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-110"
                     />
+                    <Button
+                        onClick={(e) => {
+                            e.preventDefault();
+                            e.stopPropagation();
+                            toggleFavorite?.(product);
+                        }}
+                        variant="ghost"
+                        size="icon"
+                        className="absolute top-2 right-2 cursor-pointer bg-background/80 backdrop-blur-sm transition-all hover:bg-background"
+                    >
+                        <Heart
+                            className={`h-5 w-5 transition-all ${
+                                isFavorite
+                                    ? 'fill-red-500 text-red-500'
+                                    : 'text-muted-foreground hover:text-red-500'
+                            }`}
+                        />
+                    </Button>
                 </div>
             </Link>
 

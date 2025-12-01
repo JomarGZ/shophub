@@ -15,6 +15,7 @@ export default function Index({
 }: {
     wishlist_products: any;
 }) {
+    console.log();
     const { addToCart, loading } = useAddToCart();
     const [wishlistProducts, setWishlistProducts] = useState<WishlistProduct[]>(
         wishlist_products.data,
@@ -191,6 +192,7 @@ export default function Index({
                                         product={product}
                                         onAddToCart={addToCart}
                                         loading={loading}
+                                        isFavorite={true}
                                     />
                                 ))}
                             </div>

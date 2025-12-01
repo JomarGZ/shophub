@@ -12,7 +12,7 @@ class WishlistService
         return $user->wishlist()->toggle($product->id);
     }
 
-    public function getSimplePaginatedWishlistProducts(User $user, $perPage = 15, array $columns = ['*'], array $relations = [])
+    public function getSimplePaginatedWishlistProducts(User $user, $perPage = 15, array $columns = ['*'], array|string $relations = [])
     {
         return $user->wishlist()->with($relations)->simplePaginate($perPage, $columns)->withQueryString();
     }
