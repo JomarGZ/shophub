@@ -1,3 +1,4 @@
+import WishlistToggleController from '@/actions/App/Http/Controllers/WishlistToggleController';
 import { Container } from '@/components/container';
 import { ProductCard } from '@/components/products/product-card';
 import { Badge } from '@/components/ui/badge';
@@ -6,10 +7,11 @@ import { Label } from '@/components/ui/label';
 import { useAddToCart } from '@/hooks/use-add-to-cart';
 import AppLayout from '@/layouts/app-layout';
 import { index } from '@/routes/shop';
-import { BreadcrumbItem, Product } from '@/types';
-import { Head } from '@inertiajs/react';
+import { BreadcrumbItem, Product, SharedData } from '@/types';
+import { Head, router, usePage } from '@inertiajs/react';
 import { Heart, Minus, Plus, Share2, ShoppingCart, Star } from 'lucide-react';
 import { useState } from 'react';
+import { toast } from 'sonner';
 
 export default function Show({
     product,
@@ -18,6 +20,7 @@ export default function Show({
     product: Product;
     related_products: Product[];
 }) {
+    const { user } = usePage<SharedData>().props.auth;
     const { addToCart, loading } = useAddToCart();
     const breadcrumbs: BreadcrumbItem[] = [
         {
@@ -30,11 +33,30 @@ export default function Show({
         },
     ];
     const [quantity, setQuantity] = useState(1);
-    const [mainLoading, setMainLoading] = useState(false);
+    const [favoriteLoading, setFavoriteLoading] = useState(false);
+
     const increment = () => setQuantity((prev) => prev + 1);
     const decrement = () => setQuantity((prev) => Math.max(prev - 1, 1));
     const handleAddToCart = () => {
-        console.log(addToCart(product, quantity));
+        addToCart(product, quantity);
+    };
+    const handleFavorite = async (slug: string) => {
+        if (favoriteLoading) return;
+        router.post(
+            WishlistToggleController(slug),
+            {},
+            {
+                only: ['product', 'flash'],
+                preserveScroll: true,
+                onSuccess: ({ props: { flash } }) => {
+                    if (flash.success) {
+                        toast.success(flash.success);
+                    }
+                },
+                onStart: () => setFavoriteLoading(true),
+                onFinish: () => setFavoriteLoading(false),
+            },
+        );
     };
 
     return (
@@ -141,18 +163,25 @@ export default function Show({
                         <Button
                             onClick={handleAddToCart}
                             className="h-12 flex-1 bg-primary text-base text-primary-foreground hover:bg-primary/90"
-                            disabled={product.stock === 0 || mainLoading}
+                            disabled={product.stock === 0 || loading}
                         >
                             <ShoppingCart className="mr-2 h-5 w-5" />
                             Add to Cart
                         </Button>
-                        <Button
-                            variant="outline"
-                            size="icon"
-                            className="h-12 w-12"
-                        >
-                            <Heart className="h-5 w-5" />
-                        </Button>
+                        {user && (
+                            <Button
+                                variant="outline"
+                                size="icon"
+                                disabled={favoriteLoading}
+                                onClick={() => handleFavorite(product.slug)}
+                                className="h-12 w-12 cursor-pointer"
+                            >
+                                <Heart
+                                    className={`h-5 w-5 transition-all ${product.is_favorited ? 'fill-red-500 text-red-500' : ''}`}
+                                />
+                            </Button>
+                        )}
+
                         <Button
                             variant="outline"
                             size="icon"
@@ -174,6 +203,7 @@ export default function Show({
                             key={related_product.id}
                             product={related_product}
                             onAddToCart={addToCart}
+                            isFavorite={related_product.is_favorited}
                         />
                     ))}
                 </div>

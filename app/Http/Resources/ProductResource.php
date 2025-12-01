@@ -24,6 +24,7 @@ class ProductResource extends JsonResource
             'category' => CategoryResource::make($this->whenLoaded('category')),
             'description' => $this->description,
             'stock' => $this->stock,
+            'is_favorited' => $this->whenLoaded('wishlistedBy', fn () => $request->user() ? $this->wishListedBy->contains($request->user()->id) : false),
         ];
     }
 }

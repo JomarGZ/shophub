@@ -26,7 +26,7 @@ class ShopController extends Controller
                 $this->productRepository->getPaginatedProducts(
                     perPage: 12,
                     columns: ['id', 'name', 'slug', 'price', 'image_url', 'category_id', 'description', 'stock'],
-                    relations: 'category:id,name',
+                    relations: ['category:id,name', 'wishlistedBy'],
                     filters: Request::only('search', 'categories', 'min_price', 'max_price')
                 )
             ),
@@ -38,10 +38,10 @@ class ShopController extends Controller
     public function show(Product $product)
     {
         return Inertia::render('shop/show', [
-            'product' => ProductResource::make($product->load('category:id,name')),
+            'product' => ProductResource::make($product->load(['category:id,name', 'wishlistedBy'])),
             'related_products' => ProductResource::collection($this->productRepository->getRelatedProducts(
                 catId: $product->category_id,
-                relation: 'category:id,name',
+                relation: ['category:id,name', 'wishlistedBy'],
                 columns: ['id', 'name', 'slug', 'price', 'image_url', 'category_id', 'description', 'stock'],
                 limit: 4
             )),

@@ -1,5 +1,6 @@
 import { InertiaLinkProps } from '@inertiajs/react';
 import { LucideIcon } from 'lucide-react';
+import { Url } from 'url';
 
 export interface Auth {
     user: User;
@@ -20,10 +21,12 @@ export interface NavItem {
     href: NonNullable<InertiaLinkProps['href']>;
     icon?: LucideIcon | null;
     isActive?: boolean;
+    authOnly?: boolean;
 }
 
 export interface SharedData {
     name: string;
+    flash: { success: string; error: string };
     quote: { message: string; author: string };
     auth: Auth;
     sidebarOpen: boolean;
@@ -50,9 +53,13 @@ export interface PaginationLinks {
 }
 
 export interface PaginationMetaLink {
-    url: string | null;
+    url: Url | null;
     label: string;
     active: boolean;
+    first?: Url | null;
+    last?: Url | null;
+    next?: Url | null;
+    prev?: Url | null;
 }
 
 export interface SimplePaginationMeta {
@@ -74,7 +81,12 @@ export interface SimplePaginationLink {
 export interface PaginationMeta {
     current_page: number;
     from: number | null;
+    current_page_url?: Url;
     last_page: number;
+    path?: Url;
+    per_page?: number;
+    total?: number;
+    to?: number | null;
     links: PaginationMetaLink[];
 }
 
@@ -94,6 +106,7 @@ export interface Product {
     description: string;
     stock: number;
     rating: number;
+    is_favorited?: boolean;
 }
 
 export interface PaginatedResponse<T> {
@@ -112,6 +125,8 @@ export interface CartItem extends Product {
     quantity: number;
     product: Product;
 }
+
+export interface WishlistProduct extends Product {}
 
 export interface OrderItem {
     id: number;

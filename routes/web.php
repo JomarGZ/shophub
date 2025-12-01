@@ -7,6 +7,8 @@ use App\Http\Controllers\CityController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\OrderController;
 use App\Http\Controllers\ShopController;
+use App\Http\Controllers\WishlistController;
+use App\Http\Controllers\WishlistToggleController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', HomeController::class)->name('home');
@@ -26,6 +28,9 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::resource('checkout/address', AddressController::class)->only(['store', 'destroy', 'update']);
     Route::patch('checkout/address/{address}/default', [AddressController::class, 'updateDefault'])->name('checkout.address.updateDefault');
     Route::get('city/list', [CityController::class, 'index']);
+
+    Route::post('/wishlist/{product}/toggle', WishlistToggleController::class)->name('wishlist.toggle');
+    Route::resource('wishlist', WishlistController::class)->only(['index']);
 });
 
 require __DIR__.'/settings.php';

@@ -218,6 +218,7 @@ export default function Index({ products, categories }: ShopProps) {
                                 product={product}
                                 onAddToCart={addToCart}
                                 loading={loading}
+                                isFavorite={product.is_favorited}
                             />
                         ))}
                     </div>
