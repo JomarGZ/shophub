@@ -1,5 +1,6 @@
 import { InertiaLinkProps } from '@inertiajs/react';
 import { LucideIcon } from 'lucide-react';
+import { Url } from 'url';
 
 export interface Auth {
     user: User;
@@ -52,9 +53,13 @@ export interface PaginationLinks {
 }
 
 export interface PaginationMetaLink {
-    url: string | null;
+    url: Url | null;
     label: string;
     active: boolean;
+    first?: Url | null;
+    last?: Url | null;
+    next?: Url | null;
+    prev?: Url | null;
 }
 
 export interface SimplePaginationMeta {
@@ -76,7 +81,12 @@ export interface SimplePaginationLink {
 export interface PaginationMeta {
     current_page: number;
     from: number | null;
+    current_page_url?: Url;
     last_page: number;
+    path?: Url;
+    per_page?: number;
+    total?: number;
+    to?: number | null;
     links: PaginationMetaLink[];
 }
 

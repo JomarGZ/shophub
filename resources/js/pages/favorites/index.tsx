@@ -1,3 +1,4 @@
+import WishlistToggleController from '@/actions/App/Http/Controllers/WishlistToggleController';
 import { Container } from '@/components/container';
 import { ProductCard } from '@/components/products/product-card';
 import { Button } from '@/components/ui/button';
@@ -5,54 +6,35 @@ import { Card, CardContent } from '@/components/ui/card';
 import { useAddToCart } from '@/hooks/use-add-to-cart';
 import AppLayout from '@/layouts/app-layout';
 import shop from '@/routes/shop';
-import { SimplePaginatedResponse, WishlistProduct } from '@/types';
+import { PaginatedResponse, WishlistProduct } from '@/types';
 import { Head, Link, router } from '@inertiajs/react';
 import { Heart, ShoppingBag, Trash2 } from 'lucide-react';
 import { useState } from 'react';
 
-export default function Index({
-    wishlist_products,
-}: {
-    wishlist_products: any;
-}) {
-    console.log();
+interface WishlistIndexProps {
+    wishlist_products: PaginatedResponse<WishlistProduct>;
+}
+export default function Index({ wishlist_products }: WishlistIndexProps) {
+    console.log(wishlist_products);
     const { addToCart, loading } = useAddToCart();
-    const [wishlistProducts, setWishlistProducts] = useState<WishlistProduct[]>(
-        wishlist_products.data,
-    );
-    const [nextPageUrl, SetNextPageUrl] = useState<string | null>(
-        wishlist_products.next_page_url
-            ? String(wishlist_products.next_page_url)
-            : null,
-    );
-    const [hasMore, setHasMore] = useState<Boolean>(
-        wishlist_products.has_more || false,
-    );
+    const [loadingMore, setLoadingMore] = useState<boolean>(false);
     const loadMore = () => {
-        if (!hasMore || !nextPageUrl) return;
-
-        router.get(
-            nextPageUrl,
+        if (loadingMore) return;
+        router.reload({
+            only: ['wishlist_products'],
+            data: {
+                page: wishlist_products.meta.current_page + 1,
+            },
+            onStart: () => setLoadingMore(true),
+            onFinish: () => setLoadingMore(false),
+        });
+    };
+    const removeItems = (slug: string) => {
+        router.post(
+            WishlistToggleController(slug),
             {},
             {
                 preserveScroll: true,
-                preserveState: true,
-                only: ['wishlist_products'],
-                onSuccess: (page) => {
-                    console.log(page);
-                    const wishlistProducts = page.props
-                        .wishlist_products as SimplePaginatedResponse<WishlistProduct>;
-                    setWishlistProducts((prev) => [
-                        ...prev,
-                        ...wishlistProducts.data,
-                    ]);
-                    SetNextPageUrl(
-                        wishlistProducts.next_page_url
-                            ? String(wishlistProducts.next_page_url)
-                            : null,
-                    );
-                    setHasMore(wishlistProducts.has_more);
-                },
             },
         );
     };
@@ -70,8 +52,8 @@ export default function Index({
                                 My Favorites
                             </h1>
                             <p className="text-muted-foreground">
-                                {wishlistProducts.length}{' '}
-                                {wishlistProducts.length === 1
+                                {wishlist_products.meta.total}{' '}
+                                {wishlist_products.meta.total === 1
                                     ? 'item'
                                     : 'items'}{' '}
                                 saved
@@ -129,7 +111,7 @@ export default function Index({
                     </Card>
                 </div>
                 <div className="space-y-4">
-                    {wishlistProducts.length === 0 ? (
+                    {wishlist_products.meta.total === 0 ? (
                         <Card>
                             <CardContent className="space-y-6 p-8 text-center">
                                 <div className="relative">
@@ -186,28 +168,32 @@ export default function Index({
                     ) : (
                         <>
                             <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-                                {wishlistProducts.map((product) => (
+                                {wishlist_products.data.map((product) => (
                                     <ProductCard
                                         key={product.id}
                                         product={product}
                                         onAddToCart={addToCart}
+                                        toggleFavorite={(product) =>
+                                            removeItems(product.slug)
+                                        }
                                         loading={loading}
                                         isFavorite={true}
                                     />
                                 ))}
                             </div>
-                            {hasMore && (
-                                <div className="flex justify-center pt-6">
+                            <div className="flex justify-center pt-6">
+                                {wishlist_products.links.next && (
                                     <Button
                                         variant="outline"
                                         size="lg"
                                         onClick={loadMore}
+                                        disabled={loadingMore}
                                         className="min-w-[200px] cursor-pointer"
                                     >
                                         Load More Orders
                                     </Button>
-                                </div>
-                            )}
+                                )}
+                            </div>
                         </>
                     )}
                 </div>
