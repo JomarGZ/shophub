@@ -38,6 +38,7 @@ export function ProductCard({
                             e.stopPropagation();
                             toggleFavorite?.(product);
                         }}
+                        disabled={!auth.user || loading}
                         variant="ghost"
                         size="icon"
                         className="absolute top-2 right-2 cursor-pointer bg-background/80 backdrop-blur-sm transition-all hover:bg-background"

@@ -18,11 +18,10 @@ class WishlistToggleController extends Controller
     {
         $user = $request->user();
 
-        app(WishlistService::class)->toggle($user, $product);
-
-        return $this->successResponse(
-            data: ['is_favorited' => $user->wishlist->contains($product)],
-            message: $user->wishlist->contains($product) ? 'Product added to wishlist' : 'Product removed from wishlist',
-        );
+        $favorite = app(WishlistService::class)->toggle($user, $product);
+        $message = !empty($favorite['attached'])
+            ? 'Product added to wishlist.'
+            : 'Product removed from wishlist.';
+        return redirect()->back()->with('success', $message);
     }
 }

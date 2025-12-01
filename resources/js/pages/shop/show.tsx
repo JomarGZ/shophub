@@ -8,8 +8,7 @@ import { useAddToCart } from '@/hooks/use-add-to-cart';
 import AppLayout from '@/layouts/app-layout';
 import { index } from '@/routes/shop';
 import { BreadcrumbItem, Product, SharedData } from '@/types';
-import { Head, usePage } from '@inertiajs/react';
-import axios from 'axios';
+import { Head, router, usePage } from '@inertiajs/react';
 import { Heart, Minus, Plus, Share2, ShoppingCart, Star } from 'lucide-react';
 import { useState } from 'react';
 import { toast } from 'sonner';
@@ -21,7 +20,6 @@ export default function Show({
     product: Product;
     related_products: Product[];
 }) {
-    console.log(related_products);
     const { user } = usePage<SharedData>().props.auth;
     const { addToCart, loading } = useAddToCart();
     const breadcrumbs: BreadcrumbItem[] = [
@@ -36,35 +34,29 @@ export default function Show({
     ];
     const [quantity, setQuantity] = useState(1);
     const [favoriteLoading, setFavoriteLoading] = useState(false);
-    const [isFavorite, setFavorite] = useState(product.is_favorited || false);
 
     const increment = () => setQuantity((prev) => prev + 1);
     const decrement = () => setQuantity((prev) => Math.max(prev - 1, 1));
     const handleAddToCart = () => {
         addToCart(product, quantity);
     };
-
     const handleFavorite = async (slug: string) => {
         if (favoriteLoading) return;
-        setFavoriteLoading(true);
-        try {
-            const {
-                data: {
-                    data: { is_favorited },
-                    message,
-                    success,
+        router.post(
+            WishlistToggleController(slug),
+            {},
+            {
+                only: ['product', 'flash'],
+                preserveScroll: true,
+                onSuccess: ({ props: { flash } }) => {
+                    if (flash.success) {
+                        toast.success(flash.success);
+                    }
                 },
-            } = await axios.post(WishlistToggleController(slug).url);
-            if (success) {
-                setFavorite(is_favorited);
-                toast.success(message);
-            }
-        } catch (error) {
-            console.error('Error adding to wishlist', error);
-            toast.error('Error adding to wishlist');
-        } finally {
-            setFavoriteLoading(false);
-        }
+                onStart: () => setFavoriteLoading(true),
+                onFinish: () => setFavoriteLoading(false),
+            },
+        );
     };
 
     return (
@@ -185,7 +177,7 @@ export default function Show({
                                 className="h-12 w-12 cursor-pointer"
                             >
                                 <Heart
-                                    className={`h-5 w-5 transition-all ${isFavorite ? 'fill-red-500 text-red-500' : ''}`}
+                                    className={`h-5 w-5 transition-all ${product.is_favorited ? 'fill-red-500 text-red-500' : ''}`}
                                 />
                             </Button>
                         )}

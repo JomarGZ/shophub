@@ -17,11 +17,7 @@ class WishlistController extends Controller
         $wishlistProducts = $this->wishlistService->getSimplePaginatedWishlistProducts(user: $user, relations: ['category:id,name', 'wishlistedBy']);
 
         return Inertia::render('favorites/index', [
-            'wishlist_products' => [
-                'data' => fn () => ProductResource::collection($wishlistProducts)->resolve(),
-                'next_page_url' => $wishlistProducts->nextPageUrl(),
-                'has_more' => $wishlistProducts->hasMorePages(),
-            ],
+            'wishlist_products' => Inertia::scroll(fn () => ProductResource::collection($wishlistProducts))
         ]);
     }
 }
