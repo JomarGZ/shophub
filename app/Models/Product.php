@@ -3,8 +3,10 @@
 namespace App\Models;
 
 use App\Observers\ProductObserver;
+use App\Policies\ProductPolicy;
 use Illuminate\Database\Eloquent\Attributes\ObservedBy;
 use Illuminate\Database\Eloquent\Attributes\Scope;
+use Illuminate\Database\Eloquent\Attributes\UsePolicy;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -15,6 +17,7 @@ use Spatie\Sluggable\HasSlug;
 use Spatie\Sluggable\SlugOptions;
 
 #[ObservedBy([ProductObserver::class])]
+#[UsePolicy(ProductPolicy::class)]
 class Product extends Model
 {
     /** @use HasFactory<\Database\Factories\ProductFactory> */
@@ -28,6 +31,9 @@ class Product extends Model
         'description',
         'price',
         'stock',
+        'ratings_count',
+        'ratings_sum',
+        'average_rating',
         'image_url',
     ];
 
@@ -72,6 +78,11 @@ class Product extends Model
     public function cartItems(): HasMany
     {
         return $this->hasMany(CartItem::class);
+    }
+
+    public function ratings(): HasMany
+    {
+        return $this->hasMany(ProductRating::class);
     }
 
     public function wishlistedBy()

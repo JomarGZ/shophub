@@ -6,6 +6,7 @@ use App\Http\Controllers\CheckoutController;
 use App\Http\Controllers\CityController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\OrderController;
+use App\Http\Controllers\ProductRatingController;
 use App\Http\Controllers\ShopController;
 use App\Http\Controllers\WishlistController;
 use App\Http\Controllers\WishlistToggleController;
@@ -31,6 +32,10 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
     Route::post('/wishlist/{product}/toggle', WishlistToggleController::class)->name('wishlist.toggle');
     Route::resource('wishlist', WishlistController::class)->only(['index']);
+
+    Route::post('/products/{product}/ratings', [ProductRatingController::class, 'store'])->name('products.ratings.store');
+    Route::patch('/products/ratings/{rating}', [ProductRatingController::class, 'update'])->name('products.ratings.update');
+
 });
 
 require __DIR__.'/settings.php';

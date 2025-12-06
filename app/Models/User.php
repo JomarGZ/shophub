@@ -4,6 +4,7 @@ namespace App\Models;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
 
+use App\Enums\OrderStatus;
 use App\Enums\UserRole;
 use Filament\Models\Contracts\FilamentUser;
 use Filament\Panel;
@@ -81,6 +82,11 @@ class User extends Authenticatable implements FilamentUser
         return $this->belongsToMany(Product::class, 'user_wishlist');
     }
 
+    public function ratings(): HasMany
+    {
+        return $this->hasMany(ProductRating::class);
+    }
+
     public function hasDefaultAddress(): bool
     {
         return $this->addresses()->where('is_default', true)->exists();
@@ -94,5 +100,17 @@ class User extends Authenticatable implements FilamentUser
     public static function admin()
     {
         return static::query()->firstWhere('role', UserRole::ADMIN);
+    }
+
+    public function hasPurchased(Product $product): bool
+    {
+        return $this->orders()
+            ->whereHas('orderItems', fn ($q) => $q->where('product_id', $product->id)->exists())
+            ->where('status', '!=', OrderStatus::CANCELLED);
+    }
+
+    public function hasRated(Product $product): bool
+    {
+        return $this->ratings()->where('product_id', $product->id)->exists();
     }
 }

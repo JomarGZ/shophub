@@ -22,7 +22,7 @@ return new class extends Migration
             $table->timestamps();
 
             $table->unique(['user_id', 'product_id']);
-            
+
             $table->index('product_id');
             $table->index('user_id');
         });
