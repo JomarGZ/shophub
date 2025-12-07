@@ -113,4 +113,13 @@ class User extends Authenticatable implements FilamentUser
     {
         return $this->ratings()->where('product_id', $product->id)->exists();
     }
+
+    // check if user has ordered the product
+    public function hasOrdered(Product $product): bool
+    {
+        return $this->orders()
+            ->whereHas('orderItems', fn ($q) => $q->where('product_id', $product->id))
+            ->where('status', OrderStatus::DELIVERED)
+            ->exists();
+    }
 }

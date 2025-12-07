@@ -5,6 +5,7 @@ namespace App\Services;
 use App\Models\Product;
 use App\Models\ProductRating;
 use App\Models\User;
+use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Support\Facades\DB;
 use InvalidArgumentException;
 
@@ -16,6 +17,9 @@ class ProductRatingService
 
         if ($user->hasRated($product)) {
             return $this->updateRating($user, $product, $rating, $data['comment'] ?? null);
+        }
+        if (!$user->hasOrdered($product)) {
+            throw new AuthorizationException('User must have purchased the product to rate it.', 403);
         }
 
         return $this->addRating($user, $product, $rating, $data['comment'] ?? null);

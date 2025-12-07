@@ -1,9 +1,22 @@
 <?php
 
+use App\Models\Order;
 use App\Models\Product;
 use App\Models\ProductRating;
 use App\Models\User;
+use Illuminate\Support\Facades\Event;
+use Illuminate\Support\Str;
 
+dataset('invalid_ratings', [
+    [['rating' => 0], 'rating'],
+    [['rating' => null], 'rating'],
+    [['rating' => 6], 'rating'],
+    [['rating' => []], 'rating'],
+    [['rating' => 'abs'], 'rating'],
+    [['comment' => Str::repeat('a', 501)], 'comment'],
+    [['comment' => 123], 'comment'],
+    [['comment' => []], 'comment'],
+]);
 test('redirects guest when rating a product', function () {
     $product = Product::factory()->create();
 
@@ -13,9 +26,14 @@ test('redirects guest when rating a product', function () {
 });
 
 test('allows authenticated user to rate a product', function () {
+    Event::fake();
     $user = User::factory()->create();
     $product = Product::factory()->create();
-
+    Order::factory()
+        ->delivered()
+        ->forUser($user)
+        ->withProduct($product)
+        ->create();
     $this->actingAs($user)
         ->post(route('products.ratings.store', $product), [
             'rating' => 5,
@@ -26,24 +44,28 @@ test('allows authenticated user to rate a product', function () {
     expect(ProductRating::count())->toBe(1);
 });
 
-test('requires rating to be between 1 and 5', function () {
+test('fails validation for invalid rating inputs', function ($payload, $errorField) {
     $user = User::factory()->create();
     $product = Product::factory()->create();
 
     $this->actingAs($user)
-        ->post(route('products.ratings.store', $product), [
-            'rating' => 6,
-        ])
-        ->assertSessionHasErrors(['rating']);
-});
+        ->post(route('products.ratings.store', $product), $payload)
+        ->assertSessionHasErrors($errorField);
+})->with('invalid_ratings');
 
 test('updates product summary fields on rating create', function () {
+    Event::fake();
     $user = User::factory()->create();
     $product = Product::factory()->create([
         'ratings_sum' => 0,
         'ratings_count' => 0,
         'average_rating' => 0,
     ]);
+    Order::factory()
+        ->delivered()
+        ->forUser($user)
+        ->withProduct($product)
+        ->create();
 
     $this->actingAs($user)
         ->post(route('products.ratings.store', $product), [
@@ -78,3 +100,36 @@ test('does not allow a user to create a second rating (should trigger update pat
 
     expect(ProductRating::count())->toBe(1);
 });
+
+//Ensure only ordered users can rate products
+test('prevents users who have not ordered the product from rating it', function () {
+    $user = User::factory()->create();
+    $product = Product::factory()->create();
+
+    $this->actingAs($user)
+        ->post(route('products.ratings.store', $product), [
+            'rating' => 4
+        ])
+        ->assertStatus(403);
+});
+
+test('allows user who ordered the product to rate it', function () {
+    Event::fake();
+    $user = User::factory()->create();
+    $product = Product::factory()->create();
+
+    Order::factory()
+        ->delivered()
+        ->forUser($user)
+        ->withProduct($product)
+        ->create();
+
+    $this->actingAs($user)
+        ->post(route('products.ratings.store', $product), [
+            'rating' => 5,
+        ])
+        ->assertRedirect();
+
+    expect(ProductRating::count())->toBe(1);
+});
+
