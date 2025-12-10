@@ -60,7 +60,7 @@ class ProductRatingService
 
             $newRatingsSum = $product->ratings_sum - $oldRating + $newRating;
             $ratingsCount = $product->ratings_count;
-            $newAverage = (float) round($newRatingsSum / $ratingsCount, 2);
+            $newAverage =  $ratingsCount > 0 ? (float) round($newRatingsSum / $ratingsCount, 2) : 0.0;
 
             $product->update([
                 'ratings_sum' => $newRatingsSum,

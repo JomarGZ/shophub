@@ -41,7 +41,4 @@ expect()->extend('toBeOne', function () {
 |
 */
 
-function something()
-{
-    // ..
-}
+require_once __DIR__ . '/Feature/ProductRatings/Helpers.php';
