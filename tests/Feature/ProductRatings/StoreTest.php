@@ -1,91 +1,80 @@
 <?php
 
 use App\Models\Order;
-use App\Models\Product;
 use App\Models\ProductRating;
-use App\Models\User;
 use Illuminate\Support\Facades\Event;
 
+
+
 beforeEach(function () {
+    
     Event::fake();
 
     // Create default users
-    $this->guest = null;
     $this->user = createUser();
     $this->otherUser = createUser();
+    $this->product = createProduct();
+    $this->payload = [
+        'rating' => 3,
+        'comment' => 'This is comment'
+    ];
+    $this->rateProductRoute = fn () =>
+        route('products.ratings.store', $this->product);
 });
 
-dataset('rating_scenarios', [
-    'guest redirected' => ['guest', null, ['rating' => 5], 302],
-    'user cannot rate unpurchased product' => ['user', false, ['rating' => 4], 403],
-    'user can rate purchased product' => ['user', true, ['rating' => 5, 'comment' => 'Nice!'], 302],
-    'user cannot rate twice (update path)' => ['user_already_rated', true, ['rating' => 5], 302],
-]);
+it('redirects guest when rating a product', function () {
+    $product = createProduct();
 
-it('handles product rating scenarios', function (string $role, ?bool $hasPurchased, array $payload, int $expectedStatus) {
-    // Determine the user
-    $user = match ($role) {
-        'guest' => null,
-        'user' => $this->user,
-        'user_already_rated' => $this->user,
-    };
+    $response = $this->post(($this->rateProductRoute)(), $this->payload);
+    $response->assertRedirect();
+});
 
-    // Create product
-    $product = Product::factory()->create();
+it('prevents rating without purchase', function () {
+    $response = $this->actingAs($this->user)->post(($this->rateProductRoute)(), $this->payload);
+    $response->assertForbidden();
+});
 
-    // Attach order if user purchased
-    if ($user && $hasPurchased) {
-        Order::factory()->delivered()->forUser($user)->withProduct($product)->create();
-    }
+it('allows rating purchased product', function () {
+    Order::factory()->delivered()->forUser($this->user)->withProduct($this->product)->create();
+    $response = $this->actingAs($this->user)->post(($this->rateProductRoute)(), $this->payload);
+    $response->assertRedirect();
+    $this->product->refresh();
 
-    // Attach previous rating if simulating update
-    if ($role === 'user_already_rated') {
-        ProductRating::factory()->create([
-            'user_id' => $user->id,
-            'product_id' => $product->id,
-            'rating' => 3,
+    expect($this->product->ratings_count)->toBe(1);
+    expect($this->product->ratings_sum)->toBe(3);
+    expect((float) $this->product->average_rating)->toBe(3.0);
+});
+
+it('updates existing rating instead of creating a new one', function() {
+     $ratedProduct = ProductRating::factory()->create([
+            'user_id' => $this->user->id,
+            'product_id' => $this->product->id,
+            'rating' => 5,
+            'comment' => "This is old comment"
         ]);
 
-        $product->update([
-            'ratings_sum' => 3,
+     $this->product->update([
+            'ratings_sum' => 5,
             'ratings_count' => 1,
-            'average_rating' => 3.0,
+            'average_rating' => 5.0,
         ]);
-    }
+    $response = $this->actingAs($this->user)
+        ->post(($this->rateProductRoute)(), $this->payload);
+    $this->product->refresh();
+    $ratedProduct->refresh();
+    $response->assertRedirect();
 
-    // Perform POST request
-    $response = $user
-        ? $this->actingAs($user)->post(route('products.ratings.store', $product), $payload)
-        : $this->post(route('products.ratings.store', $product), $payload);
+    expect($ratedProduct->comment)->toBe('This is comment');
+    expect($ratedProduct->rating)->toBe(3);
 
-    $response->assertStatus($expectedStatus);
-
-    // Additional assertions for successful ratings
-    if ($expectedStatus === 302 && $role !== 'guest') {
-        $product->refresh();
-        $this->assertTrue($product->ratings_count >= 1);
-        $this->assertTrue($product->ratings_sum >= 3);
-    }
-})->with('rating_scenarios');
-
-dataset('invalid_ratings', [
-    [['rating' => 0], 'rating'],
-    [['rating' => null], 'rating'],
-    [['rating' => 6], 'rating'],
-    [['rating' => []], 'rating'],
-    [['rating' => 'abs'], 'rating'],
-    [['comment' => str_repeat('a', 501)], 'comment'],
-    [['comment' => 123], 'comment'],
-    [['comment' => []], 'comment'],
-]);
+    expect($this->product->ratings_sum)->toBe(3);
+    expect((float) $this->product->average_rating)->toBe(3.0);
+});
 
 it('fails validation for invalid rating inputs', function ($payload, $errorField) {
-    $user = $this->user;
-    $product = Product::factory()->create();
 
-    Order::factory()->delivered()->forUser($user)->withProduct($product)->create();
+    Order::factory()->delivered()->forUser($this->user)->withProduct($this->product)->create();
 
-    $this->actingAs($user)
-        ->post(route('products.ratings.store', $product), $payload)
-        ->assertSessionHasErrors($errorField);
+    $response = $this->actingAs($this->user)->post(($this->rateProductRoute)(), $payload);
+    $response->assertSessionHasErrors($errorField);
 })->with('invalid_ratings');
