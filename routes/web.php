@@ -34,7 +34,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::resource('wishlist', WishlistController::class)->only(['index']);
 
     Route::post('/products/{product}/ratings', [ProductRatingController::class, 'store'])->name('products.ratings.store');
-    Route::patch('/products/ratings/{rating}', [ProductRatingController::class, 'update'])->name('products.ratings.update');
+    Route::put('/products/ratings/{productRating}', [ProductRatingController::class, 'update'])->name('products.ratings.update');
 
 });
 

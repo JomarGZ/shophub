@@ -4,7 +4,6 @@ namespace Database\Factories;
 
 use App\Enums\OrderStatus;
 use App\Enums\PaymentMethod;
-use App\Models\Address;
 use App\Models\Order;
 use App\Models\OrderItem;
 use App\Models\Product;
@@ -18,7 +17,6 @@ class OrderFactory extends Factory
 {
     protected $model = Order::class;
 
-    
     public function definition(): array
     {
         $subtotal = $this->faker->randomFloat(2, 50, 500);
@@ -79,12 +77,12 @@ class OrderFactory extends Factory
         return $this->afterCreating(function (Order $order) use ($product) {
 
             OrderItem::factory()->create([
-                'order_id'   => $order->id,
+                'order_id' => $order->id,
                 'product_id' => $product->id,
                 'product_price' => $product->price ?? 100,
                 'product_name' => $product->name,
-                'quantity'   => 1,
-                'line_total' => $product->price * 1
+                'quantity' => 1,
+                'line_total' => $product->price * 1,
             ]);
 
             // Optional: update order total

@@ -4,10 +4,8 @@ use App\Models\Order;
 use App\Models\ProductRating;
 use Illuminate\Support\Facades\Event;
 
-
-
 beforeEach(function () {
-    
+
     Event::fake();
 
     // Create default users
@@ -16,14 +14,12 @@ beforeEach(function () {
     $this->product = createProduct();
     $this->payload = [
         'rating' => 3,
-        'comment' => 'This is comment'
+        'comment' => 'This is comment',
     ];
-    $this->rateProductRoute = fn () =>
-        route('products.ratings.store', $this->product);
+    $this->rateProductRoute = fn () => route('products.ratings.store', $this->product);
 });
 
 it('redirects guest when rating a product', function () {
-    $product = createProduct();
 
     $response = $this->post(($this->rateProductRoute)(), $this->payload);
     $response->assertRedirect();
@@ -45,19 +41,19 @@ it('allows rating purchased product', function () {
     expect((float) $this->product->average_rating)->toBe(3.0);
 });
 
-it('updates existing rating instead of creating a new one', function() {
-     $ratedProduct = ProductRating::factory()->create([
-            'user_id' => $this->user->id,
-            'product_id' => $this->product->id,
-            'rating' => 5,
-            'comment' => "This is old comment"
-        ]);
+it('updates existing rating instead of creating a new one', function () {
+    $ratedProduct = ProductRating::factory()->create([
+        'user_id' => $this->user->id,
+        'product_id' => $this->product->id,
+        'rating' => 5,
+        'comment' => 'This is old comment',
+    ]);
 
-     $this->product->update([
-            'ratings_sum' => 5,
-            'ratings_count' => 1,
-            'average_rating' => 5.0,
-        ]);
+    $this->product->update([
+        'ratings_sum' => 5,
+        'ratings_count' => 1,
+        'average_rating' => 5.0,
+    ]);
     $response = $this->actingAs($this->user)
         ->post(($this->rateProductRoute)(), $this->payload);
     $this->product->refresh();

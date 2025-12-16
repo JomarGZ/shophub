@@ -14,6 +14,7 @@ class StoreProductRatingRequest extends FormRequest
     {
         $product = Product::find($this->route('product'));
 
+        // return $product && $this->user()->can('create', $product);
         return true;
     }
 

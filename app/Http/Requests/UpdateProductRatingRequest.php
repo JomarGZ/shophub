@@ -2,7 +2,8 @@
 
 namespace App\Http\Requests;
 
-use App\Models\Product;
+use App\Models\ProductRating;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Foundation\Http\FormRequest;
 
 class UpdateProductRatingRequest extends FormRequest
@@ -12,16 +13,12 @@ class UpdateProductRatingRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        $product = Product::find($this->route('product'));
-        if (! $product) {
-            return false;
-        }
-        $productRating = $this->user()->ratings()->firstWhere('product_id', $product->id);
-        if (! $productRating) {
-            return false;
+        $productRating = ProductRating::find($this->route('productRating'));
+        if ($productRating instanceof Collection) {
+            $productRating = $productRating->first();
         }
 
-        return $this->user()->can('update', $productRating);
+        return $productRating && $this->user()->can('update', $productRating);
     }
 
     /**

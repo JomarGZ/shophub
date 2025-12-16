@@ -13,12 +13,12 @@ class ProductRatingService
 {
     public function rateProduct(User $user, Product $product, array $data): ProductRating
     {
-        $rating = $this->validateRating($data['rating']);
+        $rating = $this->validateRating($data['rating'] ?? null);
 
         if ($user->hasRated($product)) {
             return $this->updateRating($user, $product, $rating, $data['comment'] ?? null);
         }
-        if (!$user->hasOrdered($product)) {
+        if (! $user->hasOrdered($product)) {
             throw new AuthorizationException('User must have purchased the product to rate it.', 403);
         }
 
@@ -60,7 +60,7 @@ class ProductRatingService
 
             $newRatingsSum = $product->ratings_sum - $oldRating + $newRating;
             $ratingsCount = $product->ratings_count;
-            $newAverage =  $ratingsCount > 0 ? (float) round($newRatingsSum / $ratingsCount, 2) : 0.0;
+            $newAverage = $ratingsCount > 0 ? (float) round($newRatingsSum / $ratingsCount, 2) : 0.0;
 
             $product->update([
                 'ratings_sum' => $newRatingsSum,
@@ -77,9 +77,13 @@ class ProductRatingService
         return dump('remove rating');
     }
 
-    protected function validateRating(int $rating)
+    protected function validateRating(?int $rating)
     {
-        if (! isset($rating) || ! is_numeric($rating) || $rating < 1 || $rating > 5) {
+        if (! isset($rating)) {
+            throw new InvalidArgumentException('Rating is required');
+        }
+
+        if (! is_numeric($rating) || $rating < 1 || $rating > 5) {
             throw new InvalidArgumentException('Rating must be between 1 and 5.');
         }
 

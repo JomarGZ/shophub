@@ -23,11 +23,11 @@ class ProductRatingController extends Controller
         return redirect()->back()->withSuccess('Product rated successfully.');
     }
 
-    public function update(UpdateProductRatingRequest $request, ProductRating $rating)
+    public function update(UpdateProductRatingRequest $request, ProductRating $productRating)
     {
         $this->productRatingService->rateProduct(
             $request->user(),
-            $rating->product,
+            $productRating->product,
             $request->safe()->only(['rating', 'comment'])
         );
 

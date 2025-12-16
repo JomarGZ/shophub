@@ -1,10 +1,9 @@
 <?php
 
-use App\Models\User;
-use App\Models\Product;
 use App\Models\Order;
+use App\Models\Product;
 use App\Models\ProductRating;
-
+use App\Models\User;
 
 dataset('invalid_ratings', [
     [['rating' => 0], 'rating'],
@@ -17,8 +16,8 @@ dataset('invalid_ratings', [
     [['comment' => []], 'comment'],
 ]);
 
-
-function createOrderedProductForUser(User $user, array $productAttributes = [], ?int $rating = null): Product {
+function createOrderedProductForUser(User $user, array $productAttributes = [], ?int $rating = null): Product
+{
     $product = Product::factory()->create($productAttributes);
 
     if ($rating) {
@@ -34,10 +33,12 @@ function createOrderedProductForUser(User $user, array $productAttributes = [], 
     return $product;
 }
 
-function createProduct(?int $count = null, array $attributes = []) {
+function createProduct(?int $count = null, array $attributes = [])
+{
     return App\Models\Product::factory($count)->create($attributes);
 }
 
-function createUser(): App\Models\User {
+function createUser(): App\Models\User
+{
     return App\Models\User::factory()->create();
 }
