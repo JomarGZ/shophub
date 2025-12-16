@@ -102,13 +102,6 @@ class User extends Authenticatable implements FilamentUser
         return static::query()->firstWhere('role', UserRole::ADMIN);
     }
 
-    public function hasPurchased(Product $product): bool
-    {
-        return $this->orders()
-            ->whereHas('orderItems', fn ($q) => $q->where('product_id', $product->id)->exists())
-            ->where('status', '!=', OrderStatus::CANCELLED);
-    }
-
     public function hasRated(Product $product): bool
     {
         return $this->ratings()->where('product_id', $product->id)->exists();

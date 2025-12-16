@@ -2,7 +2,6 @@
 
 namespace App\Http\Requests;
 
-use App\Models\Product;
 use Illuminate\Foundation\Http\FormRequest;
 
 class StoreProductRatingRequest extends FormRequest
@@ -12,10 +11,9 @@ class StoreProductRatingRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        $product = Product::find($this->route('product'));
+        $product = $this->route('product');
 
-        // return $product && $this->user()->can('create', $product);
-        return true;
+        return $product && $this->user()->can('rate', $product);
     }
 
     /**

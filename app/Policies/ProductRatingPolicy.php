@@ -12,9 +12,6 @@ class ProductRatingPolicy
      */
     public function update(User $user, ProductRating $productRating): bool
     {
-        // if (! $user->hasPurchased($productRating->product)) {
-        //     return false;
-        // }
         return $user->id === $productRating->user_id;
     }
 

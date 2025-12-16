@@ -16,11 +16,12 @@ beforeEach(function () {
         'rating' => 3,
         'comment' => 'This is comment',
     ];
+
     $this->rateProductRoute = fn () => route('products.ratings.store', $this->product);
 });
 
 it('redirects guest when rating a product', function () {
-
+    Order::factory()->delivered()->forUser($this->user)->withProduct($this->product)->create();
     $response = $this->post(($this->rateProductRoute)(), $this->payload);
     $response->assertRedirect();
 });
@@ -42,6 +43,8 @@ it('allows rating purchased product', function () {
 });
 
 it('updates existing rating instead of creating a new one', function () {
+    Order::factory()->delivered()->forUser($this->user)->withProduct($this->product)->create();
+
     $ratedProduct = ProductRating::factory()->create([
         'user_id' => $this->user->id,
         'product_id' => $this->product->id,
@@ -68,9 +71,7 @@ it('updates existing rating instead of creating a new one', function () {
 });
 
 it('fails validation for invalid rating inputs', function ($payload, $errorField) {
-
     Order::factory()->delivered()->forUser($this->user)->withProduct($this->product)->create();
-
     $response = $this->actingAs($this->user)->post(($this->rateProductRoute)(), $payload);
     $response->assertSessionHasErrors($errorField);
 })->with('invalid_ratings');
