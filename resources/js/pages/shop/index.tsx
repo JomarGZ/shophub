@@ -26,6 +26,7 @@ interface ShopProps {
     categories: Category[];
 }
 export default function Index({ products, categories }: ShopProps) {
+    console.log(products);
     const { addToCart, loading } = useAddToCart();
     const {
         focus,

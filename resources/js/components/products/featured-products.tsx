@@ -8,12 +8,13 @@ interface FeatureProductsProps {
     featuredProducts: any[];
 }
 export function FeaturedProducts({ featuredProducts }: FeatureProductsProps) {
+    console.log(featuredProducts);
     const { addToCart, loading } = useAddToCart();
     const handleAddToCart = (product: Product) => {
         const options = {
             except: ['featured_products'],
         };
-        addToCart(product, options);
+        addToCart(product, undefined, options);
     };
     return (
         <>

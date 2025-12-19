@@ -13,20 +13,21 @@ abstract class ProductRepositoryDecorator implements ProductRepositoryInterface
     ) {}
 
     public function getFeaturedProducts(
-        array|string $relation = [],
+        array|string $relations = [],
         array $columns = ['*'],
-        int $limit = 8
+        int $limit = 8,
+        bool $skipFavorited = false
     ): Collection {
-        return $this->repository->getFeaturedProducts($relation, $columns, $limit);
+        return $this->repository->getFeaturedProducts($relations, $columns, $limit, $skipFavorited);
     }
 
     public function getRelatedProducts(
-        int|string $catId,
-        array|string $relation = [],
+        int|string $categoryId,
+        array|string $relations = [],
         array $columns = ['*'],
         int $limit = 8
     ): Collection {
-        return $this->repository->getRelatedProducts($catId, $relation, $columns, $limit);
+        return $this->repository->getRelatedProducts($categoryId, $relations, $columns, $limit);
     }
 
     public function getPaginatedProducts(

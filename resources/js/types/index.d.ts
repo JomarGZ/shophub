@@ -102,7 +102,7 @@ export interface Product {
     slug: string;
     price: number;
     image_url: string;
-    category: Category;
+    category?: Category;
     description: string;
     stock: number;
     rating: number;

@@ -61,9 +61,11 @@ export function ProductCard({
                             {product.name}
                         </h3>
                     </Link>
-                    <Badge variant="secondary" className="shrink-0">
-                        {product.category.name}
-                    </Badge>
+                    {product.category?.name && (
+                        <Badge variant="secondary" className="shrink-0">
+                            {product.category?.name}
+                        </Badge>
+                    )}
                 </div>
 
                 <div className="flex items-center gap-1">

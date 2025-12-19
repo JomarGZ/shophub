@@ -3,6 +3,7 @@
 namespace App\Repositories\Decorators;
 
 use Carbon\Carbon;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Facades\Cache;
 
 class CachedProductRepository extends ProductRepositoryDecorator
@@ -15,4 +16,21 @@ class CachedProductRepository extends ProductRepositoryDecorator
             fn () => parent::getPriceRange()
         );
     }
+
+    public function getFeaturedProducts(array|string $relations = [], array $columns = ['*'], int $limit = 8, bool $skipFavorited = false): Collection
+    {
+        $products = Cache::remember(
+            "featured_products_{$limit}", 
+            Carbon::now()->addMinutes(5), 
+            fn () => parent::getFeaturedProducts($relations, $columns, $limit, $skipFavorited)
+        );
+
+        if ($user = request()->user()) {
+            $products->loadCount([
+                'wishlistedBy as is_favorited' => fn ($q) => $q->where('user_id', $user->id)
+            ]);
+        }
+        return $products;
+    }
+  
 }

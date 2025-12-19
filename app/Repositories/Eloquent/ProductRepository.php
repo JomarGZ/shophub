@@ -18,19 +18,46 @@ class ProductRepository extends Repository implements ProductRepositoryInterface
         parent::__construct(new Product);
     }
 
-    public function getFeaturedProducts(array|string $relation = [], array $columns = ['*'], int $limit = 8): Collection
-    {
-        return $this->query()->with($relation)->select($columns)->inRandomOrder()->inStock()->take($limit)->get();
-    }
+        private function addIsFavoritedCount($query,?int $userId = null)
+        {
+            if ($userId) {
+                return $query->withCount([
+                    'wishlistedBy as is_favorited' => fn ($q) => $q->where('user_id', $userId)
+                ]);
+            }
 
+            return $query;
+        }
+
+    public function getFeaturedProducts(array|string $relations = [], array $columns = ['*'], int $limit = 8, bool $skipFavorited = false): Collection
+    {
+        $query = $this->query()
+            ->select($columns)
+            ->with($relations)
+            ->inStock();
+
+        if (!$skipFavorited) {
+            $query = $this->addIsFavoritedCount($query, request()->user()?->id);
+        }
+        
+        return $query->inRandomOrder()->take($limit)->get();
+    }
+    
     public function getRelatedProducts(int|string $catId, array|string $relation = [], array $columns = ['*'], int $limit = 8): Collection
     {
-        return $this->query()->with($relation)->select($columns)->inRandomOrder()->inStock()->where('category_id', $catId)->take($limit)->get();
+        $userId = request()->user()?->id;
+        $query = $this->query()->select($columns)->with($relation)->inRandomOrder()->inStock()->where('category_id', $catId);
+        $query = $this->addIsFavoritedCount($query, $userId);
+
+        return $query->take($limit)->get();
     }
 
     public function getPaginatedProducts(int $perPage = 15, array $columns = ['*'], ?array $filters = [], array|string $relations = []): LengthAwarePaginator
     {
-        return $this->query()->with($relations)->filter($filters)->paginate($perPage, $columns)->withQueryString();
+        $userId = request()->user()?->id;
+        $query = $this->query()->with($relations)->filter($filters);
+        $query = $this->addIsFavoritedCount($query, $userId);
+        return $query->paginate($perPage, $columns)->withQueryString();
     }
 
     public function getPriceRange(): array
