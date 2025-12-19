@@ -17,12 +17,12 @@ class CachedProductRepository extends ProductRepositoryDecorator
         );
     }
 
-    public function getFeaturedProducts(array|string $relations = [], array $columns = ['*'], int $limit = 8, bool $skipFavorited = false): Collection
+    public function getFeaturedProducts(array|string $relations = [], array $columns = ['*'], int $limit = 8): Collection
     {
         $products = Cache::remember(
             "featured_products_{$limit}", 
             Carbon::now()->addMinutes(5), 
-            fn () => parent::getFeaturedProducts($relations, $columns, $limit, $skipFavorited)
+            fn () => parent::getFeaturedProducts($relations, $columns, $limit)
         );
 
         if ($user = request()->user()) {

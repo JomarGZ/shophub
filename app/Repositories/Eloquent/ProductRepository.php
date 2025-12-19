@@ -29,17 +29,12 @@ class ProductRepository extends Repository implements ProductRepositoryInterface
             return $query;
         }
 
-    public function getFeaturedProducts(array|string $relations = [], array $columns = ['*'], int $limit = 8, bool $skipFavorited = false): Collection
+    public function getFeaturedProducts(array|string $relations = [], array $columns = ['*'], int $limit = 8): Collection
     {
         $query = $this->query()
             ->select($columns)
             ->with($relations)
             ->inStock();
-
-        if (!$skipFavorited) {
-            $query = $this->addIsFavoritedCount($query, request()->user()?->id);
-        }
-        
         return $query->inRandomOrder()->take($limit)->get();
     }
     

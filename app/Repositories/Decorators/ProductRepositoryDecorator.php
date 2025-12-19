@@ -16,9 +16,8 @@ abstract class ProductRepositoryDecorator implements ProductRepositoryInterface
         array|string $relations = [],
         array $columns = ['*'],
         int $limit = 8,
-        bool $skipFavorited = false
     ): Collection {
-        return $this->repository->getFeaturedProducts($relations, $columns, $limit, $skipFavorited);
+        return $this->repository->getFeaturedProducts($relations, $columns, $limit);
     }
 
     public function getRelatedProducts(

@@ -10,8 +10,7 @@ interface ProductRepositoryInterface
     public function getFeaturedProducts(
         array|string $relations = [],
         array $columns = ['*'],
-        int $limit = 8,
-        bool $skipFavorited = false
+        int $limit = 8
     ): Collection;
 
     public function getRelatedProducts(
