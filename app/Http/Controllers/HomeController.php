@@ -3,12 +3,12 @@
 namespace App\Http\Controllers;
 
 use App\Http\Resources\ProductResource;
-use App\Repositories\ProductRepository;
+use App\Repositories\Interfaces\ProductRepositoryInterface;
 use Inertia\Inertia;
 
 class HomeController extends Controller
 {
-    public function __construct(protected ProductRepository $productRepository) {}
+    public function __construct(protected ProductRepositoryInterface $productRepository) {}
 
     public function __invoke()
     {

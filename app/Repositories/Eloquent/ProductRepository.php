@@ -1,13 +1,14 @@
 <?php
 
-namespace App\Repositories;
+namespace App\Repositories\Eloquent;
 
 use App\Models\Product;
+use App\Repositories\Interfaces\ProductRepositoryInterface;
+use App\Repositories\Repository;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Eloquent\Collection;
-use Illuminate\Support\Facades\Cache;
 
-class ProductRepository extends Repository
+class ProductRepository extends Repository implements ProductRepositoryInterface
 {
     /**
      * Create a new class instance.
@@ -32,16 +33,14 @@ class ProductRepository extends Repository
         return $this->query()->with($relations)->filter($filters)->paginate($perPage, $columns)->withQueryString();
     }
 
-    public function getPriceRange()
+    public function getPriceRange(): array
     {
-        return Cache::rememberForever('product_price_range', function () {
-            $min = (float) $this->model->min('price') ?? 0;
-            $max = (float) $this->model->max('price') ?? 250;
+        $min = (float) $this->model->min('price') ?? 0;
+        $max = (float) $this->model->max('price') ?? 250;
 
-            return [
-                'min' => floor($min / 10) * 10,
-                'max' => ceil($max / 10) * 10,
-            ];
-        });
+        return [
+            'min' => floor($min / 10) * 10,
+            'max' => ceil($max / 10) * 10,
+        ];
     }
 }

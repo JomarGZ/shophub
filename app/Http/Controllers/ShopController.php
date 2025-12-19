@@ -6,14 +6,14 @@ use App\Http\Resources\CategoryResource;
 use App\Http\Resources\ProductResource;
 use App\Models\Product;
 use App\Repositories\CategoryRepository;
-use App\Repositories\ProductRepository;
+use App\Repositories\Interfaces\ProductRepositoryInterface;
 use Illuminate\Support\Facades\Request;
 use Inertia\Inertia;
 
 class ShopController extends Controller
 {
     public function __construct(
-        protected ProductRepository $productRepository,
+        protected ProductRepositoryInterface $productRepository,
         protected CategoryRepository $categoryRepository
     ) {}
 
