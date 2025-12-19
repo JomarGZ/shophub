@@ -17,7 +17,6 @@ class HomeController extends Controller
                 $this->productRepository->getFeaturedProducts(
                     relations: ['category:id,name'],
                     columns: ['id', 'name', 'slug', 'price', 'image_url', 'category_id', 'description', 'stock'],
-                    limit: 100
                 )
             ),
         ]);
