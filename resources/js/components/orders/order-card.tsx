@@ -264,9 +264,7 @@ export function OrderCard({
                                                                     onClick={() =>
                                                                         open({
                                                                             productName:
-                                                                                item
-                                                                                    .product
-                                                                                    ?.name ??
+                                                                                item.product_name ??
                                                                                 '',
                                                                             productSlug:
                                                                                 item

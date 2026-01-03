@@ -21,12 +21,17 @@ export function RatingModalProvider({
 }: {
     children: React.ReactNode;
 }) {
-    const [isOpen, SetIsOpen] = useState<boolean>(false);
+    const [isOpen, setIsOpen] = useState<boolean>(false);
     const [itemToRate, setItemToRate] = useState<ItemToRate | null>(null);
 
     const open = (item: ItemToRate) => {
         setItemToRate(item);
-        SetIsOpen(true);
+        setIsOpen(true);
+    };
+
+    const close = () => {
+        setItemToRate(null);
+        setIsOpen(false);
     };
 
     return (

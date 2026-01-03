@@ -27,7 +27,6 @@ type IndexProps = {
 };
 export default function Index() {
     const { orders, order_statuses } = usePage<IndexProps>().props;
-    console.log(orders);
     const [receiveModalOpen, setReceiveModalOpen] = useState<boolean>(false);
     const [orderList, setOrderList] = useState<Order[]>(orders.data);
     const [nextPageUrl, setNextPageUrl] = useState<string | null>(
@@ -225,7 +224,6 @@ function RatingModalWrapper() {
         <RatingModal
             isOpen={isOpen}
             onClose={close}
-            onSubmit={handleSubmit}
             productSlug={itemToRate?.productSlug ?? ''}
             productName={itemToRate?.productName ?? null}
         />

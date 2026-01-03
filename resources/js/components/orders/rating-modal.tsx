@@ -1,3 +1,4 @@
+import ProductRatingController from '@/actions/App/Http/Controllers/ProductRatingController';
 import { Button } from '@/components/ui/button';
 import {
     Dialog,
@@ -8,13 +9,14 @@ import {
     DialogTitle,
 } from '@/components/ui/dialog';
 import { Textarea } from '@/components/ui/textarea';
+import { router, useForm } from '@inertiajs/react';
 import { Star } from 'lucide-react';
 import { useState } from 'react';
+import { toast } from 'sonner';
 
 interface RatingModalProps {
     isOpen: boolean;
     onClose: () => void;
-    onSubmit: (rating: number, comment: string) => void;
     productSlug: string;
     productName: string | null;
 }
@@ -22,23 +24,31 @@ interface RatingModalProps {
 export const RatingModal = ({
     isOpen,
     onClose,
-    onSubmit,
     productSlug,
     productName,
 }: RatingModalProps) => {
-    const [rating, setRating] = useState(0);
     const [hoveredRating, setHoveredRating] = useState(0);
-    const [comment, setComment] = useState('');
-    console.log(productName);
+
+    const form = useForm({
+        rating: 0,
+        comment: '',
+    });
     const handleSubmit = () => {
-        onSubmit(rating, comment);
-        resetState();
+        form.post(ProductRatingController.store(productSlug).url, {
+            onSuccess: () => {
+                toast.success('Thank you for your rating!');
+                router.reload({
+                    only: ['orders'],
+                });
+            },
+            onError: () =>
+                toast.error('Failed to submit rating. Please try again.'),
+            onFinish: () => handleClose(),
+        });
     };
 
     const resetState = () => {
-        setRating(0);
         setHoveredRating(0);
-        setComment('');
     };
 
     const handleClose = () => {
@@ -46,7 +56,7 @@ export const RatingModal = ({
         onClose();
     };
 
-    const displayRating = hoveredRating || rating;
+    const displayRating = hoveredRating || form.data.rating;
 
     const getRatingLabel = (r: number) => {
         if (r === 1) return 'Poor';
@@ -81,10 +91,10 @@ export const RatingModal = ({
                                 <button
                                     key={star}
                                     type="button"
-                                    onClick={() => setRating(star)}
+                                    onClick={() => form.setData('rating', star)}
                                     onMouseEnter={() => setHoveredRating(star)}
                                     onMouseLeave={() => setHoveredRating(0)}
-                                    className="rounded p-1 transition-transform hover:scale-110 focus:ring-2 focus:ring-primary focus:ring-offset-2 focus:outline-none"
+                                    className="cursor-pointer rounded p-1 transition-transform hover:scale-110 focus:ring-2 focus:ring-primary focus:ring-offset-2 focus:outline-none"
                                 >
                                     <Star
                                         className={`h-8 w-8 transition-colors ${
@@ -106,8 +116,10 @@ export const RatingModal = ({
                     {/* Optional Comment */}
                     <Textarea
                         placeholder="Add a comment (optional)..."
-                        value={comment}
-                        onChange={(e) => setComment(e.target.value)}
+                        value={form.data.comment}
+                        onChange={(e) =>
+                            form.setData('comment', e.target.value)
+                        }
                         rows={3}
                         className="resize-none"
                     />
@@ -123,7 +135,7 @@ export const RatingModal = ({
                     </Button>
                     <Button
                         onClick={handleSubmit}
-                        disabled={rating === 0}
+                        disabled={form.processing || form.data.rating === 0}
                         className="w-full sm:w-auto"
                     >
                         Submit Rating

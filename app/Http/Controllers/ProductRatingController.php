@@ -18,10 +18,10 @@ class ProductRatingController extends Controller
             $request->user(),
             $product,
             $request->integer('rating'),
-            $request->string('comment')->trim(),
+            $request->string('comment'),
         );
 
-        return redirect()->back()->withSuccess('Product rated successfully.');
+        return redirect()->back();
     }
 
     public function update(UpdateProductRatingRequest $request, ProductRating $productRating)
@@ -33,6 +33,6 @@ class ProductRatingController extends Controller
             $request->string('comment')->trim(),
         );
 
-        return redirect()->back()->withSuccess('Product rating updated successfully.');
+        return redirect()->back();
     }
 }
