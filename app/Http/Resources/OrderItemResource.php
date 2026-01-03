@@ -20,6 +20,10 @@ class OrderItemResource extends JsonResource
             'product_price' => $this->product_price,
             'total' => $this->line_total,
             'quantity' => $this->quantity,
+            'product' => ProductResource::make($this->whenLoaded('product')),
+            'has_rated' => $this->whenLoaded('product', function () use ($request) {
+                return (bool) $request->user()?->hasRated($this->product);
+            })
         ];
     }
 }

@@ -15,6 +15,7 @@ class OrderRepository extends Repository
 
     public function simplePaginate(int $perPage = 15, array $columns = ['*'], array|string $relations = []): Paginator
     {
+        auth()->user()->load('ratings');
         return $this->query()->with($relations)->latest()->simplePaginate($perPage, $columns);
     }
 
@@ -22,7 +23,7 @@ class OrderRepository extends Repository
     {
         $rules = [
             OrderStatus::CANCELLED->value => fn () => $order->status === OrderStatus::PENDING,
-            OrderStatus::DELIVERED->value => fn () => $order->status === OrderStatus::SHIPPED,
+            OrderStatus::DELIVERED->value => fn () => $order->status === OrderStatus::OUT_FOR_DELIVERY,
         ];
 
         if (! isset($rules[$newStatus->value]) || ! $rules[$newStatus->value]()) {

@@ -105,7 +105,7 @@ class User extends Authenticatable implements FilamentUser, MustVerifyEmail
 
     public function hasRated(Product $product): bool
     {
-        return $this->ratings()->where('product_id', $product->id)->exists();
+        return $this->ratings->contains('product_id', $product->id);
     }
 
     // check if user has ordered the product

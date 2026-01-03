@@ -130,10 +130,12 @@ export interface WishlistProduct extends Product {}
 
 export interface OrderItem {
     id: number;
+    product?: Product | undefined;
     product_name: string;
     product_price: number | string;
     total: string | number;
     quantity: number;
+    has_rated?: boolean;
 }
 
 export interface City {
