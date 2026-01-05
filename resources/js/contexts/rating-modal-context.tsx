@@ -25,6 +25,10 @@ export function RatingModalProvider({
     const [itemToRate, setItemToRate] = useState<ItemToRate | null>(null);
 
     const open = (item: ItemToRate) => {
+        if (!item || !item.productSlug) {
+            console.warn('Invalid item provided to open rating modal.');
+            return;
+        }
         setItemToRate(item);
         setIsOpen(true);
     };
