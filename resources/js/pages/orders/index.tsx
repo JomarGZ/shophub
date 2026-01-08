@@ -3,6 +3,7 @@ import { Container } from '@/components/container';
 import { OrderCard } from '@/components/orders/order-card';
 import { RatingModal } from '@/components/orders/rating-modal';
 import { ReceivedInfoModal } from '@/components/orders/received-info-modal';
+import { Pagination } from '@/components/pagination';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import {
@@ -10,7 +11,7 @@ import {
     useRatingModal,
 } from '@/contexts/rating-modal-context';
 import AppLayout from '@/layouts/app-layout';
-import { Order, SimplePaginatedResponse } from '@/types';
+import { Order, PaginatedResponse } from '@/types';
 import { Head, router, usePage } from '@inertiajs/react';
 import { Package } from 'lucide-react';
 import { useState } from 'react';
@@ -22,22 +23,19 @@ type OrderStatusOption = {
     color: string;
 };
 type IndexProps = {
-    orders: SimplePaginatedResponse<Order>;
+    orders: PaginatedResponse<Order>;
     order_statuses: OrderStatusOption[];
 };
 export default function Index() {
     const { orders, order_statuses } = usePage<IndexProps>().props;
+    console.log(orders);
     const [receiveModalOpen, setReceiveModalOpen] = useState<boolean>(false);
-    const [orderList, setOrderList] = useState<Order[]>(orders.data);
-    const [nextPageUrl, setNextPageUrl] = useState<string | null>(
-        orders.next_page_url ? String(orders.next_page_url) : null,
-    );
+
     const statusMap: Record<string, OrderStatusOption> = Object.fromEntries(
         order_statuses.map((s) => [s.value, s]),
     );
     const [loading, setLoading] = useState<boolean>(false);
 
-    const [hasMore, setHasMore] = useState<Boolean>(orders.has_more);
     const [expandedOrders, setExpandedOrders] = useState<Set<string>>(
         new Set(),
     );
@@ -62,18 +60,6 @@ export default function Index() {
                 preserveScroll: true,
                 onSuccess: ({ props: { flash } }: any) => {
                     setReceiveModalOpen(true);
-                    setOrderList((prev) =>
-                        prev.map((o) =>
-                            o.id === id
-                                ? {
-                                      ...o,
-                                      status: statusMap[
-                                          'delivered'
-                                      ] as unknown as Order['status'],
-                                  }
-                                : o,
-                        ),
-                    );
                 },
                 onError: ({ props: { flash } }: any) =>
                     toast.error(flash.error || 'Failed to mark as Recieved'),
@@ -93,18 +79,6 @@ export default function Index() {
                 preserveScroll: true,
                 onSuccess: ({ props: { flash } }: any) => {
                     toast.success(flash.success || 'Cancel Order Successfully');
-                    setOrderList((prev) =>
-                        prev.map((o) =>
-                            o.id === id
-                                ? {
-                                      ...o,
-                                      status: statusMap[
-                                          'cancelled'
-                                      ] as unknown as Order['status'],
-                                  }
-                                : o,
-                        ),
-                    );
                 },
                 onError: ({ props: { flash } }: any) =>
                     toast.error(flash.error || 'Cancel Order Failed'),
@@ -114,29 +88,6 @@ export default function Index() {
         );
     };
 
-    const loadMore = () => {
-        if (!hasMore || !nextPageUrl) return;
-
-        router.get(
-            nextPageUrl,
-            {},
-            {
-                preserveScroll: true,
-                preserveState: true,
-                onSuccess: (page) => {
-                    const orders = page.props
-                        .orders as SimplePaginatedResponse<Order>;
-                    setOrderList((prev) => [...prev, ...orders.data]);
-                    setNextPageUrl(
-                        orders.next_page_url
-                            ? String(orders.next_page_url)
-                            : null,
-                    );
-                    setHasMore(orders.has_more);
-                },
-            },
-        );
-    };
     return (
         <AppLayout>
             <Head title="Orders" />
@@ -151,7 +102,7 @@ export default function Index() {
             <RatingModalProvider>
                 <Container>
                     <div className="space-y-4">
-                        {orderList.length === 0 ? (
+                        {orders.data.length === 0 ? (
                             <Card>
                                 <CardContent className="py-16 text-center">
                                     <Package className="mx-auto mb-4 h-16 w-16 text-muted-foreground" />
@@ -168,7 +119,7 @@ export default function Index() {
                             </Card>
                         ) : (
                             <>
-                                {orderList.map((order) => (
+                                {orders.data.map((order) => (
                                     <OrderCard
                                         key={order.id}
                                         order={order}
@@ -184,23 +135,10 @@ export default function Index() {
                                         onCancel={handleCancelOrder}
                                     />
                                 ))}
-
-                                {/* Load More Button */}
-                                {hasMore && (
-                                    <div className="flex justify-center pt-6">
-                                        <Button
-                                            variant="outline"
-                                            size="lg"
-                                            onClick={loadMore}
-                                            className="min-w-[200px]"
-                                        >
-                                            Load More Orders
-                                        </Button>
-                                    </div>
-                                )}
                             </>
                         )}
                     </div>
+                    <Pagination links={orders.meta.links} />
                 </Container>
                 <ReceivedInfoModal
                     isOpen={receiveModalOpen}
@@ -214,12 +152,6 @@ export default function Index() {
 
 function RatingModalWrapper() {
     const { isOpen, close, itemToRate } = useRatingModal();
-
-    const handleSubmit = () => {
-        // your submit logic here
-        close();
-    };
-
     return (
         <RatingModal
             isOpen={isOpen}

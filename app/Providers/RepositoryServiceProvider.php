@@ -19,6 +19,8 @@ class RepositoryServiceProvider extends ServiceProvider
 
             return new CachedProductRepository($repository);
         });
+
+        $this->app->bind(\App\Repositories\Contracts\OrderRepositoryInterface::class, \App\Repositories\Eloquent\OrderRepository::class);
     }
 
     /**

@@ -6,7 +6,8 @@ use App\Enums\OrderStatus;
 use App\Http\Requests\StoreOrderRequest;
 use App\Http\Resources\OrderResource;
 use App\Models\Order;
-use App\Repositories\OrderRepository;
+use App\Repositories\Contracts\OrderRepositoryInterface;
+use App\Repositories\Eloquent\OrderRepository;
 use App\Services\OrderService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
@@ -17,26 +18,18 @@ class OrderController extends Controller
 {
     public function __construct(
         protected OrderService $orderService,
-        protected OrderRepository $orderRepository
+        protected OrderRepositoryInterface $orderRepository
     ) {}
 
     public function index()
     {
-        $orders = $this->orderRepository->simplePaginate(
+        $orders = $this->orderRepository->getUserOrdersWithRatings(
             perPage: 10,
-            columns: ['id', 'shipping_full_name', 'status', 'payment_status', 'payment_method', 'created_at', 'shipping_fee', 'total', 'shipping_city', 'shipping_country', 'shipping_street_address'],
-            relations: [
-                'orderItems:id,order_id,product_id,product_name,product_price,line_total,quantity',
-                'orderItems.product:id,slug'
-            ]
+            columns: ['id', 'shipping_full_name', 'status', 'payment_status', 'payment_method', 'created_at', 'shipping_fee', 'total', 'shipping_city', 'shipping_country', 'shipping_street_address']
         );
-
+      
         return Inertia::render('orders/index', [
-            'orders' => [
-                'data' => fn () => OrderResource::collection($orders)->resolve(),
-                'next_page_url' => $orders->nextPageUrl(),
-                'has_more' => $orders->hasMorePages(),
-            ],
+            'orders' => fn () => OrderResource::collection($orders),
             'order_statuses' => OrderStatus::fullOptions(),
         ]);
     }

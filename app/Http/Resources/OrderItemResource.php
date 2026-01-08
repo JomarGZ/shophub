@@ -4,6 +4,7 @@ namespace App\Http\Resources;
 
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
+use Illuminate\Support\Facades\Log;
 
 class OrderItemResource extends JsonResource
 {
@@ -14,6 +15,11 @@ class OrderItemResource extends JsonResource
      */
     public function toArray(Request $request): array
     {
+        Log::info('OrderItem rating check', [
+    'order_item_id' => $this->id,
+    'product_id' => $this->product?->id,
+    'ratings_count' => $this->product?->ratings?->count(),
+]);
         return [
             'id' => $this->id,
             'product_name' => $this->product_name,
@@ -21,9 +27,11 @@ class OrderItemResource extends JsonResource
             'total' => $this->line_total,
             'quantity' => $this->quantity,
             'product' => ProductResource::make($this->whenLoaded('product')),
-            'has_rated' => $this->whenLoaded('product', function () use ($request) {
-                return (bool) $request->user()?->hasRated($this->product);
-            })
+            'has_rated' => $this->when(
+                    $this->relationLoaded('product') && $this->product->relationLoaded('ratings'),
+                    $this->product->ratings->isNotEmpty(),
+                    false // Default value when not loaded
+                )
         ];
     }
 }

@@ -10,7 +10,7 @@ use App\Models\Address;
 use App\Models\Order;
 use App\Models\User;
 use App\Repositories\AddressRepository;
-use App\Repositories\OrderRepository;
+use App\Repositories\Eloquent\OrderRepository;
 use App\Services\Cart\CartCalculationService;
 use App\Services\Payments\PaymentProcessor;
 use Exception;

@@ -16,14 +16,14 @@ class ProductResource extends JsonResource
     public function toArray(Request $request): array
     {
         return [
-            'id' => $this->id,
-            'name' => $this->whenHas($this->name, $this->name),
-            'slug' => $this->slug,
-            'price' => $this->whenHas($this->price, number_format($this->price, 2)),
+            'id' => $this->whenHas('id', $this->id),
+            'name' => $this->whenHas('name', $this->name),
+            'slug' => $this->whenHas('slug',$this->slug),
+            'price' => $this->whenHas('price', number_format($this->price, 2)),
             'image_url' => $this->when($this->image_url, Storage::url($this->image_url), asset('images/defaults/product.png')),
             'category' => CategoryResource::make($this->whenLoaded('category')),
-            'description' => $this->description,
-            'stock' => $this->stock,
+            'description' => $this->whenHas('description', $this->description),
+            'stock' => $this->whenHas('stock', $this->stock),
             'is_favorited' => (bool) $this->is_favorited
         ];
     }

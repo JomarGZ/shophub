@@ -20,7 +20,7 @@ export function Pagination({ links }: PaginationProps) {
                         return (
                             <Link
                                 key={i}
-                                href={link.url ?? '#'}
+                                href={link.url ? String(link.url) : '#'}
                                 preserveScroll
                                 className={`flex items-center justify-center rounded-md border transition ${isPageNumber ? 'h-9 w-9 text-sm font-medium' : 'h-9 px-3 text-sm'} ${link.active ? 'bg-secondary text-primary-foreground' : 'bg-card hover:bg-accent'} ${!link.url ? 'pointer-events-none opacity-50' : ''} `}
                             >
