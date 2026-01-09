@@ -6,8 +6,8 @@ use App\Enums\OrderStatus;
 
 class CancelledOrderState extends BaseOrderState
 {
-    public function getName(): string
+    public function status(): OrderStatus
     {
-        return OrderStatus::CANCELLED->value;
+        return OrderStatus::CANCELLED;
     }
 }

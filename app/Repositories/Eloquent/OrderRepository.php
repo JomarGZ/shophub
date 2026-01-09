@@ -18,6 +18,12 @@ class OrderRepository extends BaseRepository implements OrderRepositoryInterface
         parent::__construct($model);
     }
 
+    public function save(Order $order): void
+    {
+        if (!$order->save()) {
+            throw new \DomainException('Failed to save the order.');
+        }
+    }
     public function getUserOrdersWithRatings(int $perPage = 15, array $columns = ['*'])
     {
         return $this->model->query()
@@ -33,12 +39,4 @@ class OrderRepository extends BaseRepository implements OrderRepositoryInterface
             ->paginate($perPage, $columns);
     }
     
-    public function updateStatus(Order $order, OrderStatus $newStatus)
-    {
-        match ($newStatus) {
-            OrderStatus::CANCELLED => $order->cancel(),
-            OrderStatus::DELIVERED => $order->deliver(),
-            default => throw new DomainException('Unsupported action'),
-        };
-    }
 }

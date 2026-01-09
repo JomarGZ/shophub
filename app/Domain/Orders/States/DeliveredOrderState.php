@@ -6,8 +6,8 @@ use App\Enums\OrderStatus;
 
 class DeliveredOrderState extends BaseOrderState
 {
-    public function getName(): string
+    public function status(): OrderStatus
     {
-        return OrderStatus::DELIVERED->value;
+        return OrderStatus::DELIVERED;
     }
 }

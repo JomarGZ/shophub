@@ -11,8 +11,8 @@ class PendingOrderState extends BaseOrderState
         $this->order->setState(new CancelledOrderState($this->order));
     }
 
-    public function getName(): string
+    public function status(): OrderStatus
     {
-        return OrderStatus::PENDING->value;
+        return OrderStatus::PENDING;
     }
 }

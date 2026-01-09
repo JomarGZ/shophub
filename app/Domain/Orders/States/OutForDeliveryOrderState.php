@@ -11,9 +11,9 @@ class OutForDeliveryOrderState extends BaseOrderState
         $this->order->setState(new DeliveredOrderState($this->order));
     }
 
-    public function getName(): string
+    public function status(): OrderStatus
     {
-        return OrderStatus::OUT_FOR_DELIVERY->value;
+        return OrderStatus::OUT_FOR_DELIVERY;
     }
     
    

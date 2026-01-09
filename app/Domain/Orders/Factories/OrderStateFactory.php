@@ -12,7 +12,7 @@ use App\Models\Order;
 
 class OrderStateFactory
 {
-    public static function from(Order $order, OrderStatus $status)
+    public static function from(Order $order, OrderStatus $status): OrderState
     {
         return match($status) {
             OrderStatus::PENDING => new PendingOrderState($order),

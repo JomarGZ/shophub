@@ -79,10 +79,7 @@ class Order extends Model
     public function setState(OrderState $state): void
     {
         $this->state = $state;
-
-        $this->update([
-            'status' => $state->getName(),
-        ]);
+        $this->status = $state->status();
     }
 
      /**

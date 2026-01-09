@@ -7,7 +7,6 @@ use App\Http\Requests\StoreOrderRequest;
 use App\Http\Resources\OrderResource;
 use App\Models\Order;
 use App\Repositories\Contracts\OrderRepositoryInterface;
-use App\Repositories\Eloquent\OrderRepository;
 use App\Services\OrderService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
@@ -54,7 +53,7 @@ class OrderController extends Controller
 
         $newStatus = OrderStatus::from($validated['status']);
 
-        $this->orderRepository->updateStatus($order, $newStatus);
+        $this->orderService->updateStatus($order, $newStatus);
 
         return redirect()->back()->with('success', 'Order status updated successfully');
     }
