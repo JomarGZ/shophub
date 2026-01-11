@@ -28,7 +28,6 @@ type IndexProps = {
 };
 export default function Index() {
     const { orders, order_statuses } = usePage<IndexProps>().props;
-    console.log(orders);
     const [receiveModalOpen, setReceiveModalOpen] = useState<boolean>(false);
 
     const statusMap: Record<string, OrderStatusOption> = Object.fromEntries(
@@ -77,11 +76,11 @@ export default function Index() {
             },
             {
                 preserveScroll: true,
-                onSuccess: ({ props: { flash } }: any) => {
-                    toast.success(flash.success || 'Cancel Order Successfully');
+                onSuccess: () => {
+                    toast.success('Cancel Order Successfully');
                 },
-                onError: ({ props: { flash } }: any) =>
-                    toast.error(flash.error || 'Cancel Order Failed'),
+                onError: (props) =>
+                    toast.error(props.status || 'Cancel Order Failed'),
                 onStart: () => setLoading(true),
                 onFinish: () => setLoading(false),
             },
