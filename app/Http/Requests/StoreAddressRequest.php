@@ -24,7 +24,6 @@ class StoreAddressRequest extends FormRequest
     {
         $countryId = (int) $this->get('country_id', null);
         $countryCode = $this->getCountryCode($countryId);
-        info($countryCode);
 
         return [
             'first_name' => 'required|string|max:255',

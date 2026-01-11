@@ -9,9 +9,9 @@ use App\Factories\PaymentMethodFactory;
 use App\Models\Address;
 use App\Models\Order;
 use App\Models\User;
+use App\Notifications\OrderPlacedCOD;
 use App\Repositories\AddressRepository;
 use App\Repositories\Contracts\OrderRepositoryInterface;
-use App\Repositories\Eloquent\OrderRepository;
 use App\Services\Cart\CartCalculationService;
 use App\Services\Payments\PaymentProcessor;
 use Exception;
@@ -162,5 +162,6 @@ class OrderService
 
             $this->orderRepository->save($order);   
         });
+       
     }
 }

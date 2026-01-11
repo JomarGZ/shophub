@@ -17,14 +17,14 @@ abstract class BaseOrderState implements OrderState
    public function cancel(): void
    {
         throw new DomainException(
-            "Cannot cancel an order in the '{$this->getName()}' state."
+            "Cannot cancel an order in the '{$this->status()->value}' state."
         );
    }
 
    public function deliver(): void
    {
         throw new DomainException(
-            "Cannot deliver an order in the '{$this->getName()}' state."
+            "Cannot deliver an order in the '{$this->status()->value}' state."
         );
    }
 

@@ -8,7 +8,9 @@ use App\Http\Resources\OrderResource;
 use App\Models\Order;
 use App\Repositories\Contracts\OrderRepositoryInterface;
 use App\Services\OrderService;
+use DomainException;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 use Illuminate\Validation\Rule;
 use Inertia\Inertia;
@@ -48,13 +50,22 @@ class OrderController extends Controller
     public function update(Order $order, Request $request)
     {
         $validated = $request->validate([
-            'status' => ['required', Rule::in([OrderStatus::CANCELLED, OrderStatus::DELIVERED])],
+            'status' => ['required', Rule::in([OrderStatus::CANCELLED->value, OrderStatus::DELIVERED->value])],
         ]);
-
-        $newStatus = OrderStatus::from($validated['status']);
-
-        $this->orderService->updateStatus($order, $newStatus);
-
-        return redirect()->back()->with('success', 'Order status updated successfully');
+        try {
+            $newStatus = OrderStatus::from($validated['status']); 
+            $this->orderService->updateStatus($order, $newStatus);
+            return redirect()->back();
+        } catch (DomainException $e) {
+            Log::error("Order status update failed: {$e->getMessage()}", [
+                'order_id' => $order->id,
+                'user_id' => $request->user()->id,
+                'attempted_status' => $request->string('status'),
+                'current_status' => $order->status->value,
+                'exception' => $e
+            ]);
+            return redirect()->back()->withErrors(['status' => 'Cannot update order to this status.']);
+        }
+      
     }
 }

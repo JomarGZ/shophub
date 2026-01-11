@@ -32,13 +32,3 @@ function createOrderedProductForUser(User $user, array $productAttributes = [], 
 
     return $product;
 }
-
-function createProduct(?int $count = null, array $attributes = [])
-{
-    return App\Models\Product::factory($count)->create($attributes);
-}
-
-function createUser(): App\Models\User
-{
-    return App\Models\User::factory()->create();
-}

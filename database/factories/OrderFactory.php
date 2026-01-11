@@ -55,7 +55,28 @@ class OrderFactory extends Factory
     public function delivered()
     {
         return $this->state([
-            'status' => \App\Enums\OrderStatus::DELIVERED,
+            'status' => OrderStatus::DELIVERED,
+        ]);
+    }
+
+    public function pending()
+    {
+        return $this->state([
+            'status' => OrderStatus::PENDING
+        ]);
+    }
+
+    public function cancelled()
+    {
+        return $this->state([
+            'status' => OrderStatus::CANCELLED,
+        ]);
+    }
+
+    public function outForDelivery()
+    {
+        return $this->state([
+            'status' => OrderStatus::OUT_FOR_DELIVERY,
         ]);
     }
 
