@@ -34,8 +34,9 @@ class ProductRepository extends BaseRepository implements ProductRepositoryInter
         $query = $this->model->query()
             ->select($columns)
             ->with($relations)
-            ->inStock();
-        return $query->inRandomOrder()->take($limit)->get();
+            ->inStock()
+            ->orderByDesc('ratings_sum');
+        return $query->take($limit)->get();
     }
     
     public function getRelatedProducts(int|string $catId, array|string $relation = [], array $columns = ['*'], int $limit = 8): Collection
