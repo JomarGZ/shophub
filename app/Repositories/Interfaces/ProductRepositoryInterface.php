@@ -2,10 +2,11 @@
 
 namespace App\Repositories\Interfaces;
 
+use App\Repositories\Contracts\RepositoryInterface;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Eloquent\Collection;
 
-interface ProductRepositoryInterface
+interface ProductRepositoryInterface extends RepositoryInterface
 {
     public function getFeaturedProducts(
         array|string $relations = [],

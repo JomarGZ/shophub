@@ -3,19 +3,19 @@
 namespace App\Repositories\Eloquent;
 
 use App\Models\Product;
+use App\Repositories\BaseRepository;
 use App\Repositories\Interfaces\ProductRepositoryInterface;
-use App\Repositories\Repository;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Eloquent\Collection;
 
-class ProductRepository extends Repository implements ProductRepositoryInterface
+class ProductRepository extends BaseRepository implements ProductRepositoryInterface
 {
     /**
      * Create a new class instance.
      */
-    public function __construct()
+    public function __construct(Product $model)
     {
-        parent::__construct(new Product);
+        parent::__construct($model);
     }
 
         private function addIsFavoritedCount($query,?int $userId = null)
@@ -31,7 +31,7 @@ class ProductRepository extends Repository implements ProductRepositoryInterface
 
     public function getFeaturedProducts(array|string $relations = [], array $columns = ['*'], int $limit = 8): Collection
     {
-        $query = $this->query()
+        $query = $this->model->query()
             ->select($columns)
             ->with($relations)
             ->inStock();
@@ -41,7 +41,7 @@ class ProductRepository extends Repository implements ProductRepositoryInterface
     public function getRelatedProducts(int|string $catId, array|string $relation = [], array $columns = ['*'], int $limit = 8): Collection
     {
         $userId = request()->user()?->id;
-        $query = $this->query()->select($columns)->with($relation)->inRandomOrder()->inStock()->where('category_id', $catId);
+        $query = $this->model->query()->select($columns)->with($relation)->inRandomOrder()->inStock()->where('category_id', $catId);
         $query = $this->addIsFavoritedCount($query, $userId);
 
         return $query->take($limit)->get();
@@ -50,7 +50,7 @@ class ProductRepository extends Repository implements ProductRepositoryInterface
     public function getPaginatedProducts(int $perPage = 15, array $columns = ['*'], ?array $filters = [], array|string $relations = []): LengthAwarePaginator
     {
         $userId = request()->user()?->id;
-        $query = $this->query()->with($relations)->filter($filters);
+        $query = $this->model->query()->with($relations)->filter($filters);
         $query = $this->addIsFavoritedCount($query, $userId);
         return $query->paginate($perPage, $columns)->withQueryString();
     }

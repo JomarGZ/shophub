@@ -15,11 +15,10 @@ class RepositoryServiceProvider extends ServiceProvider
     public function register(): void
     {
         $this->app->bind(ProductRepositoryInterface::class, function ($app) {
-            $repository = new ProductRepository;
-
-            return new CachedProductRepository($repository);
+            return new CachedProductRepository(
+                $app->make(ProductRepository::class)
+            );
         });
-
         $this->app->bind(\App\Repositories\Contracts\OrderRepositoryInterface::class, \App\Repositories\Eloquent\OrderRepository::class);
     }
 

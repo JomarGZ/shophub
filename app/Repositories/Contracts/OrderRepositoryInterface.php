@@ -2,7 +2,6 @@
 
 namespace App\Repositories\Contracts;
 
-use App\Enums\OrderStatus;
 use App\Models\Order;
 
 interface OrderRepositoryInterface extends RepositoryInterface
