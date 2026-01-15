@@ -26,9 +26,10 @@ class OrderController extends Controller
     {
         $orders = $this->orderRepository->getUserOrdersWithRatings(
             perPage: 10,
+            user: request()->user(),
             columns: ['id', 'shipping_full_name', 'status', 'payment_status', 'payment_method', 'created_at', 'shipping_fee', 'total', 'shipping_city', 'shipping_country', 'shipping_street_address']
         );
-      
+
         return Inertia::render('orders/index', [
             'orders' => fn () => OrderResource::collection($orders),
             'order_statuses' => OrderStatus::fullOptions(),
@@ -53,8 +54,9 @@ class OrderController extends Controller
             'status' => ['required', Rule::in([OrderStatus::CANCELLED->value, OrderStatus::DELIVERED->value])],
         ]);
         try {
-            $newStatus = OrderStatus::from($validated['status']); 
+            $newStatus = OrderStatus::from($validated['status']);
             $this->orderService->updateStatus($order, $newStatus);
+
             return redirect()->back();
         } catch (DomainException $e) {
             Log::error("Order status update failed: {$e->getMessage()}", [
@@ -62,10 +64,11 @@ class OrderController extends Controller
                 'user_id' => $request->user()->id,
                 'attempted_status' => $request->string('status'),
                 'current_status' => $order->status->value,
-                'exception' => $e
+                'exception' => $e,
             ]);
+
             return redirect()->back()->withErrors(['status' => 'Cannot update order to this status.']);
         }
-      
+
     }
 }

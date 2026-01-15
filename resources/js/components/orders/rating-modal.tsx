@@ -44,6 +44,7 @@ export const RatingModal = ({
             onError: () =>
                 toast.error('Failed to submit rating. Please try again.'),
             onFinish: () => handleClose(),
+            preserveScroll: true,
         });
     };
 

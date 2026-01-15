@@ -10,7 +10,6 @@ use App\Http\Controllers\ProductRatingController;
 use App\Http\Controllers\ShopController;
 use App\Http\Controllers\WishlistController;
 use App\Http\Controllers\WishlistToggleController;
-use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', HomeController::class)->name('home');

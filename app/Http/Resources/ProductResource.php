@@ -18,13 +18,14 @@ class ProductResource extends JsonResource
         return [
             'id' => $this->whenHas('id', $this->id),
             'name' => $this->whenHas('name', $this->name),
-            'slug' => $this->whenHas('slug',$this->slug),
+            'slug' => $this->whenHas('slug', $this->slug),
             'price' => $this->whenHas('price', number_format($this->price, 2)),
             'image_url' => $this->when($this->image_url, Storage::url($this->image_url), asset('images/defaults/product.png')),
+            'product_ratings' => ProductRatingResource::collection($this->whenLoaded('ratings')),
             'category' => CategoryResource::make($this->whenLoaded('category')),
             'description' => $this->whenHas('description', $this->description),
             'stock' => $this->whenHas('stock', $this->stock),
-            'is_favorited' => (bool) $this->is_favorited
+            'is_favorited' => (bool) $this->is_favorited,
         ];
     }
 }

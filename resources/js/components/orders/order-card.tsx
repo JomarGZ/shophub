@@ -12,13 +12,8 @@ import {
 import { useRatingModal } from '@/contexts/rating-modal-context';
 import { getPaymentVariant } from '@/lib/utils';
 import { Order } from '@/types';
-import {
-    CheckCircle,
-    ChevronDown,
-    ChevronUp,
-    Star,
-    XCircle,
-} from 'lucide-react';
+import { CheckCircle, ChevronDown, ChevronUp, XCircle } from 'lucide-react';
+import ProductRatingAction from '../product-rating-action';
 
 type OrderStatusOption = {
     value: string;
@@ -53,11 +48,6 @@ export function OrderCard({
             month: 'long',
             day: 'numeric',
         });
-
-    const handleOpenRatingModal = (
-        productSlug: string,
-        productName: string,
-    ) => {};
     return (
         <Card className="overflow-hidden">
             <CardHeader className="bg-muted/30">
@@ -249,36 +239,30 @@ export function OrderCard({
                                                     {order.status.value ===
                                                         'delivered' && (
                                                         <TableCell className="text-center">
-                                                            {item.has_rated ? (
-                                                                <Badge
-                                                                    variant="secondary"
-                                                                    className="gap-1"
-                                                                >
-                                                                    <Star className="h-3 w-3 fill-yellow-400 text-yellow-400" />
-                                                                    Rated
-                                                                </Badge>
-                                                            ) : (
-                                                                <Button
-                                                                    variant="ghost"
-                                                                    size="sm"
-                                                                    onClick={() =>
-                                                                        open({
-                                                                            productName:
-                                                                                item.product_name ??
-                                                                                '',
-                                                                            productSlug:
-                                                                                item
-                                                                                    .product
-                                                                                    ?.slug ??
-                                                                                '',
-                                                                        })
-                                                                    }
-                                                                    className="cursor-pointer gap-1 text-xs"
-                                                                >
-                                                                    <Star className="h-3 w-3" />
-                                                                    Rate
-                                                                </Button>
-                                                            )}
+                                                            <ProductRatingAction
+                                                                hasRated={
+                                                                    item.has_rated ??
+                                                                    false
+                                                                }
+                                                                rating={
+                                                                    item.product
+                                                                        ?.product_ratings?.[0]
+                                                                        ?.rating ??
+                                                                    0
+                                                                }
+                                                                onRate={() =>
+                                                                    open({
+                                                                        productName:
+                                                                            item.product_name ??
+                                                                            '',
+                                                                        productSlug:
+                                                                            item
+                                                                                .product
+                                                                                ?.slug ??
+                                                                            '',
+                                                                    })
+                                                                }
+                                                            />
                                                         </TableCell>
                                                     )}
                                                 </TableRow>

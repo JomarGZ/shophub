@@ -45,7 +45,6 @@ class Order extends Model
         'refund_at',
     ];
 
-
     protected function casts()
     {
         return [
@@ -72,7 +71,7 @@ class Order extends Model
         if (is_null($this->state)) {
             $this->state = OrderStateFactory::from($this, $this->status);
         }
-        
+
         return $this->state;
     }
 
@@ -82,7 +81,7 @@ class Order extends Model
         $this->status = $state->status();
     }
 
-     /**
+    /**
      * Domain actions
      */
     public function cancel(): void

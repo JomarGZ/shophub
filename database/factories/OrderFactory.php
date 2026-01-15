@@ -62,7 +62,7 @@ class OrderFactory extends Factory
     public function pending()
     {
         return $this->state([
-            'status' => OrderStatus::PENDING
+            'status' => OrderStatus::PENDING,
         ]);
     }
 

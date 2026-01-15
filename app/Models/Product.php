@@ -31,8 +31,8 @@ class Product extends Model
         'description',
         'price',
         'stock',
-        'ratings_count', //total of users who rated
-        'ratings_sum', //total of stars
+        'ratings_count', // total of users who rated
+        'ratings_sum', // total of stars
         'average_rating',
         'image_url',
     ];

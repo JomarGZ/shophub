@@ -14,7 +14,7 @@ class OrderStateFactory
 {
     public static function from(Order $order, OrderStatus $status): OrderState
     {
-        return match($status) {
+        return match ($status) {
             OrderStatus::PENDING => new PendingOrderState($order),
             OrderStatus::OUT_FOR_DELIVERY => new OutForDeliveryOrderState($order),
             OrderStatus::DELIVERED => new DeliveredOrderState($order),

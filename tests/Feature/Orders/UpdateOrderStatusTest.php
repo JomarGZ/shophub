@@ -6,8 +6,6 @@ use App\Models\Order;
 use function Pest\Laravel\actingAs;
 use function Pest\Laravel\patch;
 
-
-
 describe('Order status update', function () {
     beforeEach(function () {
         $this->user = createUser();
@@ -96,7 +94,3 @@ describe('Order status update', function () {
         $response->assertSessionHasErrors($errorField);
     })->with('invalid_statuses');
 });
-   
-
-
-

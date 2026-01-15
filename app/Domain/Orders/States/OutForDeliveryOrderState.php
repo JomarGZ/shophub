@@ -15,6 +15,4 @@ class OutForDeliveryOrderState extends BaseOrderState
     {
         return OrderStatus::OUT_FOR_DELIVERY;
     }
-    
-   
 }

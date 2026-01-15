@@ -7,25 +7,24 @@ use DomainException;
 
 abstract class BaseOrderState implements OrderState
 {
-   protected Order $order;
+    protected Order $order;
 
-   public function __construct(Order $order)
-   {
+    public function __construct(Order $order)
+    {
         $this->order = $order;
-   }
+    }
 
-   public function cancel(): void
-   {
+    public function cancel(): void
+    {
         throw new DomainException(
             "Cannot cancel an order in the '{$this->status()->value}' state."
         );
-   }
+    }
 
-   public function deliver(): void
-   {
+    public function deliver(): void
+    {
         throw new DomainException(
             "Cannot deliver an order in the '{$this->status()->value}' state."
         );
-   }
-
+    }
 }

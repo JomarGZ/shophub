@@ -9,7 +9,6 @@ use App\Factories\PaymentMethodFactory;
 use App\Models\Address;
 use App\Models\Order;
 use App\Models\User;
-use App\Notifications\OrderPlacedCOD;
 use App\Repositories\AddressRepository;
 use App\Repositories\Contracts\OrderRepositoryInterface;
 use App\Services\Cart\CartCalculationService;
@@ -153,15 +152,15 @@ class OrderService
 
     public function updateStatus(Order $order, OrderStatus $newStatus)
     {
-        DB::transaction(function() use ($order, $newStatus) {
+        DB::transaction(function () use ($order, $newStatus) {
             match ($newStatus) {
                 OrderStatus::CANCELLED => $order->cancel(),
                 OrderStatus::DELIVERED => $order->deliver(),
                 default => throw new \DomainException('Unsupported action')
             };
 
-            $this->orderRepository->save($order);   
+            $this->orderRepository->save($order);
         });
-       
+
     }
 }

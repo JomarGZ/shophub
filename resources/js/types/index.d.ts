@@ -107,8 +107,15 @@ export interface Product {
     stock: number;
     rating: number;
     is_favorited?: boolean;
+    product_ratings?: ProductRating[];
 }
-
+export interface ProductRating {
+    id: number;
+    user_id: number;
+    product_id: number;
+    rating: number;
+    comment: string;
+}
 export interface PaginatedResponse<T> {
     data: T[];
     meta: PaginationMeta;

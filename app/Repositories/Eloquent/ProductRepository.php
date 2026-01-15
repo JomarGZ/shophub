@@ -18,16 +18,16 @@ class ProductRepository extends BaseRepository implements ProductRepositoryInter
         parent::__construct($model);
     }
 
-        private function addIsFavoritedCount($query,?int $userId = null)
-        {
-            if ($userId) {
-                return $query->withCount([
-                    'wishlistedBy as is_favorited' => fn ($q) => $q->where('user_id', $userId)
-                ]);
-            }
-
-            return $query;
+    private function addIsFavoritedCount($query, ?int $userId = null)
+    {
+        if ($userId) {
+            return $query->withCount([
+                'wishlistedBy as is_favorited' => fn ($q) => $q->where('user_id', $userId),
+            ]);
         }
+
+        return $query;
+    }
 
     public function getFeaturedProducts(array|string $relations = [], array $columns = ['*'], int $limit = 8): Collection
     {
@@ -36,9 +36,10 @@ class ProductRepository extends BaseRepository implements ProductRepositoryInter
             ->with($relations)
             ->inStock()
             ->orderByDesc('ratings_sum');
+
         return $query->take($limit)->get();
     }
-    
+
     public function getRelatedProducts(int|string $catId, array|string $relation = [], array $columns = ['*'], int $limit = 8): Collection
     {
         $userId = request()->user()?->id;
@@ -53,6 +54,7 @@ class ProductRepository extends BaseRepository implements ProductRepositoryInter
         $userId = request()->user()?->id;
         $query = $this->model->query()->with($relations)->filter($filters);
         $query = $this->addIsFavoritedCount($query, $userId);
+
         return $query->paginate($perPage, $columns)->withQueryString();
     }
 
