@@ -41,7 +41,7 @@ class ShopController extends Controller
             'product' => ProductResource::make($product->load(['category:id,name'])),
             'related_products' => ProductResource::collection($this->productRepository->getRelatedProducts(
                 categoryId: $product->category_id,
-                columns: ['id', 'name', 'slug', 'price', 'image_url', 'category_id', 'description', 'stock'],
+                columns: ['id', 'name', 'slug', 'price', 'image_url', 'category_id', 'description', 'stock', 'average_rating', 'ratings_count'],
                 limit: 4
             )),
         ]);

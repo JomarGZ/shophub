@@ -38,4 +38,9 @@ class OrderRepository extends BaseRepository implements OrderRepositoryInterface
             ->latest()
             ->paginate($perPage, $columns);
     }
+
+    public function find(int $id): ?Order
+    {
+        return $this->model->with(['orderItems'])->find($id);
+    }
 }

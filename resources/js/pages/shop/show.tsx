@@ -1,4 +1,5 @@
 import WishlistToggleController from '@/actions/App/Http/Controllers/WishlistToggleController';
+import { AverageRatingStars } from '@/components/average-rating-stars';
 import { Container } from '@/components/container';
 import { ProductCard } from '@/components/products/product-card';
 import { Badge } from '@/components/ui/badge';
@@ -9,7 +10,7 @@ import AppLayout from '@/layouts/app-layout';
 import { index } from '@/routes/shop';
 import { BreadcrumbItem, Product, SharedData } from '@/types';
 import { Head, router, usePage } from '@inertiajs/react';
-import { Heart, Minus, Plus, Share2, ShoppingCart, Star } from 'lucide-react';
+import { Heart, Minus, Plus, Share2, ShoppingCart } from 'lucide-react';
 import { useState } from 'react';
 import { toast } from 'sonner';
 
@@ -32,6 +33,7 @@ export default function Show({
             href: '#',
         },
     ];
+    console.log('Product:', product);
     const [quantity, setQuantity] = useState(1);
     const [favoriteLoading, setFavoriteLoading] = useState(false);
 
@@ -49,16 +51,14 @@ export default function Show({
                 only: ['product', 'flash'],
                 preserveScroll: true,
                 onSuccess: ({ props: { flash } }) => {
-                    if (flash.success) {
-                        toast.success(flash.success);
-                    }
+                    toast.success('Added to wishlist successfully!');
                 },
                 onStart: () => setFavoriteLoading(true),
                 onFinish: () => setFavoriteLoading(false),
             },
         );
     };
-
+    const ratingsCount = Number(product.ratings_count ?? 0);
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="Shop" />
@@ -77,28 +77,27 @@ export default function Show({
                 <div className="space-y-6">
                     <div>
                         <Badge variant="secondary" className="mb-3">
-                            {product.category.name}
+                            {product.category?.name}
                         </Badge>
                         <h1 className="mb-4 text-4xl font-bold text-foreground">
                             {product.name}
                         </h1>
                         <div className="mb-4 flex items-center gap-4">
                             <div className="flex items-center gap-1">
-                                {[...Array(5)].map((_, i) => (
-                                    <Star
-                                        key={i}
-                                        className={`h-5 w-5 ${
-                                            i < Math.floor(product.rating)
-                                                ? 'fill-primary text-primary'
-                                                : 'text-muted'
-                                        }`}
-                                    />
-                                ))}
+                                <AverageRatingStars
+                                    rating={product.average_rating ?? 0}
+                                />
                             </div>
-                            <span className="text-sm text-muted-foreground">
-                                {product.rating} (
-                                {Math.floor(Math.random() * 100 + 20)} reviews)
-                            </span>
+                            {ratingsCount > 0 ? (
+                                <span className="text-sm text-muted-foreground">
+                                    {product.average_rating} (
+                                    {product.ratings_count} ratings)
+                                </span>
+                            ) : (
+                                <span className="text-sm text-muted-foreground">
+                                    No ratings yet
+                                </span>
+                            )}
                         </div>
                         <p className="text-5xl font-bold text-foreground">
                             ${product.price}

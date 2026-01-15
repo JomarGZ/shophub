@@ -4,7 +4,7 @@ namespace App\Services\Payments;
 
 use App\Enums\PaymentMethod;
 use App\Models\Order;
-use App\Repositories\OrderRepository;
+use App\Repositories\Contracts\OrderRepositoryInterface;
 use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
@@ -15,7 +15,7 @@ use Stripe\Exception\ApiErrorException;
 
 class StripePaymentMethod implements PaymentMethodInterface
 {
-    public function __construct(protected OrderRepository $orderRepository) {}
+    public function __construct(protected OrderRepositoryInterface $orderRepository) {}
 
     public function pay(Order $order)
     {
@@ -79,7 +79,7 @@ class StripePaymentMethod implements PaymentMethodInterface
             ]);
             throw new \Exception('Order ID is missing from payment session.');
         }
-        $order = $this->orderRepository->model()->with('orderItems')->find($orderId);
+        $order = $this->orderRepository->find($orderId);
 
         if (! $order) {
             Log::error('Order not found for checkout session', [

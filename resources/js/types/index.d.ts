@@ -105,7 +105,8 @@ export interface Product {
     category?: Category;
     description: string;
     stock: number;
-    rating: number;
+    average_rating?: number;
+    ratings_count?: number;
     is_favorited?: boolean;
     product_ratings?: ProductRating[];
 }

@@ -8,7 +8,7 @@ use App\Http\Requests\StoreOrderRequest;
 use App\Http\Resources\AddressResource;
 use App\Repositories\AddressRepository;
 use App\Repositories\CartRepository;
-use App\Repositories\OrderRepository;
+use App\Repositories\Contracts\OrderRepositoryInterface;
 use App\Services\Cart\CartCalculationService;
 use App\Services\CartService;
 use App\Services\OrderService;
@@ -25,7 +25,7 @@ class CheckoutController extends Controller
         protected CartRepository $cartRepository,
         protected CartService $cartService,
         protected OrderService $orderService,
-        protected OrderRepository $orderRepository,
+        protected OrderRepositoryInterface $orderRepository,
         protected CartCalculationService $cartCalculationService
     ) {}
 
