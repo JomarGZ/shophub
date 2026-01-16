@@ -40,8 +40,14 @@ expect()->extend('toBeOne', function () {
 | global functions to help you to reduce the number of lines of code in your test files.
 |
 */
-
-function something()
+function createUser(): App\Models\User
 {
-    // ..
+    return App\Models\User::factory()->create();
 }
+
+function createProduct(?int $count = null, array $attributes = [])
+{
+    return App\Models\Product::factory($count)->create($attributes);
+}
+
+require_once __DIR__.'/Feature/ProductRatings/Helpers.php';

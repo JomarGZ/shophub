@@ -6,14 +6,14 @@ use App\Http\Resources\CategoryResource;
 use App\Http\Resources\ProductResource;
 use App\Models\Product;
 use App\Repositories\CategoryRepository;
-use App\Repositories\ProductRepository;
+use App\Repositories\Interfaces\ProductRepositoryInterface;
 use Illuminate\Support\Facades\Request;
 use Inertia\Inertia;
 
 class ShopController extends Controller
 {
     public function __construct(
-        protected ProductRepository $productRepository,
+        protected ProductRepositoryInterface $productRepository,
         protected CategoryRepository $categoryRepository
     ) {}
 
@@ -25,8 +25,8 @@ class ShopController extends Controller
             'products' => fn () => ProductResource::collection(
                 $this->productRepository->getPaginatedProducts(
                     perPage: 12,
-                    columns: ['id', 'name', 'slug', 'price', 'image_url', 'category_id', 'description', 'stock'],
-                    relations: ['category:id,name', 'wishlistedBy'],
+                    columns: ['id', 'name', 'slug', 'price', 'image_url', 'category_id', 'description', 'stock', 'average_rating', 'ratings_count'],
+                    relations: ['category:id,name'],
                     filters: Request::only('search', 'categories', 'min_price', 'max_price')
                 )
             ),
@@ -38,11 +38,10 @@ class ShopController extends Controller
     public function show(Product $product)
     {
         return Inertia::render('shop/show', [
-            'product' => ProductResource::make($product->load(['category:id,name', 'wishlistedBy'])),
+            'product' => ProductResource::make($product->load(['category:id,name'])),
             'related_products' => ProductResource::collection($this->productRepository->getRelatedProducts(
-                catId: $product->category_id,
-                relation: ['category:id,name', 'wishlistedBy'],
-                columns: ['id', 'name', 'slug', 'price', 'image_url', 'category_id', 'description', 'stock'],
+                categoryId: $product->category_id,
+                columns: ['id', 'name', 'slug', 'price', 'image_url', 'category_id', 'description', 'stock', 'average_rating', 'ratings_count'],
                 limit: 4
             )),
         ]);

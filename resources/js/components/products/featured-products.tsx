@@ -13,8 +13,9 @@ export function FeaturedProducts({ featuredProducts }: FeatureProductsProps) {
         const options = {
             except: ['featured_products'],
         };
-        addToCart(product, options);
+        addToCart(product, undefined, options);
     };
+    console.log(featuredProducts);
     return (
         <>
             <div className="mb-8 flex items-center justify-between">

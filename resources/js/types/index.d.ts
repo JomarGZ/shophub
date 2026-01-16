@@ -102,13 +102,21 @@ export interface Product {
     slug: string;
     price: number;
     image_url: string;
-    category: Category;
+    category?: Category;
     description: string;
     stock: number;
-    rating: number;
+    average_rating?: number;
+    ratings_count?: number;
     is_favorited?: boolean;
+    product_ratings?: ProductRating[];
 }
-
+export interface ProductRating {
+    id: number;
+    user_id: number;
+    product_id: number;
+    rating: number;
+    comment: string;
+}
 export interface PaginatedResponse<T> {
     data: T[];
     meta: PaginationMeta;
@@ -130,10 +138,12 @@ export interface WishlistProduct extends Product {}
 
 export interface OrderItem {
     id: number;
+    product?: Product | undefined;
     product_name: string;
     product_price: number | string;
     total: string | number;
     quantity: number;
+    has_rated?: boolean;
 }
 
 export interface City {

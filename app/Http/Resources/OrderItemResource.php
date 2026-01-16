@@ -20,6 +20,12 @@ class OrderItemResource extends JsonResource
             'product_price' => $this->product_price,
             'total' => $this->line_total,
             'quantity' => $this->quantity,
+            'product' => ProductResource::make($this->whenLoaded('product')),
+            'has_rated' => $this->when(
+                $this->relationLoaded('product') && $this->product->relationLoaded('ratings'),
+                $this->product->ratings->isNotEmpty(),
+                false // Default value when not loaded
+            ),
         ];
     }
 }

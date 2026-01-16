@@ -6,9 +6,11 @@ use App\Enums\OrderStatus;
 use App\Http\Requests\StoreOrderRequest;
 use App\Http\Resources\OrderResource;
 use App\Models\Order;
-use App\Repositories\OrderRepository;
+use App\Repositories\Contracts\OrderRepositoryInterface;
 use App\Services\OrderService;
+use DomainException;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 use Illuminate\Validation\Rule;
 use Inertia\Inertia;
@@ -17,25 +19,19 @@ class OrderController extends Controller
 {
     public function __construct(
         protected OrderService $orderService,
-        protected OrderRepository $orderRepository
+        protected OrderRepositoryInterface $orderRepository
     ) {}
 
     public function index()
     {
-        $orders = $this->orderRepository->simplePaginate(
+        $orders = $this->orderRepository->getUserOrdersWithRatings(
             perPage: 10,
-            columns: ['id', 'shipping_full_name', 'status', 'payment_status', 'payment_method', 'created_at', 'shipping_fee', 'total', 'shipping_city', 'shipping_country', 'shipping_street_address'],
-            relations: [
-                'orderItems:id,order_id,product_name,product_price,line_total,quantity',
-            ]
+            user: request()->user(),
+            columns: ['id', 'shipping_full_name', 'status', 'payment_status', 'payment_method', 'created_at', 'shipping_fee', 'total', 'shipping_city', 'shipping_country', 'shipping_street_address']
         );
 
         return Inertia::render('orders/index', [
-            'orders' => [
-                'data' => fn () => OrderResource::collection($orders)->resolve(),
-                'next_page_url' => $orders->nextPageUrl(),
-                'has_more' => $orders->hasMorePages(),
-            ],
+            'orders' => fn () => OrderResource::collection($orders),
             'order_statuses' => OrderStatus::fullOptions(),
         ]);
     }
@@ -55,13 +51,24 @@ class OrderController extends Controller
     public function update(Order $order, Request $request)
     {
         $validated = $request->validate([
-            'status' => ['required', Rule::in([OrderStatus::CANCELLED, OrderStatus::DELIVERED])],
+            'status' => ['required', Rule::in([OrderStatus::CANCELLED->value, OrderStatus::DELIVERED->value])],
         ]);
+        try {
+            $newStatus = OrderStatus::from($validated['status']);
+            $this->orderService->updateStatus($order, $newStatus);
 
-        $newStatus = OrderStatus::from($validated['status']);
+            return redirect()->back();
+        } catch (DomainException $e) {
+            Log::error("Order status update failed: {$e->getMessage()}", [
+                'order_id' => $order->id,
+                'user_id' => $request->user()->id,
+                'attempted_status' => $request->string('status'),
+                'current_status' => $order->status->value,
+                'exception' => $e,
+            ]);
 
-        $this->orderRepository->updateStatus($order, $newStatus);
+            return redirect()->back()->withErrors(['status' => 'Cannot update order to this status.']);
+        }
 
-        return redirect()->back()->with('success', 'Order status updated successfully');
     }
 }

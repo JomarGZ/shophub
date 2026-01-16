@@ -2,6 +2,8 @@
 
 namespace App\Models;
 
+use App\Domain\Orders\Factories\OrderStateFactory;
+use App\Domain\Orders\States\OrderState;
 use App\Enums\OrderStatus;
 use App\Enums\PaymentMethod;
 use App\Enums\PaymentStatus;
@@ -53,6 +55,8 @@ class Order extends Model
         ];
     }
 
+    protected ?OrderState $state = null;
+
     public static function booted()
     {
         static::addGlobalScope('user_orders', function (Builder $query) {
@@ -60,6 +64,34 @@ class Order extends Model
                 $query->where('user_id', Auth::id());
             }
         });
+    }
+
+    public function state(): OrderState
+    {
+        if (is_null($this->state)) {
+            $this->state = OrderStateFactory::from($this, $this->status);
+        }
+
+        return $this->state;
+    }
+
+    public function setState(OrderState $state): void
+    {
+        $this->state = $state;
+        $this->status = $state->status();
+    }
+
+    /**
+     * Domain actions
+     */
+    public function cancel(): void
+    {
+        $this->state()->cancel();
+    }
+
+    public function deliver(): void
+    {
+        $this->state()->deliver();
     }
 
     public function orderItems(): HasMany

@@ -30,3 +30,23 @@ export function getOrderVariant(status: string) {
 export function getPaymentVariant(status: string) {
     return paymentStatusVariants[status] ?? 'destructive';
 }
+
+export function formatCount(count: number): string {
+    const num = Number(count);
+    if (!Number.isFinite(num) || num < 0) return '0';
+
+    if (count >= 1_000_000) {
+        return (count / 1_000_000).toFixed(1).replace(/\.0$/, '') + 'M';
+    } else if (count >= 1_000) {
+        return (count / 1_000).toFixed(1).replace(/\.0$/, '') + 'K';
+    }
+
+    return count.toString();
+}
+
+export function formatRatingCount(count: number): string {
+    const num = Number(count);
+    const formatted = formatCount(num);
+    const label = count > 1 ? 'ratings' : 'rating';
+    return `${formatted} ${label}`;
+}

@@ -4,9 +4,11 @@ namespace App\Models;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
 
+use App\Enums\OrderStatus;
 use App\Enums\UserRole;
 use Filament\Models\Contracts\FilamentUser;
 use Filament\Panel;
+use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
@@ -15,7 +17,7 @@ use Illuminate\Notifications\Notifiable;
 use Laravel\Cashier\Billable;
 use Laravel\Fortify\TwoFactorAuthenticatable;
 
-class User extends Authenticatable implements FilamentUser
+class User extends Authenticatable implements FilamentUser, MustVerifyEmail
 {
     /** @use HasFactory<\Database\Factories\UserFactory> */
     use Billable, HasFactory, Notifiable, TwoFactorAuthenticatable;
@@ -81,6 +83,11 @@ class User extends Authenticatable implements FilamentUser
         return $this->belongsToMany(Product::class, 'user_wishlist');
     }
 
+    public function ratings(): HasMany
+    {
+        return $this->hasMany(ProductRating::class);
+    }
+
     public function hasDefaultAddress(): bool
     {
         return $this->addresses()->where('is_default', true)->exists();
@@ -94,5 +101,19 @@ class User extends Authenticatable implements FilamentUser
     public static function admin()
     {
         return static::query()->firstWhere('role', UserRole::ADMIN);
+    }
+
+    public function hasRated(Product $product): bool
+    {
+        return $this->ratings->contains('product_id', $product->id);
+    }
+
+    // check if user has ordered the product
+    public function hasOrdered(Product $product): bool
+    {
+        return $this->orders()
+            ->whereHas('orderItems', fn ($q) => $q->where('product_id', $product->id))
+            ->where('status', OrderStatus::DELIVERED)
+            ->exists();
     }
 }

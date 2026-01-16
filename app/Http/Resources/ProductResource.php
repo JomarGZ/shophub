@@ -16,15 +16,18 @@ class ProductResource extends JsonResource
     public function toArray(Request $request): array
     {
         return [
-            'id' => $this->id,
-            'name' => $this->name,
-            'slug' => $this->slug,
-            'price' => number_format($this->price, 2),
+            'id' => $this->whenHas('id', $this->id),
+            'name' => $this->whenHas('name', $this->name),
+            'slug' => $this->whenHas('slug', $this->slug),
+            'price' => $this->whenHas('price', number_format($this->price, 2)),
             'image_url' => $this->when($this->image_url, Storage::url($this->image_url), asset('images/defaults/product.png')),
+            'product_ratings' => ProductRatingResource::collection($this->whenLoaded('ratings')),
             'category' => CategoryResource::make($this->whenLoaded('category')),
-            'description' => $this->description,
-            'stock' => $this->stock,
-            'is_favorited' => $this->whenLoaded('wishlistedBy', fn () => $request->user() ? $this->wishListedBy->contains($request->user()->id) : false),
+            'description' => $this->whenHas('description', $this->description),
+            'stock' => $this->whenHas('stock', $this->stock),
+            'average_rating' => $this->whenHas('average_rating', $this->average_rating),
+            'ratings_count' => $this->whenHas('ratings_count', $this->ratings_count),
+            'is_favorited' => (bool) $this->is_favorited,
         ];
     }
 }

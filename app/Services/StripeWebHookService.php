@@ -4,7 +4,7 @@ namespace App\Services;
 
 use App\Enums\OrderStatus;
 use App\Enums\PaymentStatus;
-use App\Repositories\OrderRepository;
+use App\Repositories\Contracts\OrderRepositoryInterface;
 use App\Services\Payments\StripePaymentMapper;
 use Illuminate\Support\Facades\Log;
 
@@ -14,7 +14,7 @@ class StripeWebHookService
      * Create a new class instance.
      */
     public function __construct(
-        protected OrderRepository $orderRepository,
+        protected OrderRepositoryInterface $orderRepository,
         protected StockService $stockService,
         protected CartService $cartService,
         protected OrderService $orderService
@@ -34,7 +34,7 @@ class StripeWebHookService
             return;
         }
 
-        $order = $this->orderRepository->model()->find($orderId);
+        $order = $this->orderRepository->find($orderId);
 
         if (! $order) {
             Log::error('Order not found for stripe session', [
@@ -79,7 +79,7 @@ class StripeWebHookService
         if (! $orderId) {
             return;
         }
-        $order = $this->orderRepository->model()->where('transaction_id', $session['session_id']);
+        $order = $this->orderRepository->where('transaction_id', $session['session_id']);
         $order->update(['status' => OrderStatus::FAILED]);
         Log::warning('Order payment failed', ['order_id' => $order->id]);
     }
@@ -94,7 +94,7 @@ class StripeWebHookService
 
             return;
         }
-        $order = $this->orderRepository->model()->find($orderId);
+        $order = $this->orderRepository->find($orderId);
 
         if (! $order) {
             Log::error('Order not found for async payment', ['order_id' => $orderId]);

@@ -10,7 +10,7 @@ use App\Models\Address;
 use App\Models\Order;
 use App\Models\User;
 use App\Repositories\AddressRepository;
-use App\Repositories\OrderRepository;
+use App\Repositories\Contracts\OrderRepositoryInterface;
 use App\Services\Cart\CartCalculationService;
 use App\Services\Payments\PaymentProcessor;
 use Exception;
@@ -23,7 +23,7 @@ class OrderService
     public function __construct(
         protected CartCalculationService $cartCalcService,
         protected CartService $cartService,
-        protected OrderRepository $orderRepository,
+        protected OrderRepositoryInterface $orderRepository,
         protected AddressRepository $addressRepository,
         protected StockService $stockService
     ) {}
@@ -147,6 +147,20 @@ class OrderService
                 'error' => $e->getMessage(),
             ]);
         }
+
+    }
+
+    public function updateStatus(Order $order, OrderStatus $newStatus)
+    {
+        DB::transaction(function () use ($order, $newStatus) {
+            match ($newStatus) {
+                OrderStatus::CANCELLED => $order->cancel(),
+                OrderStatus::DELIVERED => $order->deliver(),
+                default => throw new \DomainException('Unsupported action')
+            };
+
+            $this->orderRepository->save($order);
+        });
 
     }
 }

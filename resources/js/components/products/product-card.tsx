@@ -1,8 +1,10 @@
 import { show } from '@/actions/App/Http/Controllers/ShopController';
+import { formatRatingCount } from '@/lib/utils';
 import { login } from '@/routes';
 import { Product, SharedData } from '@/types';
 import { Link, usePage } from '@inertiajs/react';
-import { Heart, ShoppingCart, Star } from 'lucide-react';
+import { Heart, ShoppingCart } from 'lucide-react';
+import { AverageRatingStars } from '../average-rating-stars';
 import { Badge } from '../ui/badge';
 import { Button } from '../ui/button';
 import { Card, CardContent, CardFooter } from '../ui/card';
@@ -22,7 +24,11 @@ export function ProductCard({
     loading,
 }: ProductCardProps) {
     const { auth } = usePage<SharedData>().props;
-
+    const rating = Number(product.average_rating ?? 0);
+    const averageRating = Number.isFinite(rating)
+        ? (Math.round(rating * 10) / 10).toFixed(1)
+        : '0.0';
+    const ratingsCount = Number(product.ratings_count ?? 0);
     return (
         <Card className="group hover:shadow-hover overflow-hidden border-border transition-all duration-300">
             <Link href={show({ slug: product.slug })}>
@@ -61,19 +67,29 @@ export function ProductCard({
                             {product.name}
                         </h3>
                     </Link>
-                    <Badge variant="secondary" className="shrink-0">
-                        {product.category.name}
-                    </Badge>
+                    {product.category?.name && (
+                        <Badge variant="secondary" className="shrink-0">
+                            {product.category?.name}
+                        </Badge>
+                    )}
                 </div>
 
                 <div className="flex items-center gap-1">
-                    <Star className="h-4 w-4 fill-primary text-primary" />
-                    <span className="text-sm font-medium text-foreground">
-                        {product.rating}
-                    </span>
-                    <span className="ml-1 text-sm text-muted-foreground">
-                        ({Math.floor(Math.random() * 100 + 20)} reviews)
-                    </span>
+                    <AverageRatingStars rating={rating} size="sm" />
+                    {ratingsCount > 0 ? (
+                        <>
+                            <span className="text-sm font-medium text-foreground">
+                                {averageRating}
+                            </span>
+                            <span className="ml-1 text-sm text-muted-foreground">
+                                {`(${formatRatingCount(ratingsCount)})`}
+                            </span>
+                        </>
+                    ) : (
+                        <span className="text-sm text-muted-foreground">
+                            No ratings yet
+                        </span>
+                    )}
                 </div>
 
                 <div className="flex items-center justify-between">
