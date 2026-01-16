@@ -15,6 +15,7 @@ export function FeaturedProducts({ featuredProducts }: FeatureProductsProps) {
         };
         addToCart(product, undefined, options);
     };
+    console.log(featuredProducts);
     return (
         <>
             <div className="mb-8 flex items-center justify-between">

@@ -35,7 +35,8 @@ class ProductRepository extends BaseRepository implements ProductRepositoryInter
             ->select($columns)
             ->with($relations)
             ->inStock()
-            ->orderByDesc('ratings_sum');
+            ->orderByDesc('average_rating')
+            ->inRandomOrder();
 
         return $query->take($limit)->get();
     }
@@ -43,7 +44,7 @@ class ProductRepository extends BaseRepository implements ProductRepositoryInter
     public function getRelatedProducts(int|string $catId, array|string $relation = [], array $columns = ['*'], int $limit = 8): Collection
     {
         $userId = request()->user()?->id;
-        $query = $this->model->query()->select($columns)->with($relation)->inRandomOrder()->inStock()->where('category_id', $catId);
+        $query = $this->model->query()->select($columns)->with($relation)->orderByDesc('average_rating')->inRandomOrder()->inStock()->where('category_id', $catId);
         $query = $this->addIsFavoritedCount($query, $userId);
 
         return $query->take($limit)->get();
@@ -52,7 +53,7 @@ class ProductRepository extends BaseRepository implements ProductRepositoryInter
     public function getPaginatedProducts(int $perPage = 15, array $columns = ['*'], ?array $filters = [], array|string $relations = []): LengthAwarePaginator
     {
         $userId = request()->user()?->id;
-        $query = $this->model->query()->with($relations)->filter($filters);
+        $query = $this->model->query()->orderByDesc('average_rating')->inRandomOrder()->with($relations)->filter($filters);
         $query = $this->addIsFavoritedCount($query, $userId);
 
         return $query->paginate($perPage, $columns)->withQueryString();

@@ -7,6 +7,7 @@ import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
 import { useAddToCart } from '@/hooks/use-add-to-cart';
 import AppLayout from '@/layouts/app-layout';
+import { formatRatingCount } from '@/lib/utils';
 import { index } from '@/routes/shop';
 import { BreadcrumbItem, Product, SharedData } from '@/types';
 import { Head, router, usePage } from '@inertiajs/react';
@@ -90,8 +91,7 @@ export default function Show({
                             </div>
                             {ratingsCount > 0 ? (
                                 <span className="text-sm text-muted-foreground">
-                                    {product.average_rating} (
-                                    {product.ratings_count} ratings)
+                                    {`(${formatRatingCount(ratingsCount)})`}
                                 </span>
                             ) : (
                                 <span className="text-sm text-muted-foreground">

@@ -25,7 +25,7 @@ class ShopController extends Controller
             'products' => fn () => ProductResource::collection(
                 $this->productRepository->getPaginatedProducts(
                     perPage: 12,
-                    columns: ['id', 'name', 'slug', 'price', 'image_url', 'category_id', 'description', 'stock'],
+                    columns: ['id', 'name', 'slug', 'price', 'image_url', 'category_id', 'description', 'stock', 'average_rating', 'ratings_count'],
                     relations: ['category:id,name'],
                     filters: Request::only('search', 'categories', 'min_price', 'max_price')
                 )

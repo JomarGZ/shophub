@@ -16,7 +16,7 @@ class HomeController extends Controller
             'featured_products' => fn () => ProductResource::collection(
                 $this->productRepository->getFeaturedProducts(
                     relations: ['category:id,name'],
-                    columns: ['id', 'name', 'slug', 'price', 'image_url', 'category_id', 'description', 'stock'],
+                    columns: ['id', 'name', 'slug', 'price', 'image_url', 'category_id', 'description', 'stock', 'ratings_count', 'average_rating'],
                 )
             ),
         ]);
