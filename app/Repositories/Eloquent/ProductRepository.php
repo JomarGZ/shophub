@@ -2,6 +2,7 @@
 
 namespace App\Repositories\Eloquent;
 
+use App\Models\Category;
 use App\Models\Product;
 use App\Repositories\BaseRepository;
 use App\Repositories\Interfaces\ProductRepositoryInterface;
@@ -35,8 +36,7 @@ class ProductRepository extends BaseRepository implements ProductRepositoryInter
             ->select($columns)
             ->with($relations)
             ->inStock()
-            ->orderByDesc('average_rating')
-            ->inRandomOrder();
+            ->orderByDesc('average_rating');
 
         return $query->take($limit)->get();
     }
@@ -53,16 +53,23 @@ class ProductRepository extends BaseRepository implements ProductRepositoryInter
     public function getPaginatedProducts(int $perPage = 15, array $columns = ['*'], ?array $filters = [], array|string $relations = []): LengthAwarePaginator
     {
         $userId = request()->user()?->id;
-        $query = $this->model->query()->orderByDesc('average_rating')->inRandomOrder()->with($relations)->filter($filters);
+        $query = $this->model->query()->orderByDesc('average_rating')->with($relations)->filter($filters);
         $query = $this->addIsFavoritedCount($query, $userId);
 
         return $query->paginate($perPage, $columns)->withQueryString();
     }
 
-    public function getPriceRange(): array
+    public function getPriceRange(array $filters = []): array
     {
-        $min = (float) $this->model->min('price') ?? 0;
-        $max = (float) $this->model->max('price') ?? 250;
+       
+        $range = $this->model
+            ->query()
+            ->where('stock', '>', 0)
+            ->filter($filters)
+            ->selectRaw('MIN(price) as min, max(price) as max')
+            ->first();
+        $min = (float) ($range->min ?? 0);
+        $max = (float) ($range->max ?? 250);
 
         return [
             'min' => floor($min / 10) * 10,
