@@ -22,6 +22,7 @@ export default function Show({
     product: Product;
     related_products: Product[];
 }) {
+    console.log(product);
     const { user } = usePage<SharedData>().props.auth;
     const { addToCart, loading } = useAddToCart();
     const breadcrumbs: BreadcrumbItem[] = [
@@ -34,7 +35,6 @@ export default function Show({
             href: '#',
         },
     ];
-    console.log('Product:', product);
     const [quantity, setQuantity] = useState(1);
     const [favoriteLoading, setFavoriteLoading] = useState(false);
 
@@ -49,9 +49,9 @@ export default function Show({
             WishlistToggleController(slug),
             {},
             {
-                only: ['product', 'flash'],
+                only: ['product'],
                 preserveScroll: true,
-                onSuccess: ({ props: { flash } }) => {
+                onSuccess: () => {
                     toast.success('Added to wishlist successfully!');
                 },
                 onStart: () => setFavoriteLoading(true),

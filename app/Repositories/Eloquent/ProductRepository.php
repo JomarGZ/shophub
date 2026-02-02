@@ -75,4 +75,36 @@ class ProductRepository extends BaseRepository implements ProductRepositoryInter
             'max' => ceil($max / 10) * 10,
         ];
     }
+
+    public function paginateWithWishlist(int $perPage, int $userId)
+    {
+        return $this->model
+            ->withExists([
+                'wishlistedBy as is_favorited' => fn ($q) =>
+                    $q->where('user_id', $userId)
+            ])
+            ->paginate($perPage);
+    }
+
+    public function paginateWishlistProducts(int $userId, int $perPage = 12)
+    {
+        return $this->model
+            ->whereHas('wishlistedBy', function ($q) use ($userId) {
+                $q->where('user_id', $userId);
+            })
+            ->withExists([
+                'wishlistedBy as is_favorited' => fn ($q) => $q->where('user_id', $userId)
+            ])
+            ->paginate($perPage);
+    }
+
+    public function findWithWishlistBySlug(string $slug, int $userId)
+    {
+        return $this->model
+            ->withExists([
+                'wishlistedBy as is_favorited' => fn ($q) => $q->where('user_id', $userId) 
+            ]) 
+            ->where('slug', $slug)
+            ->firstOrFail();
+    }
 }

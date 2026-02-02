@@ -31,7 +31,7 @@ export function ProductCard({
     const ratingsCount = Number(product.ratings_count ?? 0);
     return (
         <Card className="group hover:shadow-hover overflow-hidden border-border transition-all duration-300">
-            <Link href={show({ slug: product.slug })}>
+            <Link href={show(product.slug)}>
                 <div className="relative aspect-square overflow-hidden bg-muted">
                     <img
                         src={product.image_url}
@@ -62,7 +62,7 @@ export function ProductCard({
 
             <CardContent className="space-y-2 p-4">
                 <div className="flex items-start justify-between gap-2">
-                    <Link href={show({ slug: product.slug })}>
+                    <Link href={show(product.id)}>
                         <h3 className="line-clamp-2 font-semibold text-foreground transition-colors group-hover:text-primary">
                             {product.name}
                         </h3>

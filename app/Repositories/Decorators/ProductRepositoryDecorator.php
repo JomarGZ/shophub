@@ -83,4 +83,12 @@ abstract class ProductRepositoryDecorator implements ProductRepositoryInterface
     {
         return $this->repository->getPriceRange();
     }
+
+    public function paginateWithWishlist(int $perPage, int $userId)
+    {
+        $products = $this->repository
+            ->paginateWithWishlist($perPage, $userId);
+
+        return $products;
+    }
 }
