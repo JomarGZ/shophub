@@ -15,7 +15,7 @@ interface ProductRepositoryInterface extends RepositoryInterface
     ): Collection;
 
     public function getRelatedProducts(
-        int|string $categoryId,
+        int|string $catId,
         array|string $relations = [],
         array $columns = ['*'],
         int $limit = 8
