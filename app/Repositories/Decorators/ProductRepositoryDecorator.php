@@ -62,12 +62,12 @@ abstract class ProductRepositoryDecorator implements ProductRepositoryInterface
     }
 
     public function getRelatedProducts(
-        int|string $categoryId,
+        int|string $catId,
         array|string $relations = [],
         array $columns = ['*'],
         int $limit = 8
     ): Collection {
-        return $this->repository->getRelatedProducts($categoryId, $relations, $columns, $limit);
+        return $this->repository->getRelatedProducts($catId, $relations, $columns, $limit);
     }
 
     public function getPaginatedProducts(
