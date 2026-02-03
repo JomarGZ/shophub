@@ -22,7 +22,6 @@ export default function Show({
     product: Product;
     related_products: Product[];
 }) {
-    console.log(product);
     const { user } = usePage<SharedData>().props.auth;
     const { addToCart, loading } = useAddToCart();
     const breadcrumbs: BreadcrumbItem[] = [

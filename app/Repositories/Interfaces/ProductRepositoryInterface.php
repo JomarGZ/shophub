@@ -30,8 +30,9 @@ interface ProductRepositoryInterface extends RepositoryInterface
 
     public function getPriceRange(): array;
     
-    public function paginateWithWishlist(int $perPage, int $userId);
+    public function paginateWithWishlist(int $perPage, int $userId, array $columns = ['*']);
 
-    public function findWithWishlistBySlug(string $slug, int $userId);
-    public function paginateWishlistProducts(int $userId, int $perPage = 12);
+    public function findWithWishlistBySlug(string $slug, int $userId, array $columns = ['*']);
+
+    public function paginateWishlistProducts(int $userId, int $perPage = 12, array $columns = ['*'], array|string $relations = []): LengthAwarePaginator;
 }

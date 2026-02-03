@@ -16,7 +16,6 @@ interface WishlistIndexProps {
 }
 export default function Index({ wishlist_products }: WishlistIndexProps) {
     const { addToCart, loading } = useAddToCart();
-
     const [mainLoading, setMainLoading] = useState<boolean>(false);
     const removeItems = (slug: string) => {
         if (mainLoading) return;

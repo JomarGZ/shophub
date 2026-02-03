@@ -76,9 +76,11 @@ class ProductRepository extends BaseRepository implements ProductRepositoryInter
         ];
     }
 
-    public function paginateWithWishlist(int $perPage, int $userId)
+    public function paginateWithWishlist(int $perPage, int $userId, array $columns = ['*'], array|string $relations = [])
     {
         return $this->model
+            ->select($columns)
+            ->with($relations)
             ->withExists([
                 'wishlistedBy as is_favorited' => fn ($q) =>
                     $q->where('user_id', $userId)
@@ -86,9 +88,11 @@ class ProductRepository extends BaseRepository implements ProductRepositoryInter
             ->paginate($perPage);
     }
 
-    public function paginateWishlistProducts(int $userId, int $perPage = 12)
+    public function paginateWishlistProducts(int $userId, int $perPage = 12, array $columns = ['*'], array|string $relations = []): LengthAwarePaginator
     {
         return $this->model
+            ->select($columns)
+            ->with($relations)
             ->whereHas('wishlistedBy', function ($q) use ($userId) {
                 $q->where('user_id', $userId);
             })
@@ -98,9 +102,10 @@ class ProductRepository extends BaseRepository implements ProductRepositoryInter
             ->paginate($perPage);
     }
 
-    public function findWithWishlistBySlug(string $slug, int $userId)
+    public function findWithWishlistBySlug(string $slug, int $userId, array $columns = ['*'])
     {
         return $this->model
+            ->select($columns)
             ->withExists([
                 'wishlistedBy as is_favorited' => fn ($q) => $q->where('user_id', $userId) 
             ]) 

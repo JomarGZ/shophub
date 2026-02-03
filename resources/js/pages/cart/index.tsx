@@ -184,7 +184,7 @@ export default function Index({
                                                               {
                                                                   product
                                                                       .category
-                                                                      .name
+                                                                      ?.name
                                                               }
                                                           </p>
                                                           <p className="text-sm text-muted-foreground">
