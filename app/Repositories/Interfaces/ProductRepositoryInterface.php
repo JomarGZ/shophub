@@ -9,6 +9,7 @@ use Illuminate\Database\Eloquent\Collection;
 interface ProductRepositoryInterface extends RepositoryInterface
 {
     public function getFeaturedProducts(
+        int $userId,
         array|string $relations = [],
         array $columns = ['*'],
         int $limit = 8
@@ -21,16 +22,9 @@ interface ProductRepositoryInterface extends RepositoryInterface
         int $limit = 8
     ): Collection;
 
-    public function getPaginatedProducts(
-        int $perPage = 15,
-        array $columns = ['*'],
-        ?array $filters = [],
-        array|string $relations = []
-    ): LengthAwarePaginator;
-
     public function getPriceRange(): array;
     
-    public function paginateWithWishlist(int $perPage, int $userId, array $columns = ['*']);
+    public function paginateWithWishlist(int $perPage, int $userId, array $columns = ['*'], array|string $relations = []): LengthAwarePaginator;
 
     public function findWithWishlistBySlug(string $slug, int $userId, array $columns = ['*']);
 

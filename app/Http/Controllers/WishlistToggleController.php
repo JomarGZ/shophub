@@ -19,10 +19,7 @@ class WishlistToggleController extends Controller
         WishlistService $wishlistService
     )
     {
-        $wishlistService->toggle(
-            auth()->id(),
-            $product->id
-        );
+        $wishlistService->toggle(auth()->id(),$product->id);
         return redirect()->back();
     }
 }
