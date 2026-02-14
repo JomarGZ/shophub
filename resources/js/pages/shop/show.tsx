@@ -79,7 +79,7 @@ export default function Show({
                         <Badge variant="secondary" className="mb-3">
                             {product.category?.name}
                         </Badge>
-                        <h1 className="mb-4 text-4xl font-bold text-foreground">
+                        <h1 className="mb-4 text-2xl font-bold text-foreground sm:text-3xl md:text-4xl lg:text-5xl">
                             {product.name}
                         </h1>
                         <div className="mb-4 flex items-center gap-4">

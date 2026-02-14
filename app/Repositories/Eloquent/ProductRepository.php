@@ -18,7 +18,7 @@ class ProductRepository extends BaseRepository implements ProductRepositoryInter
         parent::__construct($model);
     }
 
-    public function getFeaturedProducts(int $userId, array|string $relations = [], array $columns = ['*'], int $limit = 8): Collection
+    public function getFeaturedProducts(?int $userId = null, array|string $relations = [], array $columns = ['*'], int $limit = 8): Collection
     {
         $query = $this->model->query()
             ->select($columns)
@@ -55,7 +55,7 @@ class ProductRepository extends BaseRepository implements ProductRepositoryInter
         ];
     }
 
-    public function paginateWithWishlist(int $perPage, int $userId, array $columns = ['*'], array|string $relations = []): LengthAwarePaginator
+    public function paginateWithWishlist(int $perPage, ?int $userId = null, array $columns = ['*'], array|string $relations = []): LengthAwarePaginator
     {
         return $this->model
             ->select($columns)
@@ -64,7 +64,7 @@ class ProductRepository extends BaseRepository implements ProductRepositoryInter
             ->paginate($perPage);
     }
 
-    public function paginateWishlistProducts(int $userId, int $perPage = 12, array $columns = ['*'], array|string $relations = []): LengthAwarePaginator
+    public function paginateWishlistProducts(?int $userId = null, int $perPage = 12, array $columns = ['*'], array|string $relations = []): LengthAwarePaginator
     {
         return $this->model
             ->select($columns)
@@ -74,13 +74,11 @@ class ProductRepository extends BaseRepository implements ProductRepositoryInter
             ->paginate($perPage);
     }
 
-    public function findWithWishlistBySlug(string $slug, int $userId, array $columns = ['*'])
+    public function findWithWishlistBySlug(string $slug, ?int $userId = null, array $columns = ['*'])
     {
         return $this->model
             ->select($columns)
-            ->withExists([
-                'wishlistedBy as is_favorited' => fn ($q) => $q->where('user_id', $userId) 
-            ]) 
+            ->withWishlistFlag($userId)
             ->where('slug', $slug)
             ->firstOrFail();
     }

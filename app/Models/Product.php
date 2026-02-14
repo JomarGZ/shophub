@@ -12,6 +12,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 use Spatie\Sluggable\HasSlug;
 use Spatie\Sluggable\SlugOptions;
@@ -108,8 +109,11 @@ class Product extends Model
     }
 
     #[Scope]
-    protected function withWishlistFlag(Builder $query, int $userId): Builder
+    protected function withWishlistFlag(Builder $query, ?int $userId): Builder
     {
+        if (!$userId) {
+            return $query->addSelect(DB::raw('0 as is_favorited'));
+        }
         return $query->withExists([
             'wishlistedBy as is_favorited' => fn ($q) => $q->where('user_id', $userId)
         ]);

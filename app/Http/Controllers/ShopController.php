@@ -25,7 +25,7 @@ class ShopController extends Controller
                 Request::only('search', 'categories')
             ),
             'products' => fn () => ProductResource::collection(
-                $this->productRepository->paginateWithWishlist(12, auth()->id()),
+                $this->productRepository->paginateWithWishlist(12, request()->user()?->id),
             ),
             'categories' => fn () => CategoryResource::collection($this->categoryRepository->getOnlyWithProducts()),
             'focus' => Request::get('focus'),
@@ -34,7 +34,7 @@ class ShopController extends Controller
 
     public function show(string $slug)
     {
-        $product = $this->productRepository->findWithWishlistBySlug($slug, auth()->id());
+        $product = $this->productRepository->findWithWishlistBySlug($slug, request()->user()?->id);
         return Inertia::render('shop/show', [
             'product' => ProductResource::make($product->load(['category:id,name'])),
             'related_products' => ProductResource::collection($this->productRepository->getRelatedProducts(
