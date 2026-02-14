@@ -34,7 +34,7 @@ import { index } from '@/routes/shop';
 import wishlist from '@/routes/wishlist';
 import { type BreadcrumbItem, type NavItem, type SharedData } from '@/types';
 import { Link, usePage } from '@inertiajs/react';
-import { Menu, Search, User } from 'lucide-react';
+import { Menu, User } from 'lucide-react';
 import AppLogo from './app-logo';
 import AppLogoIcon from './app-logo-icon';
 import { AuthMenuContent } from './auth-menu-content';
@@ -198,15 +198,6 @@ export function AppHeader({ breadcrumbs = [] }: AppHeaderProps) {
 
                     <div className="ml-auto flex items-center space-x-2">
                         <div className="relative flex items-center space-x-1">
-                            <Link href={index({ query: { focus: 'search' } })}>
-                                <Button
-                                    variant="ghost"
-                                    size="icon"
-                                    className="group h-9 w-9 cursor-pointer"
-                                >
-                                    <Search className="!size-5 opacity-80 group-hover:opacity-100" />
-                                </Button>
-                            </Link>
                             <div className="hidden lg:flex">
                                 {rightNavItems.map((item) => (
                                     <TooltipProvider

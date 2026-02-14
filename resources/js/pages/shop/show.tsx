@@ -34,7 +34,6 @@ export default function Show({
             href: '#',
         },
     ];
-    console.log('Product:', product);
     const [quantity, setQuantity] = useState(1);
     const [favoriteLoading, setFavoriteLoading] = useState(false);
 
@@ -49,9 +48,9 @@ export default function Show({
             WishlistToggleController(slug),
             {},
             {
-                only: ['product', 'flash'],
+                only: ['product'],
                 preserveScroll: true,
-                onSuccess: ({ props: { flash } }) => {
+                onSuccess: () => {
                     toast.success('Added to wishlist successfully!');
                 },
                 onStart: () => setFavoriteLoading(true),
@@ -80,7 +79,7 @@ export default function Show({
                         <Badge variant="secondary" className="mb-3">
                             {product.category?.name}
                         </Badge>
-                        <h1 className="mb-4 text-4xl font-bold text-foreground">
+                        <h1 className="mb-4 text-2xl font-bold text-foreground sm:text-3xl md:text-4xl lg:text-5xl">
                             {product.name}
                         </h1>
                         <div className="mb-4 flex items-center gap-4">

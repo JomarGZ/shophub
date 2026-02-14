@@ -14,15 +14,12 @@ class WishlistToggleController extends Controller
     /**
      * Handle the incoming request.
      */
-    public function __invoke(Request $request, Product $product)
+    public function __invoke(
+        Product $product,
+        WishlistService $wishlistService
+    )
     {
-        $user = $request->user();
-
-        $favorite = app(WishlistService::class)->toggle($user, $product);
-        $message = ! empty($favorite['attached'])
-            ? 'Product added to wishlist.'
-            : 'Product removed from wishlist.';
-
-        return redirect()->back()->with('success', $message);
+        $wishlistService->toggle(auth()->id(),$product->id);
+        return redirect()->back();
     }
 }

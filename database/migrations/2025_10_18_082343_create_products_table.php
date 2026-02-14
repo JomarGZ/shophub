@@ -21,7 +21,15 @@ return new class extends Migration
             $table->decimal('price', 10, 2);
             $table->unsignedBigInteger('stock')->default(0);
             $table->string('image_url')->nullable();
+
+            $table->unsignedBigInteger('ratings_count')->default(0);
+            $table->unsignedBigInteger('ratings_sum')->default(0);
+            $table->decimal('average_rating', 3, 2)->default(0);
+        
             $table->timestamps();
+
+            $table->index('ratings_count');
+            $table->index('average_rating');
         });
     }
 

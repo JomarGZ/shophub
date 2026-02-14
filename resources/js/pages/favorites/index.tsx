@@ -1,7 +1,7 @@
 import WishlistToggleController from '@/actions/App/Http/Controllers/WishlistToggleController';
 import { Container } from '@/components/container';
+import { Pagination } from '@/components/pagination';
 import { ProductCard } from '@/components/products/product-card';
-import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { useAddToCart } from '@/hooks/use-add-to-cart';
 import AppLayout from '@/layouts/app-layout';
@@ -16,19 +16,7 @@ interface WishlistIndexProps {
 }
 export default function Index({ wishlist_products }: WishlistIndexProps) {
     const { addToCart, loading } = useAddToCart();
-
     const [mainLoading, setMainLoading] = useState<boolean>(false);
-    const loadMore = () => {
-        if (mainLoading) return;
-        router.reload({
-            only: ['wishlist_products'],
-            data: {
-                page: wishlist_products.meta.current_page + 1,
-            },
-            onStart: () => setMainLoading(true),
-            onFinish: () => setMainLoading(false),
-        });
-    };
     const removeItems = (slug: string) => {
         if (mainLoading) return;
         router.post(
@@ -185,17 +173,9 @@ export default function Index({ wishlist_products }: WishlistIndexProps) {
                                 ))}
                             </div>
                             <div className="flex justify-center pt-6">
-                                {wishlist_products.links.next && (
-                                    <Button
-                                        variant="outline"
-                                        size="lg"
-                                        onClick={loadMore}
-                                        disabled={mainLoading}
-                                        className="min-w-[200px] cursor-pointer"
-                                    >
-                                        Load More Orders
-                                    </Button>
-                                )}
+                                <Pagination
+                                    links={wishlist_products.meta.links}
+                                />
                             </div>
                         </>
                     )}

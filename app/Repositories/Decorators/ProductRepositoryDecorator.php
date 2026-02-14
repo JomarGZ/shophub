@@ -54,11 +54,12 @@ abstract class ProductRepositoryDecorator implements ProductRepositoryInterface
     }
 
     public function getFeaturedProducts(
+        int $userId,
         array|string $relations = [],
         array $columns = ['*'],
         int $limit = 8,
     ): Collection {
-        return $this->repository->getFeaturedProducts($relations, $columns, $limit);
+        return $this->repository->getFeaturedProducts($userId, $relations, $columns, $limit);
     }
 
     public function getRelatedProducts(
@@ -70,17 +71,26 @@ abstract class ProductRepositoryDecorator implements ProductRepositoryInterface
         return $this->repository->getRelatedProducts($catId, $relations, $columns, $limit);
     }
 
-    public function getPaginatedProducts(
-        int $perPage = 15,
-        array $columns = ['*'],
-        ?array $filters = [],
-        array|string $relations = []
-    ): LengthAwarePaginator {
-        return $this->repository->getPaginatedProducts($perPage, $columns, $filters, $relations);
-    }
-
     public function getPriceRange(): array
     {
         return $this->repository->getPriceRange();
+    }
+
+    public function paginateWithWishlist(int $perPage, int $userId, array $columns = ['*'], array|string $relations = []): LengthAwarePaginator
+    {
+        $products = $this->repository
+            ->paginateWithWishlist($perPage, $userId, $columns, $relations);
+
+        return $products;
+    }
+
+    public function findWithWishlistBySlug(string $slug, int $userId, array $columns = ['*'])
+    {
+        return $this->repository->findWithWishlistBySlug($slug, $userId, $columns);
+    }
+
+    public function paginateWishlistProducts(int $userId, int $perPage = 12, array $columns = ['*'], array|string $relations = []): LengthAwarePaginator
+    {
+        return $this->repository->paginateWishlistProducts($userId, $perPage, $columns, $relations);
     }
 }

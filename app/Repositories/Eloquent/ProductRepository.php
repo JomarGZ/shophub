@@ -18,22 +18,12 @@ class ProductRepository extends BaseRepository implements ProductRepositoryInter
         parent::__construct($model);
     }
 
-    private function addIsFavoritedCount($query, ?int $userId = null)
-    {
-        if ($userId) {
-            return $query->withCount([
-                'wishlistedBy as is_favorited' => fn ($q) => $q->where('user_id', $userId),
-            ]);
-        }
-
-        return $query;
-    }
-
-    public function getFeaturedProducts(array|string $relations = [], array $columns = ['*'], int $limit = 8): Collection
+    public function getFeaturedProducts(?int $userId = null, array|string $relations = [], array $columns = ['*'], int $limit = 8): Collection
     {
         $query = $this->model->query()
             ->select($columns)
             ->with($relations)
+            ->withWishlistFlag($userId)
             ->inStock()
             ->orderByDesc('average_rating');
 
@@ -43,19 +33,8 @@ class ProductRepository extends BaseRepository implements ProductRepositoryInter
     public function getRelatedProducts(int|string $catId, array|string $relation = [], array $columns = ['*'], int $limit = 8): Collection
     {
         $userId = request()->user()?->id;
-        $query = $this->model->query()->select($columns)->with($relation)->orderByDesc('average_rating')->inRandomOrder()->inStock()->where('category_id', $catId);
-        $query = $this->addIsFavoritedCount($query, $userId);
-
+        $query = $this->model->query()->select($columns)->with($relation)->orderByDesc('average_rating')->withWishlistFlag($userId)->inStock()->where('category_id', $catId);
         return $query->take($limit)->get();
-    }
-
-    public function getPaginatedProducts(int $perPage = 15, array $columns = ['*'], ?array $filters = [], array|string $relations = []): LengthAwarePaginator
-    {
-        $userId = request()->user()?->id;
-        $query = $this->model->query()->orderByDesc('average_rating')->with($relations)->filter($filters);
-        $query = $this->addIsFavoritedCount($query, $userId);
-
-        return $query->paginate($perPage, $columns)->withQueryString();
     }
 
     public function getPriceRange(array $filters = []): array
@@ -74,5 +53,33 @@ class ProductRepository extends BaseRepository implements ProductRepositoryInter
             'min' => floor($min / 10) * 10,
             'max' => ceil($max / 10) * 10,
         ];
+    }
+
+    public function paginateWithWishlist(int $perPage, ?int $userId = null, array $columns = ['*'], array|string $relations = []): LengthAwarePaginator
+    {
+        return $this->model
+            ->select($columns)
+            ->with($relations)
+            ->withWishlistFlag($userId)
+            ->paginate($perPage);
+    }
+
+    public function paginateWishlistProducts(?int $userId = null, int $perPage = 12, array $columns = ['*'], array|string $relations = []): LengthAwarePaginator
+    {
+        return $this->model
+            ->select($columns)
+            ->with($relations)
+            ->wishlistedByUser($userId)
+            ->withWishlistFlag($userId)
+            ->paginate($perPage);
+    }
+
+    public function findWithWishlistBySlug(string $slug, ?int $userId = null, array $columns = ['*'])
+    {
+        return $this->model
+            ->select($columns)
+            ->withWishlistFlag($userId)
+            ->where('slug', $slug)
+            ->firstOrFail();
     }
 }

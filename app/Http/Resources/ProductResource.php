@@ -27,7 +27,7 @@ class ProductResource extends JsonResource
             'stock' => $this->whenHas('stock', $this->stock),
             'average_rating' => $this->whenHas('average_rating', $this->average_rating),
             'ratings_count' => $this->whenHas('ratings_count', $this->ratings_count),
-            'is_favorited' => (bool) $this->is_favorited,
+            'is_favorited' => (bool) ($this->is_favorited ?? false),
         ];
     }
 }
