@@ -15,7 +15,7 @@ class WishlistRepository extends BaseRepository implements WishlistRepositoryInt
     {
         parent::__construct($model);
     }
-    
+
     public function exists(int $userId, int $productId): bool
     {
         return $this->model
@@ -24,7 +24,7 @@ class WishlistRepository extends BaseRepository implements WishlistRepositoryInt
             ->exists();
     }
 
-     public function create(array $data): Wishlist
+    public function create(array $data): Wishlist
     {
         return $this->model->create($data);
     }

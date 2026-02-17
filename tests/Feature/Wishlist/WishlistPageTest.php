@@ -16,8 +16,7 @@ it('shows favorited products in wishlist page', function () {
 
     $this->actingAs($user)
         ->get(route('wishlist.index'))
-        ->assertInertia(fn ($page) =>
-            $page->component('favorites/index')
-                ->where('wishlist_products.data.0.id', $product->id)
+        ->assertInertia(fn ($page) => $page->component('favorites/index')
+            ->where('wishlist_products.data.0.id', $product->id)
         );
 });

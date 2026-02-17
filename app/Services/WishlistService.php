@@ -8,7 +8,7 @@ use App\Repositories\Contracts\WishlistRepositoryInterface;
 
 class WishlistService
 {
-     public function __construct(
+    public function __construct(
         private WishlistRepositoryInterface $wishlistRepository
     ) {}
     // public function toggle(User $user, Product $product)
@@ -28,11 +28,12 @@ class WishlistService
 
         $this->wishlistRepository->create([
             'user_id' => $userId,
-            'product_id' => $productId
+            'product_id' => $productId,
         ]);
 
         return true;
     }
+
     public function getSimplePaginatedWishlistProducts(User $user, $perPage = 15, array $columns = ['*'], array|string $relations = [])
     {
         return $user->wishlist()->with($relations)->simplePaginate($perPage, $columns)->withQueryString();
