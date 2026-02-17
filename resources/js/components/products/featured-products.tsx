@@ -23,7 +23,7 @@ export function FeaturedProducts({ featuredProducts }: FeatureProductsProps) {
                     Featured Products
                 </h2>
                 <Link href="/shop">
-                    <Button variant="outline">
+                    <Button variant="outline" className="cursor-pointer">
                         View All <ArrowRight className="ml-2 h-4 w-4" />
                     </Button>
                 </Link>

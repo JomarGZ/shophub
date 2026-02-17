@@ -20,12 +20,14 @@ export function useAddToCart() {
                 quantity: quantity,
             },
             {
-                onSuccess: () =>
-                    toast.success(`${product.name} added to cart!`),
+                onSuccess: ({ props }) => {
+                    if (props.flash?.success) {
+                        toast.success(`${product.name} added to cart!`);
+                    }
+                },
                 onError: () => toast.error('Failed to add to cart'),
                 onFinish: () => setLoading(false),
                 preserveScroll: true,
-                only: ['cart_items'],
                 ...extraOptions,
             },
         );

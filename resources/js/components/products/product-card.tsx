@@ -1,6 +1,5 @@
 import { show } from '@/actions/App/Http/Controllers/ShopController';
 import { formatRatingCount } from '@/lib/utils';
-import { login } from '@/routes';
 import { Product, SharedData } from '@/types';
 import { Link, usePage } from '@inertiajs/react';
 import { Heart, ShoppingCart } from 'lucide-react';
@@ -19,7 +18,6 @@ interface ProductCardProps {
 export function ProductCard({
     product,
     onAddToCart,
-    toggleFavorite,
     isFavorite,
     loading,
 }: ProductCardProps) {
@@ -38,25 +36,11 @@ export function ProductCard({
                         alt={product.name}
                         className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-110"
                     />
-                    <Button
-                        onClick={(e) => {
-                            e.preventDefault();
-                            e.stopPropagation();
-                            toggleFavorite?.(product);
-                        }}
-                        disabled={!auth.user || loading}
-                        variant="ghost"
-                        size="icon"
-                        className="absolute top-2 right-2 cursor-pointer bg-background/80 backdrop-blur-sm transition-all hover:bg-background"
-                    >
-                        <Heart
-                            className={`h-5 w-5 transition-all ${
-                                isFavorite
-                                    ? 'fill-red-500 text-red-500'
-                                    : 'text-muted-foreground hover:text-red-500'
-                            }`}
-                        />
-                    </Button>
+                    {isFavorite && (
+                        <div className="absolute top-2 right-2">
+                            <Heart className="h-5 w-5 fill-red-500 text-red-500 transition-all" />
+                        </div>
+                    )}
                 </div>
             </Link>
 
@@ -103,24 +87,16 @@ export function ProductCard({
             </CardContent>
 
             <CardFooter className="p-4 pt-0">
-                {auth.user ? (
-                    <Button
-                        onClick={() => onAddToCart?.(product)}
-                        disabled={Number(product.stock) === 0 || loading}
-                        className={`w-full cursor-pointer ${Number(product.stock) === 0 ? 'bg-primary/60' : 'bg-primary'} text-primary-foreground hover:bg-primary/90`}
-                    >
-                        <ShoppingCart className="mr-2 h-4 w-4" />
-                        {Number(product.stock) === 0
-                            ? 'Out of Stock'
-                            : 'Add to Cart'}
-                    </Button>
-                ) : (
-                    <Link href={login()} className="w-full">
-                        <Button className="w-full cursor-pointer bg-secondary/70">
-                            Login to Add to Cart
-                        </Button>
-                    </Link>
-                )}
+                <Button
+                    onClick={() => onAddToCart?.(product)}
+                    disabled={Number(product.stock) === 0 || loading}
+                    className={`w-full cursor-pointer ${Number(product.stock) === 0 ? 'bg-primary/60' : 'bg-primary'} text-primary-foreground hover:bg-primary/90`}
+                >
+                    <ShoppingCart className="mr-2 h-4 w-4" />
+                    {Number(product.stock) === 0
+                        ? 'Out of Stock'
+                        : 'Add to Cart'}
+                </Button>
             </CardFooter>
         </Card>
     );
