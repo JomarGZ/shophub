@@ -41,10 +41,6 @@ import { AuthMenuContent } from './auth-menu-content';
 
 const mainNavItems: NavItem[] = [
     {
-        title: 'Home',
-        href: home(),
-    },
-    {
         title: 'Shop',
         href: index(),
     },

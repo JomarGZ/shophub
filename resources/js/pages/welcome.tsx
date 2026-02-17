@@ -16,10 +16,10 @@ const breadcrumbs: BreadcrumbItem[] = [
 interface HomeProps {
     featured_products: any[];
 }
-export default function Home({ featured_products }: HomeProps) {
+export default function Welcome({ featured_products }: HomeProps) {
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
-            <Head title="Home" />
+            <Head title="Welcome to ShopHub" />
             {/* Hero Section */}
             <Container
                 as="section"
