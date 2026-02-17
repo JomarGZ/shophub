@@ -111,16 +111,18 @@ class Product extends Model
     #[Scope]
     protected function withWishlistFlag(Builder $query, ?int $userId): Builder
     {
-        if (!$userId) {
+        if (! $userId) {
             return $query->addSelect(DB::raw('0 as is_favorited'));
         }
+
         return $query->withExists([
-            'wishlistedBy as is_favorited' => fn ($q) => $q->where('user_id', $userId)
+            'wishlistedBy as is_favorited' => fn ($q) => $q->where('user_id', $userId),
         ]);
     }
+
     #[Scope]
     protected function wishlistedByUser(Builder $query, int $userId): Builder
-    {   
+    {
         return $query->whereHas('wishlistedBy', fn ($q) => $q->where('user_id', $userId));
     }
 

@@ -33,5 +33,4 @@ class CachedProductRepository extends ProductRepositoryDecorator
 
         return $products;
     }
-
 }

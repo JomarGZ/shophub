@@ -25,7 +25,7 @@ return new class extends Migration
             $table->unsignedBigInteger('ratings_count')->default(0);
             $table->unsignedBigInteger('ratings_sum')->default(0);
             $table->decimal('average_rating', 3, 2)->default(0);
-        
+
             $table->timestamps();
 
             $table->index('ratings_count');

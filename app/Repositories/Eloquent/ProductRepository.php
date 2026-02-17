@@ -34,12 +34,13 @@ class ProductRepository extends BaseRepository implements ProductRepositoryInter
     {
         $userId = request()->user()?->id;
         $query = $this->model->query()->select($columns)->with($relation)->orderByDesc('average_rating')->withWishlistFlag($userId)->inStock()->where('category_id', $catId);
+
         return $query->take($limit)->get();
     }
 
     public function getPriceRange(array $filters = []): array
     {
-       
+
         $range = $this->model
             ->query()
             ->where('stock', '>', 0)

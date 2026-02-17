@@ -46,7 +46,8 @@ class CartController extends Controller
 
         $this->cartService->addItem(request()->user(), $product, quantity: $request->validated('quantity'));
 
-        return redirect()->back()->with('success', 'Product added to cart successfully!');
+        return redirect()->back()->with('success', "{$product->name} added to cart successfully!");
+
     }
 
     public function update(ValidationRequest $request, CartItem $cartItem)

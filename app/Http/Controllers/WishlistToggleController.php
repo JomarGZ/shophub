@@ -17,9 +17,9 @@ class WishlistToggleController extends Controller
     public function __invoke(
         Product $product,
         WishlistService $wishlistService
-    )
-    {
-        $wishlistService->toggle(auth()->id(),$product->id);
+    ) {
+        $wishlistService->toggle(auth()->id(), $product->id);
+
         return redirect()->back();
     }
 }

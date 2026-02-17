@@ -4,7 +4,6 @@ namespace App\Http\Controllers;
 
 use App\Http\Resources\CategoryResource;
 use App\Http\Resources\ProductResource;
-use App\Models\Product;
 use App\Repositories\CategoryRepository;
 use App\Repositories\Interfaces\ProductRepositoryInterface;
 use Illuminate\Support\Facades\Request;
@@ -35,6 +34,7 @@ class ShopController extends Controller
     public function show(string $slug)
     {
         $product = $this->productRepository->findWithWishlistBySlug($slug, request()->user()?->id);
+
         return Inertia::render('shop/show', [
             'product' => ProductResource::make($product->load(['category:id,name'])),
             'related_products' => ProductResource::collection($this->productRepository->getRelatedProducts(

@@ -23,7 +23,7 @@ interface ProductRepositoryInterface extends RepositoryInterface
     ): Collection;
 
     public function getPriceRange(): array;
-    
+
     public function paginateWithWishlist(int $perPage, int $userId, array $columns = ['*'], array|string $relations = []): LengthAwarePaginator;
 
     public function findWithWishlistBySlug(string $slug, int $userId, array $columns = ['*']);
