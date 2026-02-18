@@ -1,6 +1,6 @@
 import { cn } from '@/lib/utils';
 import { RefreshCw, Shield, ShoppingBag, Truck } from 'lucide-react';
-import { Container } from '../../container';
+import { Container } from '../container';
 
 export function Features({ className }: { className?: string }) {
     return (

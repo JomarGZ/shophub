@@ -24,7 +24,13 @@ class ShopController extends Controller
                 Request::only('search', 'categories')
             ),
             'products' => fn () => ProductResource::collection(
-                $this->productRepository->paginateWithWishlist(12, request()->user()?->id),
+                $this->productRepository->paginateWithWishlist(
+                    perPage: 12, 
+                    userId: request()->user()?->id, 
+                    relations: ['category:id,name'],
+                    columns: ['id', 'category_id', 'name', 'description', 'price', 'stock', 'ratings_count', 'ratings_sum', 'image_url', 'average_rating', 'slug'],
+                    filters: Request::only('search', 'categories')
+                ),
             ),
             'categories' => fn () => CategoryResource::collection($this->categoryRepository->getOnlyWithProducts()),
             'focus' => Request::get('focus'),

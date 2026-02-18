@@ -56,10 +56,11 @@ class ProductRepository extends BaseRepository implements ProductRepositoryInter
         ];
     }
 
-    public function paginateWithWishlist(int $perPage, ?int $userId = null, array $columns = ['*'], array|string $relations = []): LengthAwarePaginator
+    public function paginateWithWishlist(int $perPage, ?int $userId = null, array $columns = ['*'], array|string $relations = [], array $filters = []): LengthAwarePaginator
     {
         return $this->model
             ->select($columns)
+            ->filter($filters)
             ->with($relations)
             ->withWishlistFlag($userId)
             ->paginate($perPage);
