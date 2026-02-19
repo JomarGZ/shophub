@@ -25,12 +25,24 @@ class ShopController extends Controller
             'price_range' => fn () => $this->productRepository->getPriceRange(Request::only('search', 'categories')),
             'products' => fn () => ProductResource::collection(
                 $this->productRepository->paginateWithWishlist(
-                    perPage: 5,
+                    perPage: 9,
                     userId: request()->user()?->id,
                     relations: ['category:id,name'],
-                    columns: ['id', 'category_id', 'name', 'description', 'price', 'stock', 'ratings_count', 'ratings_sum', 'image_url', 'average_rating', 'slug'],
+                    columns: [
+                        'id',
+                        'category_id',
+                        'name',
+                        'description',
+                        'price',
+                        'stock',
+                        'ratings_count',
+                        'ratings_sum',
+                        'image_url',
+                        'average_rating',
+                        'slug',
+                    ],
                     filters: $filters
-                ),
+                )
             ),
             'categories' => fn () => CategoryResource::collection($this->categoryRepository->getOnlyWithProducts()),
             'focus' => Request::get('focus'),

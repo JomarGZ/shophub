@@ -12,6 +12,7 @@ import pickBy from 'lodash.pickby';
 import { useEffect, useState } from 'react';
 import { usePrevious } from 'react-use';
 import { useDebounce } from 'use-debounce';
+
 type ShopPageProps = {
     products: PaginatedResponse<Product>;
     categories: Category[];
@@ -19,12 +20,12 @@ type ShopPageProps = {
     filters: ShopFilters;
     focus?: string;
 };
+
 export default function Index() {
     const { addToCart, loading } = useAddToCart();
 
     const { products, categories, price_range, filters } =
         usePage<ShopPageProps>().props;
-
     const [values, setValues] = useState({
         search: filters.search || '',
         categories: filters.categories || [],
