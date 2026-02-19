@@ -63,7 +63,8 @@ class ProductRepository extends BaseRepository implements ProductRepositoryInter
             ->filter($filters)
             ->with($relations)
             ->withWishlistFlag($userId)
-            ->paginate($perPage);
+            ->paginate($perPage)
+            ->appends($filters);
     }
 
     public function paginateWishlistProducts(?int $userId = null, int $perPage = 12, array $columns = ['*'], array|string $relations = []): LengthAwarePaginator

@@ -28,8 +28,8 @@ export default function Index() {
     const [values, setValues] = useState({
         search: filters.search || '',
         categories: filters.categories || [],
-        min_price: price_range.min,
-        max_price: price_range.max,
+        min_price: filters.min_price || price_range.min,
+        max_price: filters.max_price || price_range.max,
     });
 
     const handleFilterChange = (
