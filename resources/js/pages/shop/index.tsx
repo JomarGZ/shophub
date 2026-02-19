@@ -2,14 +2,16 @@ import { Container } from '@/components/container';
 import { ShopFiltersSidebar } from '@/components/shop/ShopFiltersSidebar';
 import { ShopProductGrid } from '@/components/shop/ShopProductGrid';
 import { ShopSearchBar } from '@/components/shop/ShopSearchBar';
-import { useShopFilters } from '@/hooks/shop/use-shop-filters';
 import { useAddToCart } from '@/hooks/use-add-to-cart';
 import AppLayout from '@/layouts/app-layout';
+import { index } from '@/routes/shop';
 import { Category, PaginatedResponse, Product } from '@/types';
 import { PriceRange, ShopFilters } from '@/types/shop';
-import { Head, usePage } from '@inertiajs/react';
-import { useRef } from 'react';
-
+import { Head, router, usePage } from '@inertiajs/react';
+import pickBy from 'lodash.pickby';
+import { useEffect, useState } from 'react';
+import { usePrevious } from 'react-use';
+import { useDebounce } from 'use-debounce';
 type ShopPageProps = {
     products: PaginatedResponse<Product>;
     categories: Category[];
@@ -23,9 +25,48 @@ export default function Index() {
     const { products, categories, price_range, filters } =
         usePage<ShopPageProps>().props;
 
-    const filterState = useShopFilters(filters, price_range);
+    const [values, setValues] = useState({
+        search: filters.search || '',
+        categories: filters.categories || [],
+        min_price: price_range.min,
+        max_price: price_range.max,
+    });
 
-    const inputRef = useRef<HTMLInputElement>(null);
+    const handleFilterChange = (
+        values: Record<string, any>,
+        prevValues: Record<string, any> | undefined,
+    ) => {
+        if (!prevValues) return;
+        const query = Object.keys(pickBy(values)).length ? pickBy(values) : {};
+
+        router.get(index.url(), query, {
+            replace: true,
+            preserveState: true,
+        });
+    };
+
+    const handleChange = (name: string, value: any) => {
+        setValues((values) => ({
+            ...values,
+            [name]: value,
+        }));
+    };
+
+    const handelReset = () => {
+        setValues({
+            search: '',
+            categories: [],
+            min_price: price_range.min,
+            max_price: price_range.max,
+        });
+    };
+
+    const prevValues = usePrevious(values);
+    const [debounceValues] = useDebounce(values, 500);
+
+    useEffect(() => {
+        handleFilterChange(debounceValues, prevValues);
+    }, [debounceValues]);
 
     return (
         <AppLayout>
@@ -34,17 +75,18 @@ export default function Index() {
                 <aside>
                     <ShopFiltersSidebar
                         categories={categories}
-                        selectedCategories={filterState.categories}
-                        toggleCategory={filterState.toggleCategory}
-                        priceRange={filterState.priceRange}
-                        setPriceRange={filterState.setPriceRange}
-                        serverPriceRange={price_range}
-                        reset={filterState.reset}
+                        values={values}
+                        onChange={handleChange}
+                        onReset={handelReset}
+                        priceRange={price_range}
                     />
                 </aside>
 
                 <div className="lg:col-span-3">
-                    <ShopSearchBar />
+                    <ShopSearchBar
+                        value={values.search}
+                        onChange={(value) => handleChange('search', value)}
+                    />
                     <ShopProductGrid
                         products={products}
                         addToCart={addToCart}

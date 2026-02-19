@@ -6,35 +6,48 @@ import { ShopPriceRangeFilter } from './ShopPriceRangeFilter';
 
 interface Props {
     categories: Category[];
-    selectedCategories: string[];
-    toggleCategory: (slug: string) => void;
-    priceRange: number[];
-    setPriceRange: (v: number[]) => void;
-    serverPriceRange: { min: number; max: number };
-    reset: () => void;
+    values: {
+        categories: string[];
+        min_price: number;
+        max_price: number;
+    };
+    priceRange: {
+        min: number;
+        max: number;
+    };
+    onChange: (name: string, value: any) => void;
+    onReset: () => void;
 }
-
-export function ShopFiltersSidebar(props: Props) {
+export function ShopFiltersSidebar({
+    categories,
+    values,
+    priceRange,
+    onChange,
+    onReset,
+}: Props) {
     return (
         <div className="sticky top-24 rounded-lg bg-card p-6 shadow-card">
             <h2 className="mb-6 text-xl font-bold">Filters</h2>
 
             <Label>Categories</Label>
             <ShopCategoryFilter
-                categories={props.categories}
-                selected={props.selectedCategories}
-                toggle={props.toggleCategory}
+                categories={categories}
+                values={values.categories}
+                onChange={onChange}
             />
 
             <Label className="mt-6">Price Range</Label>
             <ShopPriceRangeFilter
-                value={props.priceRange}
-                min={props.serverPriceRange.min}
-                max={props.serverPriceRange.max}
-                onChange={props.setPriceRange}
+                value={[values.min_price, values.max_price]}
+                min={priceRange.min}
+                max={priceRange.max}
+                onChange={(range: number[]) => {
+                    onChange('min_price', range[0]);
+                    onChange('max_price', range[1]);
+                }}
             />
 
-            <Button className="mt-6 w-full" onClick={props.reset}>
+            <Button onClick={onReset} className="mt-6 w-full">
                 Reset Filters
             </Button>
         </div>

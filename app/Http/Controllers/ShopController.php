@@ -29,7 +29,7 @@ class ShopController extends Controller
                     userId: request()->user()?->id, 
                     relations: ['category:id,name'],
                     columns: ['id', 'category_id', 'name', 'description', 'price', 'stock', 'ratings_count', 'ratings_sum', 'image_url', 'average_rating', 'slug'],
-                    filters: Request::only('search', 'categories')
+                    filters: Request::only('search', 'categories', 'min_price', 'max_price')
                 ),
             ),
             'categories' => fn () => CategoryResource::collection($this->categoryRepository->getOnlyWithProducts()),

@@ -3,18 +3,24 @@ import { Category } from '@/types';
 
 interface Props {
     categories: Category[];
-    selected: string[];
-    toggle: (slug: string) => void;
+    values: string[];
+    onChange: (name: string, value: any) => void;
 }
 
-export function ShopCategoryFilter({ categories, selected, toggle }: Props) {
+export function ShopCategoryFilter({ categories, values, onChange }: Props) {
+    const toggle = (slug: string) => {
+        const updated = values.includes(slug)
+            ? values.filter((s) => s !== slug)
+            : [...values, slug];
+        onChange('categories', updated);
+    };
     return (
         <div className="space-y-3">
             {categories.map((category) => (
                 <div key={category.slug} className="flex gap-2">
                     <Checkbox
                         id={`cat-${category.slug}`}
-                        checked={selected.includes(category.slug)}
+                        checked={values.includes(category.slug)}
                         onCheckedChange={() => toggle(category.slug)}
                     />
                     <label htmlFor={`cat-${category.slug}`}>
