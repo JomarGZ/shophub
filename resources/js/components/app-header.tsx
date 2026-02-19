@@ -54,7 +54,7 @@ const mainNavItems: NavItem[] = [
 const rightNavItems: NavItem[] = [];
 
 const activeItemStyles =
-    'text-neutral-900 dark:bg-neutral-800 dark:text-neutral-100';
+    'text-accent-foreground dark:bg-neutral-800 dark:text-neutral-100 bg-accent';
 
 interface AppHeaderProps {
     breadcrumbs?: BreadcrumbItem[];

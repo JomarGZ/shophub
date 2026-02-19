@@ -18,13 +18,31 @@ class ShopController extends Controller
 
     public function index()
     {
+        $filters = Request::only('search', 'categories', 'min_price', 'max_price');
+
         return Inertia::render('shop/index', [
-            'filters' => Request::only('search', 'categories', 'min_price', 'max_price'),
-            'price_range' => fn () => $this->productRepository->getPriceRange(
-                Request::only('search', 'categories')
-            ),
+            'filters' => $filters,
+            'price_range' => fn () => $this->productRepository->getPriceRange(Request::only('search', 'categories')),
             'products' => fn () => ProductResource::collection(
-                $this->productRepository->paginateWithWishlist(12, request()->user()?->id),
+                $this->productRepository->paginateWithWishlist(
+                    perPage: 9,
+                    userId: request()->user()?->id,
+                    relations: ['category:id,name'],
+                    columns: [
+                        'id',
+                        'category_id',
+                        'name',
+                        'description',
+                        'price',
+                        'stock',
+                        'ratings_count',
+                        'ratings_sum',
+                        'image_url',
+                        'average_rating',
+                        'slug',
+                    ],
+                    filters: $filters
+                )
             ),
             'categories' => fn () => CategoryResource::collection($this->categoryRepository->getOnlyWithProducts()),
             'focus' => Request::get('focus'),

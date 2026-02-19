@@ -1,7 +1,7 @@
 import { FeaturedProducts } from '@/components/products/featured-products';
-import { Cta } from '@/components/sections/welcome/cta';
-import { Features } from '@/components/sections/welcome/features';
-import { Hero } from '@/components/sections/welcome/hero';
+import { Cta } from '@/components/welcome/cta';
+import { Features } from '@/components/welcome/features';
+import { Hero } from '@/components/welcome/hero';
 import AppLayout from '@/layouts/app-layout';
 import { Product, type BreadcrumbItem } from '@/types';
 import { Head, usePage } from '@inertiajs/react';
