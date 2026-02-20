@@ -19,7 +19,6 @@ class ShopController extends Controller
     public function index()
     {
         $filters = Request::only('search', 'categories', 'min_price', 'max_price');
-
         return Inertia::render('shop/index', [
             'filters' => $filters,
             'price_range' => fn () => $this->productRepository->getPriceRange(Request::only('search', 'categories')),

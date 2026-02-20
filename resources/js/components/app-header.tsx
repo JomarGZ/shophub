@@ -101,7 +101,6 @@ export function AppHeader({ breadcrumbs = [] }: AppHeaderProps) {
                                                     key={item.title}
                                                     href={item.href}
                                                     className="flex items-center space-x-2 font-medium"
-                                                    prefetch
                                                 >
                                                     {item.icon && (
                                                         <Icon
@@ -144,11 +143,7 @@ export function AppHeader({ breadcrumbs = [] }: AppHeaderProps) {
                         </Sheet>
                     </div>
 
-                    <Link
-                        href={home()}
-                        prefetch
-                        className="flex items-center space-x-2"
-                    >
+                    <Link href={home()} className="flex items-center space-x-2">
                         <AppLogo />
                     </Link>
 
@@ -163,7 +158,6 @@ export function AppHeader({ breadcrumbs = [] }: AppHeaderProps) {
                                     >
                                         <Link
                                             href={item.href}
-                                            prefetch
                                             className={cn(
                                                 navigationMenuTriggerStyle(),
                                                 page.url ===

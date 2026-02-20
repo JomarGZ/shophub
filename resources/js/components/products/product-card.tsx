@@ -11,7 +11,6 @@ import { Card, CardContent, CardFooter } from '../ui/card';
 interface ProductCardProps {
     product: Product;
     onAddToCart?: (product: Product) => void;
-    toggleFavorite?: (product: Product) => void;
     loading: boolean;
     isFavorite?: boolean;
 }

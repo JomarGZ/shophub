@@ -48,13 +48,14 @@ export default function Show({
             WishlistToggleController(slug),
             {},
             {
-                only: ['product'],
                 preserveScroll: true,
-                onSuccess: () => {
-                    toast.success('Added to wishlist successfully!');
-                },
                 onStart: () => setFavoriteLoading(true),
-                onFinish: () => setFavoriteLoading(false),
+                onFinish: () => {
+                    setFavoriteLoading(false);
+                },
+                onSuccess: ({ props }) => {
+                    toast.success(props.flash?.success);
+                },
             },
         );
     };

@@ -14,7 +14,7 @@ class WishlistController extends Controller
     public function index(Request $request)
     {
         $user = $request->user();
-        $wishlistProducts = $this->productRepository->paginateWishlistProducts(userId: $user->id, columns: ['name', 'slug', 'price', 'image_url',  'category_id', 'id', 'stock', 'ratings_count', 'average_rating'], relations: ['category:id,name'], perPage: 12);
+        $wishlistProducts = $this->productRepository->paginateWishlistProducts(userId: $user->id, columns: ['name', 'slug', 'price', 'image_url',  'category_id', 'id', 'stock', 'ratings_count', 'average_rating'], relations: ['category:id,name'], perPage: 9);
 
         return Inertia::render('favorites/index', [
             'wishlist_products' => ProductResource::collection($wishlistProducts),
