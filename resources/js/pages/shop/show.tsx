@@ -53,8 +53,8 @@ export default function Show({
                 onFinish: () => {
                     setFavoriteLoading(false);
                 },
-                onSuccess: () => {
-                    toast.success('Wishlist updated!');
+                onSuccess: ({ props }) => {
+                    toast.success(props.flash?.success);
                 },
             },
         );
