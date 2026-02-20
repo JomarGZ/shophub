@@ -18,7 +18,7 @@ class WishlistToggleController extends Controller
         Product $product,
         WishlistService $wishlistService
     ) {
-        $added = $wishlistService->toggle(auth()->id(), $product->id);
+        $added = $wishlistService->toggle(request()->user()?->id, $product->id);
         
         return redirect()->route('wishlist.index')->with('success', $added ? "Product added to wishlist" : "Product removed from wishlist");
     }
