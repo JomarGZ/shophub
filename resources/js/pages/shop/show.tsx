@@ -48,7 +48,6 @@ export default function Show({
             WishlistToggleController(slug),
             {},
             {
-                only: ['product'],
                 preserveScroll: true,
                 onSuccess: () => {
                     toast.success('Added to wishlist successfully!');

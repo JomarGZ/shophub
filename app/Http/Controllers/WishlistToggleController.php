@@ -20,6 +20,6 @@ class WishlistToggleController extends Controller
     ) {
         $wishlistService->toggle(auth()->id(), $product->id);
 
-        return redirect()->back();
+        return redirect()->route('wishlist.index');
     }
 }
