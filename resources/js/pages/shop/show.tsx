@@ -49,11 +49,13 @@ export default function Show({
             {},
             {
                 preserveScroll: true,
-                onSuccess: () => {
-                    toast.success('Added to wishlist successfully!');
-                },
                 onStart: () => setFavoriteLoading(true),
-                onFinish: () => setFavoriteLoading(false),
+                onFinish: () => {
+                    setFavoriteLoading(false);
+                },
+                onSuccess: () => {
+                    toast.success('Wishlist updated!');
+                },
             },
         );
     };
